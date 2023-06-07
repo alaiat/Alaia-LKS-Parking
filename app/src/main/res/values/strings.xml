@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ParkingAlaiaT</string>
+    <string name="loginText">Login</string>
+    <string name="loginButton">Login</string>
+    <string name="registerText">Register</string>
+    <string name="registerUsername">Username</string>
+    <string name="registerEmail">Email</string>
+    <string name="registerPassword">Password</string>
+    <string name="registerTologin_link">Already have an account? Login</string>
+    <string name="loginToRegister_link">Dont have an account? Register</string>
+    <string name="Er"></string>
+
+</resources>
