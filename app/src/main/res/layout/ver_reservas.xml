@@ -4,68 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Perfil">
+    tools:context=".VerReservas">
 
-<!-- activity_reservations.xml -->
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints="Idatzi"
+        android:maxLines="1"
+        android:singleLine="true"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mis Reservas"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp"/>
-
-            <!-- Aquí se repetirá la siguiente sección para cada reserva -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#EEEEEE"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:id="@+id/textViewParkingNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Número de Plaza: 123"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/textViewDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fecha: 10/06/2023"
-                    android:textSize="16sp"
-                    android:textColor="#666666"
-                    android:layout_marginTop="8dp"/>
-
-                <TextView
-                    android:id="@+id/textViewHours"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Horas de Reserva: 09:00 - 11:00"
-                    android:textSize="16sp"
-                    android:textColor="#666666"
-                    android:layout_marginTop="8dp"/>
-
-            </LinearLayout>
-            <!-- Fin de la sección repetida -->
-
-        </LinearLayout>
-    </ScrollView>
-
-
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Añadir"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReserva"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintVertical_bias="0"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

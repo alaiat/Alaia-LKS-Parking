@@ -23,6 +23,7 @@
         <activity android:name=".Register" />
         <activity android:name=".NuevaReserva" />
         <activity android:name=".Perfil" />
+        <activity android:name=".VerReservas" />
     </application>
 
 </manifest>
