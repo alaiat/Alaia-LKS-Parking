@@ -34,15 +34,50 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Horas"
+            android:text="Hora de Inicio"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"/>
 
-        <Spinner
-            android:id="@+id/spinnerHours"
+        <Button
+            android:id="@+id/buttonStartTime"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Elegir Hora de Inicio"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/textViewStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora de Inicio seleccionada"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora Final"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/buttonEndTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Elegir Hora Final"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/textViewEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora Final seleccionada"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -80,7 +115,5 @@
             android:layout_marginTop="24dp"/>
 
     </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
