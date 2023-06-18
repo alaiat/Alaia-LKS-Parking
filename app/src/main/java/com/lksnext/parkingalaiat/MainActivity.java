@@ -16,6 +16,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private ParkingLot parking;
@@ -27,12 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private Button registerB;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent(MainActivity.this, VerReservas.class);
+
+        Intent intent = new Intent(MainActivity.this, Login.class);
         startActivity(intent);
         initUi();
     }
@@ -46,14 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private void initializeDatabase() {
         parking=new ParkingLot("parkina","helbidea");
 
-        User user1=new User("user1","user1@email.com");
-        User user2=new User("user2","user2@email.com");
-        User user3=new User("user3","user3@email.com");
 
-        userList.add(user1);
-        userList.add(user2);
-        userList.add(user3);
-        System.out.println("Lista: "+userList.toString());
 
 
 
@@ -75,22 +74,7 @@ public class MainActivity extends AppCompatActivity {
         parking.addSpot(spot6);
         parking.addSpot(spot7);
 
-        // Get the current date and time
-       /* Calendar calendar = Calendar.getInstance();
 
-        // Set the time for the first date: today at 12:30
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND, 0);
-        Date date1 = calendar.getTime();
-
-        // Set the time for the second date: today at 19:00
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        Date date2 = calendar.getTime();
-
-        Reserva r1=new Reserva(user1,spot0,date1,date2);*/
 
     }
 

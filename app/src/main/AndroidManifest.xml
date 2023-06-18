@@ -24,6 +24,10 @@
         <activity android:name=".NuevaReserva" />
         <activity android:name=".Perfil" />
         <activity android:name=".VerReservas" />
+        <meta-data
+            android:name="com.google.firebase.firestore.FirebaseFirestoreRegistrar"
+            android:value="firestore_prod" />
+
     </application>
 
 </manifest>

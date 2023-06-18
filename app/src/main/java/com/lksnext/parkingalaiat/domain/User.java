@@ -6,17 +6,20 @@ import java.util.Date;
 import java.util.List;
 
 public class User {
-    private String id;
+    private String userId;
     private String name;
     private String email;
+    private String phoneNumber;
+
 
     private List<Reserva> reservas;
 
 
-    public User(String nombre, String correoElectronico) {
-        //this.id = id;
+    public User(String id,String nombre, String correoElectronico, String phoneNum) {
+        this.userId = id;
         this.name = nombre;
         this.email = correoElectronico;
+        this.phoneNumber=phoneNum;
         //reservas=new ArrayList<Reserva>();
     }
 
@@ -28,14 +31,6 @@ public class User {
 
     public void setReservas(List<Reserva> reservas) {
         this.reservas = reservas;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
