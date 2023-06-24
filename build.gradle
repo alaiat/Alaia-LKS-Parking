@@ -9,10 +9,9 @@ buildscript {
 plugins {
     id 'com.android.application' version '7.4.1' apply false
     id 'com.android.library' version '7.4.1' apply false
-}
-plugins {
     id "org.sonarqube" version "4.2.1.3168"
 }
+
 
 sonarqube {
     properties {
