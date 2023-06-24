@@ -21,7 +21,8 @@
         </activity>
         <activity android:name=".Login" />
         <activity android:name=".Register" />
-        <activity android:name=".NuevaReserva" />
+        <activity android:name=".NuevaReservaOld" />
+        <activity android:name=".VerReservasPruebaSQLDatabase" />
         <activity android:name=".Perfil" />
         <activity android:name=".VerReservas" />
         <meta-data

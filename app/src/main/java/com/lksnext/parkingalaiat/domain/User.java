@@ -1,8 +1,5 @@
 package com.lksnext.parkingalaiat.domain;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class User {
@@ -12,7 +9,7 @@ public class User {
     private String phoneNumber;
 
 
-    private List<Reserva> reservas;
+    private List<ReservaOld> reservas;
 
 
     public User(String id,String nombre, String correoElectronico, String phoneNum) {
@@ -25,11 +22,11 @@ public class User {
 
     // Getters y setters
 
-    public List<Reserva> getReservas() {
+    public List<ReservaOld> getReservas() {
         return reservas;
     }
 
-    public void setReservas(List<Reserva> reservas) {
+    public void setReservas(List<ReservaOld> reservas) {
         this.reservas = reservas;
     }
 

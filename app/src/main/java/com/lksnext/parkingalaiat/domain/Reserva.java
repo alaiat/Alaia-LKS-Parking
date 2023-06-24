@@ -1,57 +1,75 @@
 package com.lksnext.parkingalaiat.domain;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Date;
 
+@Entity(tableName = "reserva_table")
 public class Reserva {
+    public int getId() {
+        return id;
+    }
 
-    private User user;
-    private Spot spot;
-    private Date startTime;
-    private Date endTime;
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public Reserva(User user, Spot spot, Date startTime, Date endTime) {
-        this.user = user;
-        this.spot = spot;
-        this.startTime = startTime;
-        this.endTime = endTime;
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    public String type;
+    public String startHour;
+    public String endHour;
+    public String date;
+    public Boolean status;
+
+    public Reserva(String type, String startHour, String endHour, String date,Boolean status) {
+        this.type = type;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.date = date;
+        this.status=status;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(String startHour) {
+        this.startHour = startHour;
+    }
+
+    public String getEndHour() {
+        return endHour;
+    }
+
+    public void setEndHour(String endHour) {
+        this.endHour = endHour;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Spot getSpot() {
-        return spot;
-    }
-
-    public void setSpot(Spot spot) {
-        this.spot = spot;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-
-    public boolean isOverlapping(Reserva other) {
-        //return startTime.before(other.getEndTime()) && other.getStartTime().before(endTime);
-        return false;
-    }
 }

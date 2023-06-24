@@ -1,13 +1,10 @@
 package com.lksnext.parkingalaiat;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,7 +15,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.auth.AuthResult;
 
 
 public class Login extends AppCompatActivity {
@@ -69,24 +65,28 @@ public class Login extends AppCompatActivity {
     private void initListeners(){
         button.setOnClickListener(v ->{ login(); });
         createAcco.setOnClickListener(view -> {changeToRegister();});
-        changeP.setOnClickListener(view -> {changeToChangePassword();});
+        //changeP.setOnClickListener(view -> {changeToChangePassword();});
+        edPassword.setOnClickListener(view ->{password.setError(null);});
 
     }
 
-    private void changeToChangePassword() {
-    }
 
-    private void login(){
+
+    public void login(){
+        String em=edEmail.getText().toString();
+        String pass=edPassword.getText().toString();
         try{
-            mAuth.signInWithEmailAndPassword(edEmail.getText().toString(), edPassword.getText().toString())
+            mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             // Login successful
                             FirebaseUser user = mAuth.getCurrentUser();
                             // Handle the authenticated user (e.g., proceed to the main screen)
-                            showSuccessDialog();
+                            //showSuccessDialog();
+                            changeToVerReservas();
                         } else {
                             // Login failed
+                            showErrorDialog();
                             // Handle the failure scenario (e.g., display an error message)
 
                         }
@@ -96,6 +96,13 @@ public class Login extends AppCompatActivity {
         }
 
     }
+
+    private void changeToVerReservas() {
+        Intent intent = new Intent(Login.this, VerReservas.class);
+        startActivity(intent);
+        password.setError(null);
+    }
+
     private void showErrorDialog(){
         new MaterialAlertDialogBuilder(context)
                 .setTitle("Could not login")
@@ -103,12 +110,12 @@ public class Login extends AppCompatActivity {
                 .setPositiveButton("OK", (dialog, which) -> {
                     // Handle positive button click
                     dialog.dismiss();
-                    password.setError("");
+                    password.setError("Incorrect password");
 
                 })
                 .show();
     }
-    private void changeToRegister(){
+    public void changeToRegister(){
         Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
         password.setError(null);
@@ -120,6 +127,7 @@ public class Login extends AppCompatActivity {
                 .setPositiveButton("OK", (dialog, which) -> {
                     // Handle positive button click
                     dialog.dismiss();
+                    password.setError(null);
 
 
                 })

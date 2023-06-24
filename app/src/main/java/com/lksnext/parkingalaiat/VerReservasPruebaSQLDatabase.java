@@ -1,16 +1,16 @@
 package com.lksnext.parkingalaiat;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -21,9 +21,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class VerReservas extends AppCompatActivity {
+public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
+
+    private ReservaViewModel reservaViewModel;
 
 
     List<Reserva> reservas;
@@ -40,16 +41,41 @@ public class VerReservas extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ver_reserva_view);
-        //initUi();
+
+        final ReservaAdapter adapter=new ReservaAdapter();
+        RecyclerView recyclerView= findViewById(R.id.listRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+        reservaViewModel = new ViewModelProvider(this).get(ReservaViewModel.class);
+        reservaViewModel.getAllReservas().observe(this, new Observer<List<Reserva>>() {
+            @Override
+            public void onChanged(List<Reserva> reservas) {
+                adapter.setItems(reservas);
+            }
+        });
+
+
+
+       // initUi();
 
     }
-    /*
+
+    public void setAdapter(){
+        adapter=new ReservaAdapter();
+        RecyclerView recyclerView= findViewById(R.id.listRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        //changeDataToActive();
+    }
     public void initUi(){
 
 
-        initData();
-        initView();
-        initListeners();
+        //initData();
+        //initView();
+        //initListeners();
     }
     private void sortReservas(List<Reserva> lista){
         ReservaSorter rs = new ReservaSorter();
@@ -106,7 +132,7 @@ public class VerReservas extends AppCompatActivity {
         ((NuevaReserva) dialog).setCallback(new NuevaReserva.Callback() {
             @Override
             public void onActionClick(String name) {
-                Toast.makeText(VerReservas.this, name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerReservasPruebaSQLDatabase.this, name, Toast.LENGTH_SHORT).show();
             }
         });
         dialog.show(getSupportFragmentManager(), "tag");
@@ -167,15 +193,7 @@ public class VerReservas extends AppCompatActivity {
         setAdapter();
 
     }
-    public void setAdapter(){
-        adapter=new ReservaAdapter(reservas,this);
-        RecyclerView recyclerView= findViewById(R.id.listRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
 
-        changeDataToActive();
-    }
     public void checkElementStatus(Reserva element) {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -202,5 +220,5 @@ public class VerReservas extends AppCompatActivity {
             inactivasList.add(element);
 
         }
-    }*/
+    }
 }
