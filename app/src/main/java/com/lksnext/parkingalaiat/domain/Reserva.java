@@ -21,9 +21,9 @@ public class Reserva {
     public String startHour;
     public String endHour;
     public String date;
-    public Boolean status;
+    public String status;
 
-    public Reserva(String type, String startHour, String endHour, String date,Boolean status) {
+    public Reserva(String type, String startHour, String endHour, String date,String status) {
         this.type = type;
         this.startHour = startHour;
         this.endHour = endHour;
@@ -31,11 +31,11 @@ public class Reserva {
         this.status=status;
     }
 
-    public Boolean getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

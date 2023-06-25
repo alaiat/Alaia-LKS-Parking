@@ -35,10 +35,6 @@ import java.util.Map;
 
 public class Register extends AppCompatActivity {
 
-
-
-
-
     private Button button;
     private TextView link;
 
@@ -62,13 +58,6 @@ public class Register extends AppCompatActivity {
     private TextInputEditText edSecondPassword;
 
     private LinearProgressIndicator progressIndicator;
-
-
-
-
-
-
-
 
 
     @Override
@@ -118,7 +107,7 @@ public class Register extends AppCompatActivity {
         progressIndicator.setProgressCompat(0, true);
         progressIndicator.setIndicatorColor(getResources().getColor(R.color.red));
 
-
+        setTitle("");
 
 
     }

@@ -11,11 +11,15 @@ import java.util.List;
 public class ReservaRepository {
     private FuncionalidadesConReservas funcionalidades;
     private LiveData<List<Reserva>> allReservas;
+    private LiveData<List<Reserva>> reservasActivas;
+    private LiveData<List<Reserva>> reservasInactivas;
 
     public ReservaRepository(Application aplication){
         ReservaDatabase db=ReservaDatabase.getInstance(aplication);
         funcionalidades=db.funcionalidades();
         allReservas= funcionalidades.getAllReservas();
+        reservasActivas= funcionalidades.getReservasActivas();
+        reservasInactivas= funcionalidades.getReservasInactivas();
     }
     public void insert(Reserva reserva){
         new InsertReservaAsyncTask(funcionalidades).execute(reserva);
@@ -32,6 +36,12 @@ public class ReservaRepository {
     }
     public LiveData<List<Reserva>> getAllreservas() {
         return allReservas;
+    }
+    public LiveData<List<Reserva>> getReservasInactivas() {
+        return reservasInactivas;
+    }
+    public LiveData<List<Reserva>> getReservasActivas() {
+        return reservasActivas;
     }
     private static class InsertReservaAsyncTask extends AsyncTask<Reserva,Void,Void> {
 

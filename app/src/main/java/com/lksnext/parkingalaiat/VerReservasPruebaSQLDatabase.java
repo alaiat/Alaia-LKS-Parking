@@ -1,6 +1,9 @@
 package com.lksnext.parkingalaiat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -23,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
+    public static final int ADD_RESERVA_REQUEST = 1;
+
 
     private ReservaViewModel reservaViewModel;
 
@@ -30,8 +35,8 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
     List<Reserva> reservas;
     List<Reserva> allReservas;
 
-    List<Reserva> activasList;
-    List<Reserva> inactivasList;
+    List<Reserva> activasList=new ArrayList<>();
+    List<Reserva> inactivasList=new ArrayList<>();
     Button activas,inactivas;
     MaterialButtonToggleGroup toggleGroup;
     private FloatingActionButton nReservaButton;
@@ -42,6 +47,20 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ver_reserva_view);
 
+
+       initUi();
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.top_bar_app, menu);
+
+        setTitle("Mis reservas");
+        return true;
+    }
+
+    public void setAdapter(){
         final ReservaAdapter adapter=new ReservaAdapter();
         RecyclerView recyclerView= findViewById(R.id.listRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -50,23 +69,17 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
         reservaViewModel = new ViewModelProvider(this).get(ReservaViewModel.class);
         reservaViewModel.getAllReservas().observe(this, new Observer<List<Reserva>>() {
             @Override
-            public void onChanged(List<Reserva> reservas) {
+            public void onChanged(List<Reserva> reservasList) {
+                allReservas=reservasList;
+                reservas=reservasList;
+                for(Reserva a:allReservas){
+                    checkElementStatus(a);
+                }
                 adapter.setItems(reservas);
+                //changeDataToActive();
             }
         });
 
-
-
-       // initUi();
-
-    }
-
-    public void setAdapter(){
-        adapter=new ReservaAdapter();
-        RecyclerView recyclerView= findViewById(R.id.listRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
 
         //changeDataToActive();
     }
@@ -74,8 +87,8 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
 
 
         //initData();
-        //initView();
-        //initListeners();
+        initView();
+        initListeners();
     }
     private void sortReservas(List<Reserva> lista){
         ReservaSorter rs = new ReservaSorter();
@@ -128,14 +141,16 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
     }
 
     private void changeToNuevaReserva() {
-        DialogFragment dialog = NuevaReserva.newInstance();
+       /* DialogFragment dialog = NuevaReserva.newInstance();
         ((NuevaReserva) dialog).setCallback(new NuevaReserva.Callback() {
             @Override
             public void onActionClick(String name) {
                 Toast.makeText(VerReservasPruebaSQLDatabase.this, name, Toast.LENGTH_SHORT).show();
             }
         });
-        dialog.show(getSupportFragmentManager(), "tag");
+        dialog.show(getSupportFragmentManager(), "tag");*/
+        Intent intent = new Intent(VerReservasPruebaSQLDatabase.this, NuevaReservaNormal.class);
+        startActivityForResult(intent,ADD_RESERVA_REQUEST);
     }
 
     public void initData(){
@@ -143,14 +158,14 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
         reservas=new ArrayList<>();
         activasList=new ArrayList<>();
         inactivasList=new ArrayList<>();
-        allReservas.add(new Reserva("Electric","08:00","13:00","23/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","13:00","22/06/2023",true));
-        allReservas.add(new Reserva("Electric","16:00","19:00","21/06/2023",true));
-        allReservas.add(new Reserva("Electric","11:00","19:00","23/06/2023",true));
-        allReservas.add(new Reserva("Electric","15:00","09:00","21/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","13:00","19/06/2023",true));
-        allReservas.add(new Reserva("Electric","10:00","15:00","17/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","19:00","03/06/2023",true));
+        allReservas.add(new Reserva("Electric","08:00","13:00","23/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","13:00","22/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","16:00","19:00","21/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","11:00","19:00","23/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","15:00","09:00","21/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","13:00","19/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","10:00","15:00","17/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","03/06/2023","Activo"));
 
         sortReservas(allReservas);
         for(Reserva a : allReservas){
@@ -162,6 +177,7 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
     public void changeDataToActive(){
         reservas.clear();
         reservas.addAll(activasList);
+
         adapter.notifyDataSetChanged();
     }
     public void addDataActive(){
@@ -190,9 +206,12 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
         toggleGroup.check(R.id.activas);
         nReservaButton=findViewById(R.id.nReservaButton);
 
+
+
         setAdapter();
 
     }
+
 
     public void checkElementStatus(Reserva element) {
         LocalDate currentDate = LocalDate.now();
@@ -204,21 +223,38 @@ public class VerReservasPruebaSQLDatabase extends AppCompatActivity {
             LocalTime time=LocalTime.parse(element.getEndHour());
 
             if(now.isAfter(time)){
-                element.setStatus(false);
+                element.setStatus("Inactivo");
                 inactivasList.add(element);
             }else{
-                element.setStatus(true);
+                element.setStatus("Activo");
                 activasList.add(element);
             }
 
         } else if (elementDate.isAfter(currentDate)) {
-            element.setStatus(true);
+            element.setStatus("Activo");
             activasList.add(element);
 
         } else {
-            element.setStatus(false);
+            element.setStatus("Inactivo");
             inactivasList.add(element);
 
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_RESERVA_REQUEST && resultCode == RESULT_OK) {
+            String date = data.getStringExtra(NuevaReservaNormal.EXTRA_DATE);
+            String start = data.getStringExtra(NuevaReservaNormal.EXTRA_START);
+            String end = data.getStringExtra(NuevaReservaNormal.EXTRA_END);
+
+            Reserva res=new Reserva("Normal",start,end,date,"Activo");
+            reservaViewModel.insert(res);
+
+            Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
         }
     }
 }

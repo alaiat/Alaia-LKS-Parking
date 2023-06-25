@@ -13,6 +13,10 @@
 
 
     </style>
+    <style name="CustomMenuItemStyle" parent="@android:style/Widget.PopupMenu">
+        <item name="android:background">@color/purple_700</item>
+    </style>
+
 
 
 

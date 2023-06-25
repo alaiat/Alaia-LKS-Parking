@@ -13,6 +13,8 @@ import java.util.List;
 public class ReservaViewModel extends AndroidViewModel {
     private ReservaRepository repository;
     private LiveData<List<Reserva>> allReservas;
+    private LiveData<List<Reserva>> reservasActivas;
+    private LiveData<List<Reserva>> reservasInactivas;
     public ReservaViewModel(@NonNull Application application) {
         super(application);
         repository=new ReservaRepository(application);
@@ -29,5 +31,11 @@ public class ReservaViewModel extends AndroidViewModel {
     }
     public LiveData<List<Reserva>> getAllReservas(){
         return allReservas;
+    }
+    public LiveData<List<Reserva>> getReservasActivas(){
+        return reservasActivas;
+    }
+    public LiveData<List<Reserva>> getReservasInactivas(){
+        return reservasInactivas;
     }
 }

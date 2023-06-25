@@ -19,12 +19,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
-        <activity android:name=".Register" />
-        <activity android:name=".NuevaReservaOld" />
+        <activity android:name=".Login"/>
+        <activity android:name=".Register"/>
+        <activity android:name=".NuevaReserva"
+            android:parentActivityName=".VerReservas"/>
+        <activity android:name=".NuevaReservaNormal"
+            android:parentActivityName=".VerReservas"/>
         <activity android:name=".VerReservasPruebaSQLDatabase" />
         <activity android:name=".Perfil" />
-        <activity android:name=".VerReservas" />
+        <activity android:name=".VerReservas"/>
         <meta-data
             android:name="com.google.firebase.firestore.FirebaseFirestoreRegistrar"
             android:value="firestore_prod" />

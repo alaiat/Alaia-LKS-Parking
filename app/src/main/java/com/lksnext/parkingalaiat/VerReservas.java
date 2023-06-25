@@ -1,6 +1,9 @@
 package com.lksnext.parkingalaiat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class VerReservas extends AppCompatActivity {
+    public static final int ADD_RESERVA_REQUEST = 1;
 
 
     List<Reserva> reservas;
@@ -40,10 +44,18 @@ public class VerReservas extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ver_reserva_view);
-        //initUi();
+        initUi();
 
     }
-    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.top_bar_app, menu);
+
+        setTitle("Mis reservas");
+        return true;
+    }
+
     public void initUi(){
 
 
@@ -102,14 +114,16 @@ public class VerReservas extends AppCompatActivity {
     }
 
     private void changeToNuevaReserva() {
-        DialogFragment dialog = NuevaReserva.newInstance();
+       /* DialogFragment dialog = NuevaReserva.newInstance();
         ((NuevaReserva) dialog).setCallback(new NuevaReserva.Callback() {
             @Override
             public void onActionClick(String name) {
                 Toast.makeText(VerReservas.this, name, Toast.LENGTH_SHORT).show();
             }
         });
-        dialog.show(getSupportFragmentManager(), "tag");
+        dialog.show(getSupportFragmentManager(), "tag");*/
+        Intent intent = new Intent(VerReservas.this, NuevaReservaNormal.class);
+        startActivityForResult(intent,ADD_RESERVA_REQUEST);
     }
 
     public void initData(){
@@ -117,19 +131,26 @@ public class VerReservas extends AppCompatActivity {
         reservas=new ArrayList<>();
         activasList=new ArrayList<>();
         inactivasList=new ArrayList<>();
-        allReservas.add(new Reserva("Electric","08:00","13:00","23/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","13:00","22/06/2023",true));
-        allReservas.add(new Reserva("Electric","16:00","19:00","21/06/2023",true));
-        allReservas.add(new Reserva("Electric","11:00","19:00","23/06/2023",true));
-        allReservas.add(new Reserva("Electric","15:00","09:00","21/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","13:00","19/06/2023",true));
-        allReservas.add(new Reserva("Electric","10:00","15:00","17/06/2023",true));
-        allReservas.add(new Reserva("Electric","08:00","19:00","03/06/2023",true));
+        allReservas.add(new Reserva("Electric","08:00","13:00","23/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","08:00","13:00","22/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","16:00","19:00","21/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","11:00","19:00","23/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","15:00","09:00","21/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","08:00","13:00","19/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","10:00","15:00","17/06/2023","Inactivo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","03/07/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","03/07/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","01/07/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","30/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","29/06/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","05/07/2023","Activo"));
+        allReservas.add(new Reserva("Electric","08:00","19:00","08/07/2023","Activo"));
 
         sortReservas(allReservas);
         for(Reserva a : allReservas){
             checkElementStatus(a);
         }
+
 
     }
 
@@ -186,21 +207,48 @@ public class VerReservas extends AppCompatActivity {
             LocalTime time=LocalTime.parse(element.getEndHour());
 
             if(now.isAfter(time)){
-                element.setStatus(false);
+                element.setStatus("Inactivo");
                 inactivasList.add(element);
             }else{
-                element.setStatus(true);
+                element.setStatus("Activo");
                 activasList.add(element);
+                System.out.println("Añadido\n\n\n\n\n\n");
             }
 
         } else if (elementDate.isAfter(currentDate)) {
-            element.setStatus(true);
+            element.setStatus("Activo");
             activasList.add(element);
 
         } else {
-            element.setStatus(false);
+            element.setStatus("Inactivo");
             inactivasList.add(element);
 
         }
-    }*/
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_RESERVA_REQUEST && resultCode == RESULT_OK) {
+            String date = data.getStringExtra(NuevaReservaNormal.EXTRA_DATE);
+            String start = data.getStringExtra(NuevaReservaNormal.EXTRA_START);
+            String end = data.getStringExtra(NuevaReservaNormal.EXTRA_END);
+
+            Reserva res=new Reserva("Normal",start,end,date,"Activo");
+            //System.out.println(res.toString());
+            //Reserva res=new Reserva("Electric","08:00","19:00","24/07/2023","Activo");
+            allReservas.add(res);
+            checkElementStatus(res);
+            //HEMENHEMENHEMENHEMEN
+            //sortReservas(allReservas);
+            changeDataToActive();
+            adapter.notifyDataSetChanged();
+
+
+            Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

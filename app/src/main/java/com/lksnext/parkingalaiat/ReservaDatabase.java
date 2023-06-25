@@ -11,8 +11,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.lksnext.parkingalaiat.domain.Reserva;
 
-import org.checkerframework.common.aliasing.qual.NonLeaked;
-
 @Database(entities = {Reserva.class},version=1)
 public abstract class ReservaDatabase  extends RoomDatabase {
 
@@ -43,10 +41,15 @@ public abstract class ReservaDatabase  extends RoomDatabase {
         }
         @Override
         protected Void doInBackground(Void... voids){
-            funcionalidades.insert(new Reserva("Electric","08:00","13:00","23/06/2023",true));
-            funcionalidades.insert(new Reserva("Normal","08:00","13:00","23/06/2023",true));
-            funcionalidades.insert(new Reserva("Normal","08:00","13:00","21/06/2023",true));
-            funcionalidades.insert(new Reserva("Electric","08:00","13:00","20/06/2023",true));
+            funcionalidades.insert(new Reserva("Electric","08:00","13:00","23/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Normal","14:00","19:00","23/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Normal","12:00","14:00","21/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Normal","08:00","11:00","21/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Normal","08:00","09:00","21/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Electric","08:00","13:00","20/07/2023","Activo"));
+            funcionalidades.insert(new Reserva("Electric","08:00","13:00","20/06/2023","Inactivo"));
+            funcionalidades.insert(new Reserva("Electric","08:00","13:00","20/06/2023","Inactivo"));
+            funcionalidades.insert(new Reserva("Electric","08:00","13:00","20/06/2023","Inactivo"));
             return null;
         }
     }

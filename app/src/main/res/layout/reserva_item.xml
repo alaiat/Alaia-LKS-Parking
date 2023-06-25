@@ -16,7 +16,7 @@
         android:orientation="vertical">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="90dp"
             android:orientation="horizontal"
             android:padding="6dp">
             <ImageView
@@ -62,7 +62,8 @@
                         android:text="08:00"
                         android:textColor="@color/black"
                         android:textSize="24sp"
-                        android:textStyle="bold"></TextView>
+                        android:textStyle="bold"
+                        android:singleLine="true"></TextView>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -70,7 +71,8 @@
                         android:text="-"
                         android:textColor="@color/black"
                         android:textSize="24sp"
-                        android:textStyle="bold"></TextView>
+                        android:textStyle="bold"
+                        android:singleLine="true"></TextView>
                     <TextView
                         android:id="@+id/endHour"
                         android:layout_width="match_parent"
@@ -79,7 +81,8 @@
                         android:text="13:00"
                         android:textColor="@color/black"
                         android:textSize="24sp"
-                        android:textStyle="bold"></TextView>
+                        android:textStyle="bold"
+                        android:singleLine="true"></TextView>
 
                 </LinearLayout>
 
@@ -89,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:text="19/06/2023"
                     android:textSize="18sp"
-                    ></TextView>
+                    android:singleLine="true"></TextView>
             </LinearLayout>
 
             <TextView
@@ -103,7 +106,8 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"></TextView>
+                android:layout_alignParentEnd="true"
+                android:singleLine="true"></TextView>
         </RelativeLayout>
     </LinearLayout>
 

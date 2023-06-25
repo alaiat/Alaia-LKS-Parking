@@ -22,12 +22,15 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
     private LayoutInflater mInflater;
     private Context context;
 
-    /*
+
     public ReservaAdapter(List<Reserva> reservas, Context context) {
         this.reservas = reservas;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
-    }*/
+    }
+    public ReservaAdapter() {
+
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -71,11 +74,8 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
             startH.setText(item.getStartHour());
             endH.setText(item.getEndHour());
             date.setText(item.getDate());
-            if(item.getStatus()){
-                status.setText("Activo");
-            }else{
-                status.setText("Inactivo");
-            }
+            status.setText(item.getStatus());
+
 
         }
 

@@ -1,7 +1,18 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3"
+    }
+}
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id "org.sonarqube" version "4.2.1.3168"
+
 }
 
 sonarqube {
@@ -109,5 +120,7 @@ dependencies {
     // optional - Paging 3 Integration
     implementation "androidx.room:room-paging:$room_version"
 }
+
+
 
 

@@ -22,4 +22,8 @@ public interface FuncionalidadesConReservas {
 
     @Query("SELECT * FROM reserva_table")
     LiveData<List<Reserva>> getAllReservas();
+    @Query("SELECT * FROM reserva_table where status='Activo'")
+    LiveData<List<Reserva>> getReservasActivas();
+    @Query("SELECT * FROM reserva_table WHERE status='Inactivo'")
+    LiveData<List<Reserva>> getReservasInactivas();
 }

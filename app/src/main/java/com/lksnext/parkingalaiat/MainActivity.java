@@ -19,9 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
     public ParkingLot parking;
     private List<User> userList;
-
-
-
     private Button loginB;
     private Button registerB;
 
@@ -33,9 +30,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        Intent intent = new Intent(MainActivity.this, VerReservasPruebaSQLDatabase.class);
+        Intent intent = new Intent(MainActivity.this, VerReservas.class);
         startActivity(intent);
         initUi();
+
     }
 
     private void initUi() {
