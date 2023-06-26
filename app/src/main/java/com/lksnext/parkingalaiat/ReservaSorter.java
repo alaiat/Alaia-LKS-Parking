@@ -37,19 +37,16 @@ public class ReservaSorter {
             LocalDate date1 = LocalDate.parse(element1.getDate(),formatter);
             LocalDate date2 = LocalDate.parse(element2.getDate(),formatter);
 
-            LocalTime time=LocalTime.parse(element1.getEndHour());
-            LocalTime time2=LocalTime.parse(element2.getEndHour());
-
-            // Calculate the difference between the dates and final hours
-            int dateDifference1 = Math.abs(today.compareTo(date1));
-            int dateDifference2 = Math.abs(today.compareTo(date2));
-
-
-            // Compare the differences, giving priority to proximity to today's date
-            if (dateDifference1 != dateDifference2) {
-                return Integer.compare(dateDifference1, dateDifference2);
+            int dateComparison = date1.compareTo(date2);
+            if (dateComparison != 0) {
+                // Dates are different, return the result of the date comparison
+                return dateComparison;
             } else {
-                return time.compareTo(time2);
+                // Dates are the same, compare the end hours
+                LocalTime time1 = LocalTime.parse(element1.getEndHour());
+                LocalTime time2 = LocalTime.parse(element2.getEndHour());
+
+                return time1.compareTo(time2);
             }
         }
 

@@ -5,36 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
+
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:tabMode="fixed"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.tabs.TabItem
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectionRequired="true">
+        <Button
+            style="?attr/materialButtonOutlinedStyle"
             android:id="@+id/activas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Activas"
-            android:icon="@drawable/list_icon"
+            android:text="ACTIVAS"
             />
-
-
-        <com.google.android.material.tabs.TabItem
+        <Button
+            style="?attr/materialButtonOutlinedStyle"
             android:id="@+id/pasadas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pasadas"
-            android:icon="@drawable/historial_icon"
+            android:text="inactivas"
             />
 
-    </com.google.android.material.tabs.TabLayout>
-
-
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
 
 
@@ -50,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabs"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

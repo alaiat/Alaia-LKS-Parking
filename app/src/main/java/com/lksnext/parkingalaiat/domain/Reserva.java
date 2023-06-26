@@ -1,12 +1,19 @@
 package com.lksnext.parkingalaiat.domain;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
-import java.util.Date;
 
-@Entity(tableName = "reserva_table")
 public class Reserva {
+
+
+
+    private int id;
+    public String type;
+    public String startHour;
+    public String endHour;
+    public String date;
+    public String status;
+    public Integer spot;
+
     public int getId() {
         return id;
     }
@@ -15,20 +22,21 @@ public class Reserva {
         this.id = id;
     }
 
-    @PrimaryKey(autoGenerate = true)
-    private int id;
-    public String type;
-    public String startHour;
-    public String endHour;
-    public String date;
-    public String status;
+    public Integer getSpot() {
+        return spot;
+    }
 
-    public Reserva(String type, String startHour, String endHour, String date,String status) {
+    public void setSpot(Integer spot) {
+        this.spot = spot;
+    }
+
+    public Reserva(String type, String startHour, String endHour, String date, String status, Integer spot) {
         this.type = type;
         this.startHour = startHour;
         this.endHour = endHour;
         this.date = date;
         this.status=status;
+        this.spot=spot;
     }
 
     public String getStatus() {

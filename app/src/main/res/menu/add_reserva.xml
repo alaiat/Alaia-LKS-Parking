@@ -4,7 +4,6 @@
 
     <item
         android:id="@+id/save_note"
-        android:icon="@drawable/baseline_add_24"
         android:title="Save"
         app:showAsAction="ifRoom" />
 </menu>

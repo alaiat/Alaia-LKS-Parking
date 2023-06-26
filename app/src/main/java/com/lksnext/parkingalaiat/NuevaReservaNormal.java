@@ -3,6 +3,9 @@ package com.lksnext.parkingalaiat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,17 +37,21 @@ public class NuevaReservaNormal extends AppCompatActivity {
     public static final String EXTRA_STATUS="com.lksnext.parkingalaiat.EXTRA_STATUS";
     public static final String EXTRA_START="com.lksnext.parkingalaiat.EXTRA_START";
     public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
+    public static final String EXTRA_TYPE="com.lksnext.parkingalaiat.EXTRA_TYPE";
 
-    String[] items={"Normal","Motor", "Electric"};
-    String[] spots={"1","2","3","4"};
+    Boolean typeSel=false;
+    Boolean dateSel=false;
+    Boolean startSel=false;
+    Boolean endSel=false;
+    String[] items={"Normal","Motor", "Electric","Handicapped"};
+    String[] spots={"1","2","3","4","5","6","7"};
     AutoCompleteTextView dropdownField,spotList;
     ArrayAdapter<String> adapterItems;
     ArrayAdapter<String> adapterItemsSpot;
-    TextInputLayout date;
+    TextInputLayout date,spotDropDown;
     TextInputLayout startHour,endHour;
     LinearProgressIndicator progress;
     MaterialDatePicker<Long> datePicker;
-    ImageButton close;
     Button search, mapSelect;
 
     TextView action;
@@ -52,8 +59,16 @@ public class NuevaReservaNormal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nueva_reserva);
+        setContentView(R.layout.nueva_reserva_sin_top_bar);
         initUi();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.add_reserva, menu);
+
+        setTitle("Nueva reserva");
+        return true;
     }
 
     private void initUi() {
@@ -62,8 +77,8 @@ public class NuevaReservaNormal extends AppCompatActivity {
     }
 
     private void initView() {
-        close = findViewById(R.id.fullscreen_dialog_close);
-        action = findViewById(R.id.fullscreen_dialog_action);
+        //close = findViewById(R.id.fullscreen_dialog_close);
+        action = findViewById(R.id.save_note);
         search=findViewById(R.id.searchButton);
         date=findViewById(R.id.date);
         mapSelect=findViewById(R.id.selectMap);
@@ -71,6 +86,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
         startHour=findViewById(R.id.startHour);
         endHour=findViewById(R.id.endHour);
         spotList=findViewById(R.id.spots);
+        spotDropDown=findViewById(R.id.spotDropdwon);
         dropdownField=findViewById(R.id.dropdownField);
 
         adapterItems= new ArrayAdapter<String>(this,R.layout.dropdown_list_item,items);
@@ -79,16 +95,21 @@ public class NuevaReservaNormal extends AppCompatActivity {
 
         adapterItemsSpot=new ArrayAdapter<String>(this,R.layout.dropdown_list_item,spots);
         spotList.setAdapter(adapterItemsSpot);
+
+        dropdownField.setBackgroundColor(date.getBoxBackgroundColor());
     }
 
     private void initListeners() {
-        close.setOnClickListener(view -> {close();});
-        action.setOnClickListener(view -> {save();});
+       // close.setOnClickListener(view -> {close();});
+
+       // action.setOnClickListener(view -> {/*save();*/});
         dropdownField.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
                 String item=parent.getItemAtPosition(position).toString();
                // Toast.makeText(getContext(),"Item "+item,Toast.LENGTH_SHORT).show();
+                typeSel=true;
+                checkAllDataFill();
             }
         });
         spotList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -96,12 +117,31 @@ public class NuevaReservaNormal extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent,View view,int position,long id){
                 String item=parent.getItemAtPosition(position).toString();
                // Toast.makeText(this,"Item "+item,Toast.LENGTH_SHORT).show();
+
             }
         });
         date.setStartIconOnClickListener(view ->{showDatePicker();});
         startHour.setStartIconOnClickListener(view->{showStartTimePicker();});
         endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
         search.setOnClickListener(view->{showProgressIndicator();});
+    }
+
+    private void checkAllDataFill() {
+        if(typeSel && dateSel && startSel && endSel){
+            search.setEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_note:
+                // Perform the save action here
+                save();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void showEndTimePicker() {
@@ -118,7 +158,10 @@ public class NuevaReservaNormal extends AppCompatActivity {
             int hour = picker.getHour();
             int minute = picker.getMinute();
             String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-            endHour.getEditText().setText(formattedTime);});
+            endHour.getEditText().setText(formattedTime);
+            endSel=true;
+            checkAllDataFill();
+        });
 
     }
     private void showProgressIndicator() {
@@ -135,7 +178,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
                 // Hide the progress indicator
                 progress.setVisibility(View.INVISIBLE);
                 mapSelect.setVisibility(View.VISIBLE);
-                spotList.setVisibility(View.VISIBLE);
+                spotDropDown.setVisibility(View.VISIBLE);
             }
         }, 3000);
     }
@@ -154,7 +197,10 @@ public class NuevaReservaNormal extends AppCompatActivity {
             int hour = picker.getHour();
             int minute = picker.getMinute();
             String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-            startHour.getEditText().setText(formattedTime);});
+            startHour.getEditText().setText(formattedTime);
+            startSel=true;
+            checkAllDataFill();
+        });
     }
 
     private void showDatePicker() {
@@ -180,31 +226,39 @@ public class NuevaReservaNormal extends AppCompatActivity {
             String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month + 1, year);
 
 
-            date.getEditText().setText(formattedDate);});
+            date.getEditText().setText(formattedDate);
+            dateSel=true;
+            checkAllDataFill();
+        });
     }
 
     private void save() {
         String date=this.date.getEditText().getText().toString();
         String startHour=this.startHour.getEditText().getText().toString();
         String endHour=this.endHour.getEditText().getText().toString();
+        String type=this.dropdownField.getEditableText().toString();
         Boolean status=true;
 
+        if(date.isEmpty() | startHour.isEmpty() | endHour.isEmpty()){
+            spotDropDown.setError(" ");
+            this.date.setError(" ");
+            this.startHour.setError(" ");
+            this.endHour.setError(" ");
+        }else{
+            Intent reserva=new Intent();
+            reserva.putExtra(EXTRA_DATE,date);
+            reserva.putExtra(EXTRA_START,startHour);
+            reserva.putExtra(EXTRA_END,endHour);
+            reserva.putExtra(EXTRA_STATUS,status);
+            reserva.putExtra(EXTRA_TYPE,type);
+            setResult(RESULT_OK, reserva);
+            finish();
+        }
 
 
-        Intent reserva=new Intent();
-        reserva.putExtra(EXTRA_DATE,date);
-        reserva.putExtra(EXTRA_START,startHour);
-        reserva.putExtra(EXTRA_END,endHour);
-        reserva.putExtra(EXTRA_STATUS,status);
-        setResult(RESULT_OK, reserva);
-        finish();
 
 
-    }
 
-    private void close(){
-        Intent intent = new Intent(NuevaReservaNormal.this, VerReservasPruebaSQLDatabase.class);
-        startActivity(intent);
     }
 
 

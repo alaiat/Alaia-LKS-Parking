@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        Intent intent = new Intent(MainActivity.this, VerReservas.class);
+        Intent intent = new Intent(MainActivity.this, Login.class);
         startActivity(intent);
         initUi();
 

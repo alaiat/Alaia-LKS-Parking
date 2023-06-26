@@ -26,7 +26,8 @@
         <activity android:name=".NuevaReservaNormal"
             android:parentActivityName=".VerReservas"/>
         <activity android:name=".VerReservasPruebaSQLDatabase" />
-        <activity android:name=".Perfil" />
+        <activity android:name=".Perfil"
+            android:parentActivityName=".VerReservas"/>
         <activity android:name=".VerReservas"/>
         <meta-data
             android:name="com.google.firebase.firestore.FirebaseFirestoreRegistrar"

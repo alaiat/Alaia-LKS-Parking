@@ -1,20 +1,20 @@
 package com.lksnext.parkingalaiat.domain;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
-@Entity(tableName = "spot_table")
+
+
 public class Spot {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+
+
+    private int number;
     private SpotType type;
     private boolean available;
-    //private ReservationManager reservationManager;
+
 
     public Spot( SpotType type) {
         this.type = type;
         this.available = true;
-        //this.reservationManager = new ReservationManager();
+
     }
 
 
@@ -26,12 +26,12 @@ public class Spot {
         ELECTRIC
     }
 
-    public int getId() {
-        return id;
+    public int getNumber() {
+        return number;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public SpotType getType() {

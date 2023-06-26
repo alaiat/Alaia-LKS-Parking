@@ -58,7 +58,7 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView iconImage;
-        TextView startH, endH, date, status;
+        TextView startH, endH, date, number;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -66,15 +66,33 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
             startH = itemView.findViewById(R.id.startHour);
             endH = itemView.findViewById(R.id.endHour);
             date = itemView.findViewById(R.id.date);
-            status = itemView.findViewById(R.id.status);
+            number = itemView.findViewById(R.id.number);
+
         }
 
         void bindData(final Reserva item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
+            String type=item.getType();
+            if(type.equals("Normal")){
+                iconImage.setImageResource(R.drawable.normal_imagen);
+
+
+            }else if(type.equals("Motor" )){
+                iconImage.setImageResource(R.drawable.moto_imagen);
+
+
+            }else if(type.equals("Electric")){
+                iconImage.setImageResource(R.drawable.electrico_imagen);
+
+            }else if(type.equals("Handicapped")){
+                iconImage.setImageResource(R.drawable.discapacitados_icono);
+            }
+
+
             startH.setText(item.getStartHour());
             endH.setText(item.getEndHour());
             date.setText(item.getDate());
-            status.setText(item.getStatus());
+            number.setText("Nº"+item.getSpot().toString());
 
 
         }

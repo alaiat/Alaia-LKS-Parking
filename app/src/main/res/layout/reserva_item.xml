@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cv"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     app:cardCornerRadius="20dp"
     app:cardElevation="4dp"
@@ -96,13 +96,13 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/status"
+                android:id="@+id/number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="6dp"
                 android:layout_marginRight="6dp"
-                android:text="Activo"
+                android:text="Nº3"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_alignParentRight="true"

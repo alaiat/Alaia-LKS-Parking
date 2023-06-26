@@ -26,7 +26,7 @@ public class Login extends AppCompatActivity {
     private TextInputEditText edPassword;
     private TextView changeP;
     private TextView createAcco;
-
+    private FirebaseManager fireManager;
     private FirebaseAuth mAuth;
     private Context context=this;
 
@@ -35,7 +35,8 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        mAuth=FirebaseAuth.getInstance();
+        //mAuth=FirebaseAuth.getInstance();
+        fireManager=fireManager.getInstance();
         initUi();
     }
 
@@ -76,7 +77,7 @@ public class Login extends AppCompatActivity {
     public void login(){
         String em=edEmail.getText().toString();
         String pass=edPassword.getText().toString();
-        try{
+        /*try{
             mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -94,6 +95,18 @@ public class Login extends AppCompatActivity {
                     });
         }catch(Exception e){
            showErrorDialog();
+        }*/
+        try{
+            boolean success=fireManager.login(em,pass);
+            if(success){
+                changeToVerReservas();
+
+            }else{
+                showErrorDialog();
+
+            }
+        }catch(Exception e){
+            showErrorDialog();
         }
 
     }
