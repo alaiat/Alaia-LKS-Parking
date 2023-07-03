@@ -3,6 +3,7 @@ package com.lksnext.parkingalaiat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcel;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -204,17 +205,46 @@ public class NuevaReservaNormal extends AppCompatActivity {
     }
 
     private void showDatePicker() {
-        CalendarConstraints constraints =
-                new CalendarConstraints.Builder()
-                        .setStart( MaterialDatePicker.todayInUtcMilliseconds())
-                        .setEnd( MaterialDatePicker.todayInUtcMilliseconds() + TimeUnit.DAYS.toMillis(14))
-                        .build();
+        Calendar calendarStart = Calendar.getInstance();
+
+        long today = MaterialDatePicker.todayInUtcMilliseconds();
+        calendarStart.setTimeInMillis(today);
+
+        calendarStart.add(Calendar.DAY_OF_MONTH, 14);
+        long endDate = calendarStart.getTimeInMillis();
+        CalendarConstraints.Builder constraints = new CalendarConstraints.Builder();
+                       // .setStart( MaterialDatePicker.todayInUtcMilliseconds())
+                        //.setEnd( MaterialDatePicker.todayInUtcMilliseconds() + TimeUnit.DAYS.toMillis(14))
+                        //.build();
+        constraints.setStart(today);
+        constraints.setEnd(endDate);
+        CalendarConstraints.DateValidator dateValidator = new CalendarConstraints.DateValidator() {
+            @Override
+            public boolean isValid(long date) {
+                return date >= today && date <= endDate;
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel parcel, int flags) {
+                // No-op
+            }
+        };
+
+// Set the custom date validator
+        constraints.setValidator(dateValidator);
+
 
         datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .setCalendarConstraints(constraints)
+                .setCalendarConstraints(constraints.build())
                 .build();
+
 
         datePicker.show(getSupportFragmentManager(),"tag");
         datePicker.addOnPositiveButtonClickListener(selection->{
@@ -230,6 +260,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
             dateSel=true;
             checkAllDataFill();
         });
+
     }
 
     private void save() {

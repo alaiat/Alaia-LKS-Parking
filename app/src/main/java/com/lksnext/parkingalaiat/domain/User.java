@@ -13,7 +13,14 @@ public class User {
 
 
     public User(String id,String nombre, String correoElectronico, String phoneNum) {
-        this.userId = id;
+        //this.userId = id;
+        this.name = nombre;
+        this.email = correoElectronico;
+        this.phoneNumber=phoneNum;
+        //reservas=new ArrayList<Reserva>();
+    }
+    public User(String nombre, String correoElectronico, String phoneNum) {
+        //this.userId = id;
         this.name = nombre;
         this.email = correoElectronico;
         this.phoneNumber=phoneNum;
@@ -44,6 +51,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber){
+        this.phoneNumber=phoneNumber;
     }
 
     /*public int obtenerDuracionTotalReservasEnDia(Date fecha) {

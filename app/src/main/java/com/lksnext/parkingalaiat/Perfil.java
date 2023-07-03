@@ -1,21 +1,29 @@
 package com.lksnext.parkingalaiat;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.lksnext.parkingalaiat.domain.User;
+import com.lksnext.parkingalaiat.domain.UserContext;
 
 public class Perfil extends AppCompatActivity {
     private ImageView image;
     private TextInputLayout name,phone,email;
     private Button edit,save;
     private String nameD,emailD,phoneD;
+    private FirebaseUser user=UserContext.getInstance().getCurrentUser();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,18 +54,18 @@ public class Perfil extends AppCompatActivity {
     private void save() {
         Boolean error=false;
         String na=name.getEditText().getText().toString();
-        String ema=email.getEditText().getText().toString();
+        //String ema=email.getEditText().getText().toString();
         String pn=phone.getEditText().getText().toString();
 
         if(na.isEmpty()){
             name.setError(" ");
             error=true;
         }
-        if(ema.isEmpty()){
+        /*if(ema.isEmpty()){
             email.setError(" ");
             error=true;
 
-        }
+        }*/
         if(pn.isEmpty()){
             phone.setError(" ");
             error=true;
@@ -65,11 +73,9 @@ public class Perfil extends AppCompatActivity {
         }
         if(!error){
             nameD=na;
-            emailD=ema;
+            //emailD=ema;
             phoneD=pn;
-            name.getEditText().setText(nameD);
-            email.getEditText().setText(emailD);
-            phone.getEditText().setText(phoneD);
+            updateUserData(user.getUid(),nameD,phoneD);
             save.setEnabled(false);
             email.setError(null);
             name.setError(null);
@@ -82,7 +88,7 @@ public class Perfil extends AppCompatActivity {
 
     private void enableEdit() {
         name.setEnabled(true);
-        email.setEnabled(true);
+        //email.setEnabled(true);
         phone.setEnabled(true);
         save.setEnabled(true);
     }
@@ -95,12 +101,61 @@ public class Perfil extends AppCompatActivity {
         edit=findViewById(R.id.edit);
         save=findViewById(R.id.save);
 
-        nameD="Alaia";
-        emailD="lks@gmail.com";
-        phoneD="666777888";
+        showData();
 
-        name.getEditText().setText(nameD);
-        email.getEditText().setText(emailD);
-        phone.getEditText().setText(phoneD);
+
+
+
+
+
+
+
+    }
+
+    private void showData() {
+        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(user.getUid());
+
+        userRef.get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("name");
+                            String phoneNumber = documentSnapshot.getString("phoneNumber");
+                            String email = documentSnapshot
+                                    .getString("email");
+
+                            System.out.println(phoneNumber+"\n\n\n\n\n\n\n\n");
+                            this.name.getEditText().setText(name);
+                            this.phone.getEditText().setText(phoneNumber);
+                            this.email.getEditText().setText(email);
+
+                            // Use the retrieved values as needed
+                        } else {
+                            // User document does not exist
+                        }
+                    } else {
+                        // Error occurred while fetching the user document
+                        Exception exception = task.getException();
+                        // Handle the exception
+                    }
+                });
+    }
+
+
+    public void updateUserData(String userId, String newName, String newPhoneNumber) {
+        DocumentReference userRef =  FirebaseFirestore.getInstance().collection("users").document(userId);
+
+        userRef.update("name", newName, "phoneNumber", newPhoneNumber)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // User data update successful
+                        // Proceed with next steps or show a success message
+                    } else {
+                        // User data update failed
+                        Exception exception = task.getException();
+                        // Handle the exception
+                    }
+                });
     }
 }

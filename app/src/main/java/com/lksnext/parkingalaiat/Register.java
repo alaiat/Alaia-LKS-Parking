@@ -27,9 +27,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.domain.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -248,14 +252,14 @@ public class Register extends AppCompatActivity {
         String pass2=secondPassword.getEditText().getText().toString();
 
             if(makeAllRegisterCheckings(nam,ema,pn,pass,pass2)) {
+
                 mAuth.createUserWithEmailAndPassword(ema, pass)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
+                                // User registration successful
                                 String userId = mAuth.getCurrentUser().getUid();
-                                //saveUserDetails(userId, nam, ema, pn);
+                                saveUserDataToFirestore(userId, ema, nam, pn);
                                 showSuccessDialog();
-                                saveUserData(userId, ema, nam, pn);
-
                             } else {
                                 try {
                                     throw task.getException();
@@ -334,23 +338,6 @@ public class Register extends AppCompatActivity {
         // Check if the string matches the regex pattern
         return str.matches(".*" + specialChars + ".*");
     }
-    /*
-    private void saveUserDetails(String userId, String name, String email, String phoneNumber) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-
-        User newUser = new User(userId, name, email, phoneNumber);
-        usersRef.child(userId).setValue(newUser)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // User details saved successfully
-                        System.out.println("User data saved successfully");
-                    } else {
-                        // Failed to save user details
-                        // Handle error
-                        System.out.println("Error saving user data");
-                    }
-                });
-    }*/
 
 
 
@@ -383,15 +370,17 @@ public class Register extends AppCompatActivity {
 
 
 
-
-    private void saveUserData(String userId, String email, String name, String phoneNumber) {
+/*
+    private void saveUserData(String email, String name, String phoneNumber) {
         // Create a new user with a first and last name
         Map<String, Object> user = new HashMap<>();
-        user.put("first", name);
+        user.put("name", name);
         user.put("email", email);
         user.put("phone number", phoneNumber);
+        user.put("image","profile_image.jpg");
+        user.put("reservas",new ArrayList<>());
 
-// Add a new document with a generated ID
+        // Add a new document with a generated ID
         db.collection("users")
                 .add(user)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -404,6 +393,23 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error adding document", e);
+                    }
+                });
+    }*/
+    private void saveUserDataToFirestore(String userId, String email, String name, String phoneNumber) {
+        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(userId);
+
+        User user = new User(name, email, phoneNumber);
+
+        userRef.set(user)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // User data saved successfully
+                        // Proceed with next steps or show a success message
+                    } else {
+                        // User data save failed
+                        Exception exception = task.getException();
+                        // Handle the exception
                     }
                 });
     }

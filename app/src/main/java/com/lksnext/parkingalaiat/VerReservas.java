@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,13 +19,22 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.lksnext.parkingalaiat.domain.Reserva;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VerReservas extends AppCompatActivity {
     public static final int ADD_RESERVA_REQUEST = 1;
@@ -32,6 +42,7 @@ public class VerReservas extends AppCompatActivity {
 
     List<Reserva> reservas;
     List<Reserva> allReservas;
+    DatabaseReference userRef;
 
     List<Reserva> activasList;
     List<Reserva> inactivasList;
@@ -96,18 +107,7 @@ public class VerReservas extends AppCompatActivity {
 
 
     }
-    private void showErrorDialog(LocalDate donde){
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(donde.toString())
-                .setMessage("The email or password introduced are wrong. Please check and try again")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Handle positive button click
-                    dialog.dismiss();
 
-
-                })
-                .show();
-    }
 
     private void changeToNuevaReserva() {
        /* DialogFragment dialog = NuevaReserva.newInstance();
@@ -188,7 +188,9 @@ public class VerReservas extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
 
-                allReservas.remove(allReservas.get(viewHolder.getAdapterPosition()));
+                //allReservas.remove(allReservas.get(viewHolder.getAdapterPosition()));
+                int swipedPosition = viewHolder.getAdapterPosition();
+                showDeleteDialog(swipedPosition);
                 changeDataToActive();
 
             }
@@ -262,4 +264,117 @@ public class VerReservas extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    private void showDeleteDialog(int position){
+        new MaterialAlertDialogBuilder(this)
+                .setMessage("Are you sure you want to delete the reservation?")
+                .setPositiveButton("DELETE", (dialog, which) -> {
+                    // Handle positive button click
+                    System.out.println(position);
+                    deleteReservation(position);
+                    dialog.dismiss();
+
+
+                }).setNegativeButton("CANCEL", (dialog,which)->{
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void deleteReservation(int position) {
+
+        Map<String, Object> reserva = new HashMap<>();
+        reserva.put("startHour", "08:00");
+        reserva.put("endHour", "10:30");
+        reserva.put("date", "07/11/2023");
+        reserva.put("status","Activo");
+        reserva.put("spot",1);
+        addReservaToUserByEmail("lara@gmail.com",reserva);
+    }
+    /*private void addReservaToUserByEmail(String userEmail, Map<String, Object>  reserva) {
+
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+
+        Query query = usersRef.orderByChild("email").equalTo(userEmail);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String userId = userSnapshot.getKey();
+
+                    // Update the reservas array list of the user
+                    DatabaseReference userReservasRef = usersRef.child(userId).child("reservas");
+                    userReservasRef.push().setValue(reserva)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    // Reserva added to the user successfully
+                                } else {
+                                    // Failed to add reserva to the user
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Error occurred while accessing the database
+            }
+        });
+    }*/
+    private void addReservaToUserByEmail(String userEmail, Map<String, Object>   reserva) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+
+        Query query = usersRef.orderByChild("email").equalTo(userEmail);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String userId = userSnapshot.getKey();
+
+                        // Update the reservas array list of the user
+                        DatabaseReference userReservasRef = usersRef.child(userId).child("reservas");
+                        userReservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                ArrayList<Reserva> reservas;
+                                if (dataSnapshot.exists()) {
+                                    reservas = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Reserva>>() {});
+                                } else {
+                                    reservas = new ArrayList<>();
+                                }
+
+                                // Add the new reserva item to the reservas list
+                                //reservas.add(reserva);
+
+                                // Update the user reference with the modified reservas list
+                                userReservasRef.setValue(reservas)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                // Reserva added to the user successfully
+                                            } else {
+                                                // Failed to add reserva to the user
+                                            }
+                                        });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                // Error occurred while accessing the database
+                            }
+                        });
+                    }
+                } else {
+                    // User does not exist in the database
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Error occurred while accessing the database
+            }
+        });
+    }
+
+
+
 }
