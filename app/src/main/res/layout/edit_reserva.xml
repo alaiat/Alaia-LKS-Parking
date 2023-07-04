@@ -5,57 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:cardBackgroundColor="#5e35b1"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageButton
-                android:id="@+id/fullscreen_dialog_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                android:src="@drawable/baseline_close_24" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:layout_toEndOf="@id/fullscreen_dialog_close"
-                android:text="Nueva Reserva"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/fullscreen_dialog_action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
-                android:text="SAVE"
-                android:textColor="@android:color/white" />
-
-        </RelativeLayout>
-
-
-    </androidx.cardview.widget.CardView>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progress"
@@ -64,7 +14,7 @@
         android:indeterminate="true"
         app:indeterminateAnimationType="disjoint"
         android:visibility="invisible"
-        app:indicatorColor="@color/black"/>
+        app:indicatorColor="@color/purple_500"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -75,39 +25,46 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dropdownField1"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-            android:layout_width="280dp"
+            android:layout_width="310dp"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:hint="Spot type"
-            app:boxBackgroundColor="@color/cardview_light_background"
+            app:boxBackgroundColor="@android:color/system_accent2_200"
             app:boxStrokeColor="@color/purple_500"
             app:hintEnabled="true"
             app:hintTextColor="@color/black"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="120dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:autoHandwritingEnabled="false"
+            android:enabled="false"
+            >
 
             <AutoCompleteTextView
                 android:id="@+id/dropdownField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"></AutoCompleteTextView>
+                android:inputType="none|text"></AutoCompleteTextView>
 
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             style="?attr/textInputFilledStyle"
             android:id="@+id/date"
-            android:layout_width="280dp"
+            android:layout_width="310dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="32dp"
             android:hint="DD/MM/YYYY"
             app:layout_constraintTop_toBottomOf="@id/dropdownField1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:startIconDrawable="@drawable/baseline_calendar_month_24"
             app:endIconMode="clear_text"
+            app:boxBackgroundColor="@android:color/system_accent2_200"
+            android:enabled="false"
+
+
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -120,7 +77,7 @@
 
         <LinearLayout
             android:id="@+id/layout"
-            android:layout_width="280dp"
+            android:layout_width="310dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/date"
@@ -130,14 +87,15 @@
             <com.google.android.material.textfield.TextInputLayout
                 style="?attr/textInputFilledStyle"
                 android:id="@+id/startHour"
-                android:layout_width="135dp"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="32dp"
                 android:hint="Start"
                 app:layout_constraintTop_toBottomOf="@id/date"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:startIconDrawable="@drawable/baseline_access_time_24"
+                app:boxBackgroundColor="@android:color/system_accent2_200"
 
 
                 >
@@ -156,14 +114,15 @@
             <com.google.android.material.textfield.TextInputLayout
                 style="?attr/textInputFilledStyle"
                 android:id="@+id/endHour"
-                android:layout_width="135dp"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="32dp"
                 android:hint="End "
                 app:layout_constraintTop_toBottomOf="@id/date"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:startIconDrawable="@drawable/baseline_access_time_24"
+                app:boxBackgroundColor="@android:color/system_accent2_200"
 
 
                 >
@@ -176,42 +135,28 @@
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
-        <Button
-            android:id="@+id/searchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search available spots"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
-        <LinearLayout
-            android:id="@+id/layout2"
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="50dp"
-            app:layout_constraintTop_toBottomOf="@id/searchButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            >
+
+
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/spotDropdwon"
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                android:layout_width="140dp"
+                android:layout_width="310dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:hint="Spot type"
-                app:boxBackgroundColor="@color/cardview_light_background"
-                app:boxStrokeColor="@color/purple_500"
+                android:hint="Spot Nº"
+                android:layout_marginTop="32dp"
+                app:boxBackgroundColor="@android:color/system_accent2_200"                app:boxStrokeColor="@color/purple_500"
                 app:hintEnabled="true"
-                android:layout_marginTop="16dp"
                 app:hintTextColor="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/searchButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="visible"
+                android:autoHandwritingEnabled="false"
+                android:enabled="false"
+
                 >
 
                 <AutoCompleteTextView
@@ -221,19 +166,8 @@
                     android:inputType="none"></AutoCompleteTextView>
 
             </com.google.android.material.textfield.TextInputLayout>
-            <Button
-                style="@style/Widget.Material3.Button.TextButton"
-                android:id="@+id/selectMap"
-                android:layout_width="140dp"
-                android:layout_marginTop="8dp"
-                android:layout_height="wrap_content"
-                android:text="Select on map"
-                android:textColor="@color/purple_500"
-                android:textSize="16dp"
-                android:visibility="invisible"
-                />
 
-        </LinearLayout>
+
 
 
 

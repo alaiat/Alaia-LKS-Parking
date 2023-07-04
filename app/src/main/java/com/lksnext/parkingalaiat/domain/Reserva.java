@@ -1,57 +1,83 @@
 package com.lksnext.parkingalaiat.domain;
 
-import java.util.Date;
+
 
 public class Reserva {
 
-    private User user;
-    private Spot spot;
-    private Date startTime;
-    private Date endTime;
 
-    public Reserva(User user, Spot spot, Date startTime, Date endTime) {
-        this.user = user;
-        this.spot = spot;
-        this.startTime = startTime;
-        this.endTime = endTime;
+
+    private int id;
+    public String type;
+    public String startHour;
+    public String endHour;
+    public String date;
+    public String status;
+    public Integer spot;
+
+    public int getId() {
+        return id;
     }
 
-
-    public User getUser() {
-        return user;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Spot getSpot() {
+    public Integer getSpot() {
         return spot;
     }
 
-    public void setSpot(Spot spot) {
+    public void setSpot(Integer spot) {
         this.spot = spot;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Reserva(String type, String startHour, String endHour, String date, String status, Integer spot) {
+        this.type = type;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.date = date;
+        this.status=status;
+        this.spot=spot;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public String getStatus() {
+        return status;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(String startHour) {
+        this.startHour = startHour;
+    }
+
+    public String getEndHour() {
+        return endHour;
+    }
+
+    public void setEndHour(String endHour) {
+        this.endHour = endHour;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
 
-    public boolean isOverlapping(Reserva other) {
-        //return startTime.before(other.getEndTime()) && other.getStartTime().before(endTime);
-        return false;
-    }
 }

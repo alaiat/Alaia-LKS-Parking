@@ -8,7 +8,7 @@ public class ParkingLot {
     private String address;
     private List<Spot> spotList;
 
-    private List<Reserva> reservaList;
+    private List<ReservaOld> reservaList;
 
     public ParkingLot(String name, String address){
         this.name=name;

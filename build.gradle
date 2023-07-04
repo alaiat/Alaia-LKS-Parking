@@ -9,4 +9,14 @@ buildscript {
 plugins {
     id 'com.android.application' version '7.4.1' apply false
     id 'com.android.library' version '7.4.1' apply false
+    id "org.sonarqube" version "4.2.1.3168"
+}
+
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "alaiat_Alaia-LKS-Parking"
+        property "sonar.organization", "alaiat"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }

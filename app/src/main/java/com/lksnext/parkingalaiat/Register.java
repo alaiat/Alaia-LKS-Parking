@@ -27,17 +27,17 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.domain.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Register extends AppCompatActivity {
-
-
-
-
 
     private Button button;
     private TextView link;
@@ -45,9 +45,6 @@ public class Register extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
-    private String errorDialogTitle="";
-    private String errorDialogBody="";
     private Context context=this;
     private TextInputLayout name;
     private TextInputEditText edName;
@@ -62,13 +59,6 @@ public class Register extends AppCompatActivity {
     private TextInputEditText edSecondPassword;
 
     private LinearProgressIndicator progressIndicator;
-
-
-
-
-
-
-
 
 
     @Override
@@ -118,7 +108,7 @@ public class Register extends AppCompatActivity {
         progressIndicator.setProgressCompat(0, true);
         progressIndicator.setIndicatorColor(getResources().getColor(R.color.red));
 
-
+        setTitle("");
 
 
     }
@@ -126,21 +116,38 @@ public class Register extends AppCompatActivity {
     private void initListeners(){
         button.setOnClickListener(v ->{ register(); });
         link.setOnClickListener(v ->{changeToLogin();});
-        // Get input text
-
-        //name.setOnClickListener(view -> {editarTexto();});
-
-        //password.setOnClickListener(view -> {onPasswordEdit();});
         edPassword.setOnClickListener(view -> {onPasswordEdit();});
+        password.setOnClickListener(view -> {onPasswordEdit();});
+        edName.setOnClickListener(view ->{deleteNameErrors();});
+        edEmail.setOnClickListener(view -> {deleteEmailErrors();});
+        edPhoneNumber.setOnClickListener(view -> {deletePhoneErrors();});
+    }
+
+    private void deleteNameErrors() {
+        name.setError(null);
+
+    }
+    private void deleteEmailErrors(){
+        email.setError(null);
+
+    }
+    private void deletePhoneErrors(){
+        phoneNumber.setError(null);
+
+    }
+    private void deletePasswordErrors(){
+        password.setError(null);
+        secondPassword.setError(null);
+
     }
 
     private void onPasswordEdit() {
-        System.out.println("Sartu\n\n\n\n");
-        if (edPassword != null) {
             edPassword.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     // Do nothing
+                    int progress = calculateProgress(s.toString()); // Calculate the progress based on password complexity or criteria
+                    progressIndicator.setProgressCompat(progress, true);
                 }
 
                 @Override
@@ -155,9 +162,12 @@ public class Register extends AppCompatActivity {
                 @Override
                 public void afterTextChanged(Editable s) {
                     // Do nothing
+                    deletePasswordErrors();
+                    int progress = calculateProgress(s.toString()); // Calculate the progress based on password complexity or criteria
+                    progressIndicator.setProgressCompat(progress, true);
+
                 }
             });
-        }
 
     }
     private int calculateProgress(String password) {
@@ -190,11 +200,45 @@ public class Register extends AppCompatActivity {
 
         if(progress==100){
             progressIndicator.setIndicatorColor(getResources().getColor(R.color.teal_200));
+        }else{
+            progressIndicator.setIndicatorColor(getResources().getColor(R.color.red));
+
         }
 
         return progress;
     }
+    private boolean checkEmpty(String name, String email, String phoneNumber, String password,String password2){
+        boolean isEmpty=false;
+        if(name.isEmpty()){
+            this.name.setError(" ");
+            isEmpty=true;
+        }
+        if(email.isEmpty()){
+            this.email.setError(" ");
+            isEmpty=true;
 
+        }
+        if(phoneNumber.isEmpty()){
+            this.phoneNumber.setError(" ");
+            isEmpty=true;
+
+
+        }
+        if(password.isEmpty()){
+            this.password.setError(" ");
+            isEmpty=true;
+
+        }
+        if(password2.isEmpty()){
+            this.secondPassword.setError(" ");
+            isEmpty=true;
+
+        }
+        if(isEmpty){
+            showErrorDialog("Missing info","You must fill all the data");
+        }
+        return isEmpty;
+    }
 
 
     private void register(){
@@ -204,27 +248,26 @@ public class Register extends AppCompatActivity {
         String pass=password.getEditText().getText().toString();
         String pass2=secondPassword.getEditText().getText().toString();
 
-        if(nam.isEmpty() | ema.isEmpty()|pn.isEmpty()|pass.isEmpty()|pass2.isEmpty()){
-            showErrorDialog("Missing info","You must fill all the data");
-        }else{
             if(makeAllRegisterCheckings(nam,ema,pn,pass,pass2)) {
+
                 mAuth.createUserWithEmailAndPassword(ema, pass)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
+                                // User registration successful
                                 String userId = mAuth.getCurrentUser().getUid();
-                                //saveUserDetails(userId, nam, ema, pn);
+                                saveUserDataToFirestore(userId, ema, nam, pn);
                                 showSuccessDialog();
-                                saveUserData(userId, ema, nam, pn);
-
                             } else {
                                 try {
                                     throw task.getException();
                                 } catch (FirebaseAuthInvalidCredentialsException invalidCredentialsException) {
-                                    showErrorDialog("Error","The email must have a valid email format");
+                                    showErrorDialog("Email error","The email must have a valid email format");
+                                    email.setError("");
                                 } catch (FirebaseAuthUserCollisionException userCollisionException) {
                                     showErrorDialog("Error", "Email already is linked with an account.");
+                                    email.setError("");
                                 } catch (Exception e) {
-                                    showErrorDialog("Error", "Error creating the user.");
+                                    showErrorDialog("User error", "Error creating the user.");
                                 }
                             }
                         });
@@ -235,7 +278,7 @@ public class Register extends AppCompatActivity {
         }
 
 
-    }
+
 
     private void changeToLogin(){
         Intent intent = new Intent(Register.this, Login.class);
@@ -243,16 +286,8 @@ public class Register extends AppCompatActivity {
     }
 
 
-    private boolean makeNameAndPhoneNumberCheckings(String name, String phoneNumber){
-        if(checkPhoneNumber(phoneNumber) && checkNameValid(name)){
-            return true;
-        }else{
-            showErrorDialog(errorDialogTitle,errorDialogBody);
-            return false;
-        }
-    }
-    private boolean makeAllRegisterCheckings(String name, String email, String phoneN,String passW,String pass2){
-        boolean isEverythingCorrect= checkEveryThingWithPasswords(passW,pass2) && isEmailValid(email) && makeNameAndPhoneNumberCheckings(name,phoneN);
+    private boolean makeAllRegisterCheckings(String name, String email, String phoneN,String passw,String pass2){
+        boolean isEverythingCorrect= !checkEmpty(name,email,phoneN,passw,pass2) && checkEveryThingWithPasswords(passw,pass2);
         return isEverythingCorrect;
     }
     private boolean checkPasswordsAreTheSame(String pass1, String pass2) {
@@ -267,14 +302,7 @@ public class Register extends AppCompatActivity {
     private boolean checkEveryThingWithPasswords(String pass1,String pass2){
         return checkPasswordsAreTheSame(pass1,pass2) && isPasswordValid(pass1);
     }
-    private boolean isEmailValid(String email){
-        if(!email.isEmpty()){
-            return true;
-        }else{
-            showErrorDialog(null,"Email can't be empty.");
-            return false;
-        }
-    }
+
 
     private boolean isPasswordValid(String password) {
         boolean hasLength = (password.length() >= 6);
@@ -291,25 +319,6 @@ public class Register extends AppCompatActivity {
 
     }
 
-    private boolean checkNameValid(String name){
-        if(!name.isEmpty()){
-            return true;
-        }else{
-            errorDialogTitle="Error with the name!";
-            errorDialogBody="Name can not be empty";
-            return false;
-        }
-
-    }
-    private boolean checkPhoneNumber(String number){
-        if(!number.isEmpty()){
-            return true;
-        }else{
-            errorDialogTitle="Error with the phone number!";
-            errorDialogBody="Phone number can not be empty";
-            return false;
-        }
-    }
 
     private boolean containsNumber(String str) {
         // Check if the string matches the regex pattern for numbers
@@ -326,23 +335,6 @@ public class Register extends AppCompatActivity {
         // Check if the string matches the regex pattern
         return str.matches(".*" + specialChars + ".*");
     }
-    /*
-    private void saveUserDetails(String userId, String name, String email, String phoneNumber) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-
-        User newUser = new User(userId, name, email, phoneNumber);
-        usersRef.child(userId).setValue(newUser)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // User details saved successfully
-                        System.out.println("User data saved successfully");
-                    } else {
-                        // Failed to save user details
-                        // Handle error
-                        System.out.println("Error saving user data");
-                    }
-                });
-    }*/
 
 
 
@@ -375,15 +367,17 @@ public class Register extends AppCompatActivity {
 
 
 
-
-    private void saveUserData(String userId, String email, String name, String phoneNumber) {
+/*
+    private void saveUserData(String email, String name, String phoneNumber) {
         // Create a new user with a first and last name
         Map<String, Object> user = new HashMap<>();
-        user.put("first", "Ada");
-        user.put("last", "Lovelace");
-        user.put("born", 1815);
+        user.put("name", name);
+        user.put("email", email);
+        user.put("phone number", phoneNumber);
+        user.put("image","profile_image.jpg");
+        user.put("reservas",new ArrayList<>());
 
-// Add a new document with a generated ID
+        // Add a new document with a generated ID
         db.collection("users")
                 .add(user)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -396,6 +390,24 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error adding document", e);
+                    }
+                });
+    }*/
+    private void saveUserDataToFirestore(String userId, String email, String name, String phoneNumber) {
+        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(userId);
+
+        User user = new User(name, email, phoneNumber);
+
+        userRef.set(user)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // User data saved successfully
+                        // Proceed with next steps or show a success message
+                    } else {
+                        // User data save failed
+                        Exception exception = task.getException();
+                        System.out.println(exception.toString());
+                        // Handle the exception
                     }
                 });
     }

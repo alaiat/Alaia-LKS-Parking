@@ -1,13 +1,10 @@
 package com.lksnext.parkingalaiat;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,11 +15,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.lksnext.parkingalaiat.domain.User;
+import com.lksnext.parkingalaiat.domain.UserContext;
 
 
 public class Login extends AppCompatActivity {
-
     private Button button;
     private TextInputLayout email;
     private TextInputEditText edEmail;
@@ -30,7 +29,7 @@ public class Login extends AppCompatActivity {
     private TextInputEditText edPassword;
     private TextView changeP;
     private TextView createAcco;
-
+    private FirebaseManager fireManager;
     private FirebaseAuth mAuth;
     private Context context=this;
 
@@ -40,6 +39,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         mAuth=FirebaseAuth.getInstance();
+        fireManager=fireManager.getInstance();
         initUi();
     }
 
@@ -64,38 +64,57 @@ public class Login extends AppCompatActivity {
         SpannableString content2 = new SpannableString(createAcco.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         createAcco.setText(content2);
+        setTitle("");
     }
 
     private void initListeners(){
         button.setOnClickListener(v ->{ login(); });
         createAcco.setOnClickListener(view -> {changeToRegister();});
-        changeP.setOnClickListener(view -> {changeToChangePassword();});
+        edPassword.setOnClickListener(view ->{password.setError(null);});
 
     }
 
-    private void changeToChangePassword() {
-    }
 
-    private void login(){
+
+    public void login(){
+        String em=edEmail.getText().toString();
+        String pass=edPassword.getText().toString();
         try{
-            mAuth.signInWithEmailAndPassword(edEmail.getText().toString(), edPassword.getText().toString())
+            mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            // Login successful
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            // Handle the authenticated user (e.g., proceed to the main screen)
-                            showSuccessDialog();
+                            FirebaseUser actualUser = mAuth.getCurrentUser();
+                            UserContext.getInstance().setCurrentUser(actualUser);
+                            changeToVerReservas();
                         } else {
-                            // Login failed
-                            // Handle the failure scenario (e.g., display an error message)
+                            showErrorDialog();
 
                         }
                     });
         }catch(Exception e){
            showErrorDialog();
         }
+       /* try{
+            boolean success=fireManager.login(em,pass);
+            if(success){
+                changeToVerReservas();
+
+            }else{
+                showErrorDialog();
+
+            }
+        }catch(Exception e){
+            showErrorDialog();
+        }*/
 
     }
+
+    private void changeToVerReservas() {
+        Intent intent = new Intent(Login.this, VerReservas.class);
+        startActivity(intent);
+        password.setError(null);
+    }
+
     private void showErrorDialog(){
         new MaterialAlertDialogBuilder(context)
                 .setTitle("Could not login")
@@ -103,26 +122,16 @@ public class Login extends AppCompatActivity {
                 .setPositiveButton("OK", (dialog, which) -> {
                     // Handle positive button click
                     dialog.dismiss();
-                    password.setError("");
+                    password.setError("Incorrect password");
 
                 })
                 .show();
     }
-    private void changeToRegister(){
+    public void changeToRegister(){
         Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
         password.setError(null);
     }
-    private void showSuccessDialog() {
-        new MaterialAlertDialogBuilder(context)
-                .setTitle("Loggin successfull")
-                .setMessage("Este dialogo desaparecera y ira directamente a mis reservas, pero la he liado y es paar ver que login funciona.")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Handle positive button click
-                    dialog.dismiss();
 
 
-                })
-                .show();
-    }
 }
