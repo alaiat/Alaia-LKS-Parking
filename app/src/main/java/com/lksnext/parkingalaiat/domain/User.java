@@ -10,7 +10,7 @@ public class User {
     private String email;
     private String phoneNumber;
     @PropertyName("reservas")
-    private List<ReservaOld> reservas;
+    private List<Reserva> reservas;
 
 
 
@@ -18,16 +18,16 @@ public class User {
         this.name = nombre;
         this.email = correoElectronico;
         this.phoneNumber=phoneNum;
-        reservas=new ArrayList<ReservaOld>();
+        reservas=new ArrayList<Reserva>();
     }
 
     // Getters y setters
 
-    public List<ReservaOld> getReservas() {
+    public List<Reserva> getReservas() {
         return reservas;
     }
 
-    public void setReservas(List<ReservaOld> reservas) {
+    public void setReservas(List<Reserva> reservas) {
         this.reservas = reservas;
     }
 

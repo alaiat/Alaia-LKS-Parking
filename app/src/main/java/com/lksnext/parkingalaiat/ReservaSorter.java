@@ -1,12 +1,10 @@
 package com.lksnext.parkingalaiat;
 
 import com.lksnext.parkingalaiat.domain.Reserva;
-import com.lksnext.parkingalaiat.domain.ReservaOld;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,7 +13,7 @@ public class ReservaSorter {
 
     }
 
-    public void sortElementsByProximity(List<ReservaOld> elements) {
+    public void sortElementsByProximity(List<Reserva> elements) {
         // Get today's date
         LocalDate today = LocalDate.now();
 
@@ -25,7 +23,7 @@ public class ReservaSorter {
 
 
 
-    private static class ElementComparator implements Comparator<ReservaOld> {
+    private static class ElementComparator implements Comparator<Reserva> {
         private final LocalDate today;
 
         public ElementComparator(LocalDate today) {
@@ -33,7 +31,7 @@ public class ReservaSorter {
         }
 
         @Override
-        public int compare(ReservaOld element1, ReservaOld element2) {
+        public int compare(Reserva element1, Reserva element2) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate date1 = LocalDate.parse(element1.getDate(),formatter);
             LocalDate date2 = LocalDate.parse(element2.getDate(),formatter);

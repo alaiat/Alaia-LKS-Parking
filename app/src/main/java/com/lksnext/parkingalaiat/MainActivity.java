@@ -3,11 +3,6 @@ package com.lksnext.parkingalaiat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import com.google.firebase.auth.FirebaseUser;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,18 +14,10 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
-import com.lksnext.parkingalaiat.domain.ParkingLot;
-import com.lksnext.parkingalaiat.domain.ReservaOld;
 import com.lksnext.parkingalaiat.domain.Spot;
-import com.lksnext.parkingalaiat.domain.User;
-import com.lksnext.parkingalaiat.domain.UserContext;
 
-import org.checkerframework.checker.units.qual.C;
-
-import java.util.List;
 import java.util.UUID;
 
 
@@ -59,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUi() {
-        initView();
-        initListeners();
+
         //initializeSpots();
 
 
@@ -106,33 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initView() {
-        loginB=findViewById(R.id.buttonLogin);
-        registerB=findViewById(R.id.buttonRegister);
-    }
 
-    private void initListeners(){
-        loginB.setOnClickListener(v ->{ changeToLogin(); });
-        registerB.setOnClickListener(v ->{changeToRegister();});
-    }
 
-    private void changeToLogin(){
-        Intent intent = new Intent(MainActivity.this, Login.class);
-        startActivity(intent);
-    }
-    private void changeToRegister(){
-        //Intent intent = new Intent(MainActivity.this, Register.class);
-        //startActivity(intent);
-        changeToNuevaReserva();
-    }
-    private void changeToNuevaReserva() {
-        DialogFragment dialog = NuevaReserva.newInstance();
-        ((NuevaReserva) dialog).setCallback(new NuevaReserva.Callback() {
-            @Override
-            public void onActionClick(String name) {
-                Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show(getSupportFragmentManager(), "tag");
-    }
+
+
 }

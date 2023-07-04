@@ -1,8 +1,6 @@
 package com.lksnext.parkingalaiat;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.Reserva;
-import com.lksnext.parkingalaiat.domain.ReservaOld;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHolder> {
-    private List<ReservaOld> reservas=new ArrayList<>();
+    private List<Reserva> reservas=new ArrayList<>();
     private LayoutInflater mInflater;
     private Context context;
     private OnItemClickListener onItemClickListener;
 
 
-    public ReservaAdapter(List<ReservaOld> reservas, Context context) {
+    public ReservaAdapter(List<Reserva> reservas, Context context) {
         this.reservas = reservas;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
@@ -52,7 +49,7 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
         return reservas.size();
     }
 
-    public void setItems(List<ReservaOld> items) {
+    public void setItems(List<Reserva> items) {
         reservas = items;
         notifyDataSetChanged();
 
@@ -90,7 +87,7 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
 
         }
 
-        void bindData(final ReservaOld item) {
+        void bindData(final Reserva item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
             String type=CurrentParking.getInstance().getTypeById(item.getSpot());
             if(type.equals("CAR")){

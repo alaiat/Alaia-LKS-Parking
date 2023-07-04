@@ -2,57 +2,39 @@ package com.lksnext.parkingalaiat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentReserva;
 import com.lksnext.parkingalaiat.domain.Reserva;
-import com.lksnext.parkingalaiat.domain.ReservaOld;
-import com.lksnext.parkingalaiat.domain.Spot;
-import com.lksnext.parkingalaiat.domain.User;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VerReservas extends AppCompatActivity {
     public static final int ADD_RESERVA_REQUEST = 1;
@@ -60,13 +42,13 @@ public class VerReservas extends AppCompatActivity {
 
 
 
-    List<ReservaOld> reservas;
-    List<ReservaOld> allReservas;
+    List<Reserva> reservas;
+    List<Reserva> allReservas;
     DatabaseReference userRef;
-    List<ReservaOld> probaList=new ArrayList<>();
+    List<Reserva> probaList=new ArrayList<>();
 
-    List<ReservaOld> activasList;
-    List<ReservaOld> inactivasList;
+    List<Reserva> activasList;
+    List<Reserva> inactivasList;
     TabItem activas,inactivas;
     TabLayout tabs;
     private FloatingActionButton nReservaButton;
@@ -95,28 +77,6 @@ public class VerReservas extends AppCompatActivity {
         initView();
         initListeners();
 
-        //getAllReservasForUserLast();
-
-
-    }
-
-
-    private void addReservaToUser(ReservaOld reserva) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser user=UserContext.getInstance().getCurrentUser();
-        DocumentReference userRef = db.collection("users").document(user.getUid());
-
-        // Update the user document to add the reserva to the reservas list
-        userRef.update("reservas", FieldValue.arrayUnion(reserva))
-                .addOnSuccessListener(aVoid -> {
-                    // Reservation added successfully
-                    // Proceed with next steps or show a success message
-                })
-                .addOnFailureListener(e -> {
-                    // Reservation addition failed
-                    // Handle the failure
-                    System.out.println("Failed to add reservation: " + e.toString());
-                });
     }
 
 
@@ -156,15 +116,7 @@ public class VerReservas extends AppCompatActivity {
 
 
     private void changeToNuevaReserva() {
-       /* DialogFragment dialog = NuevaReserva.newInstance();
-        ((NuevaReserva) dialog).setCallback(new NuevaReserva.Callback() {
-            @Override
-            public void onActionClick(String name) {
-                Toast.makeText(VerReservas.this, name, Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show(getSupportFragmentManager(), "tag");*/
-        Intent intent = new Intent(VerReservas.this, NuevaReservaNormal.class);
+        Intent intent = new Intent(VerReservas.this, NuevaReserva.class);
         startActivityForResult(intent,ADD_RESERVA_REQUEST);
     }
 
@@ -173,45 +125,12 @@ public class VerReservas extends AppCompatActivity {
         reservas=new ArrayList<>();
         activasList=new ArrayList<>();
         inactivasList=new ArrayList<>();
-/*        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,1),"08:00","13:00","23/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,3),"08:00","13:00","22/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,4),"16:00","19:00","21/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,1),"11:00","19:00","23/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"15:00","09:00","21/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:00","13:00","19/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"10:00","15:00","17/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:00","10:00","03/07/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"12:00","19:00","03/07/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:00","12:00","01/07/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:00","19:00","30/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"07:00","11:00","29/06/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"09:00","18:00","05/07/2023"));
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:30","17:10","08/07/2023"));
-*/
         getAllReservationsForUser();
 
         sortReservas();
-        for(ReservaOld a : allReservas){
+        for(Reserva a : allReservas){
             checkElementStatus(a);
-        }/*
-        addReservaToUser(new ReservaOld(new Spot(Spot.SpotType.CAR),"08:00","16:15","23/06/2023"));
-        addReservaToUser(new ReservaOld(new Spot(Spot.SpotType.CAR),"11:00","17:15","23/06/2023"));
-        addReservaToUser(new ReservaOld(new Spot(Spot.SpotType.MOTORCYCLE),"14:00","18:30", "23/06/2023"));
-        getAllReservasForUser();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Hide the progress indicator
-
-                //System.out.println("Reserva" + allReservas.get(1) + "\n\n\n\n\n\n\n\n");
-               // sortReservas();
-                for(int i=0;i<allReservas.size();i++){
-                    //checkElementStatus(allReservas.get(i));
-                }
-
-            }
-        }, 3000);*/
+        }
 
 
     }
@@ -266,22 +185,23 @@ public class VerReservas extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 // Handle item click event here
-                ReservaOld r;
+                Reserva r;
                 if(tabs.getSelectedTabPosition()==0){
                     r=activasList.get(position);
+                    CurrentReserva.getInstance().setCurrentReserva(r);
+                    Intent intent = new Intent(VerReservas.this, EditarReserva.class);
+                    startActivityForResult(intent,EDIT_RESERVA_REQUEST);
                 }else{
                     r=inactivasList.get(position);
                 }
-               CurrentReserva.getInstance().setCurrentReserva(r);
-                Intent intent = new Intent(VerReservas.this, EditarReserva.class);
-                startActivityForResult(intent,EDIT_RESERVA_REQUEST);
+
 
             }
         });
 
         changeDataToActive();
     }
-    public void checkElementStatus(ReservaOld element) {
+    public void checkElementStatus(Reserva element) {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate elementDate = LocalDate.parse(element.getDate(), formatter);
@@ -316,13 +236,13 @@ public class VerReservas extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_RESERVA_REQUEST && resultCode == RESULT_OK) {
-            String date = data.getStringExtra(NuevaReservaNormal.EXTRA_DATE);
-            String start = data.getStringExtra(NuevaReservaNormal.EXTRA_START);
-            String end = data.getStringExtra(NuevaReservaNormal.EXTRA_END);
-            String type=data.getStringExtra(NuevaReservaNormal.EXTRA_TYPE);
-            String spot=data.getStringExtra(NuevaReservaNormal.EXTRA_SPOT);
+            String date = data.getStringExtra(NuevaReserva.EXTRA_DATE);
+            String start = data.getStringExtra(NuevaReserva.EXTRA_START);
+            String end = data.getStringExtra(NuevaReserva.EXTRA_END);
+            String type=data.getStringExtra(NuevaReserva.EXTRA_TYPE);
+            String spot=data.getStringExtra(NuevaReserva.EXTRA_SPOT);
 
-            ReservaOld res=new ReservaOld(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
+            Reserva res=new Reserva(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
             allReservas.add(res);
             checkElementStatus(res);
             sortReservas();
@@ -332,12 +252,33 @@ public class VerReservas extends AppCompatActivity {
 
 
             Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
-        } else {
+        } else if(requestCode == EDIT_RESERVA_REQUEST && resultCode == RESULT_OK){
+            Reserva old=CurrentReserva.getInstance().getCurrentReserva();
+            Reserva berria= CurrentReserva.getInstance().getCurrentReserva();
+            berria.setStartTime(data.getStringExtra(NuevaReserva.EXTRA_START));
+            berria.setEndTime(data.getStringExtra(NuevaReserva.EXTRA_END));
+            allReservas.remove(old);
+            //checkElementStatus(berria);
+            //allReservas.add(berria);
+            sortReservas();
+            changeDataToActive();
+            Snackbar.make(findViewById(R.id.snackbar), "Reservation edited successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    allReservas.remove(berria);
+                    /*allReservas.add(old);
+                    checkElementStatus(old);*/
+                    sortReservas();
+                    changeDataToActive();
+                }
+            }).show();
+
+        }else {
             Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void addReservaInFirebase(ReservaOld res) {
+    private void addReservaInFirebase(Reserva res) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference reservationsRef = db.collection("reservations");
 
@@ -413,7 +354,7 @@ public class VerReservas extends AppCompatActivity {
                 })
                 .show();
     }
-    private void deleteReservationByUserAndSpot(ReservaOld r) {
+    private void deleteReservationByUserAndSpot(Reserva r) {
         // Get an instance of the Firestore database
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -480,7 +421,7 @@ public class VerReservas extends AppCompatActivity {
 
 
     private void deleteReservation(int position) {
-        ReservaOld r;
+        Reserva r;
         if(tabs.getSelectedTabPosition()==0){
             r=activasList.get(position);
             activasList.remove(position);
@@ -524,7 +465,7 @@ public class VerReservas extends AppCompatActivity {
         // Execute the query
         query.get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<ReservaOld> reservations = new ArrayList<>();
+                    List<Reserva> reservations = new ArrayList<>();
 
                     // Iterate through the query results
                     for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
@@ -534,7 +475,8 @@ public class VerReservas extends AppCompatActivity {
                         String startT= documentSnapshot.getString("startTime");
                         String spot= documentSnapshot.getString("spot");
                         System.out.println(date+" "+endT+" "+startT+ " "+spot);
-                       ReservaOld reservation = new ReservaOld(spot,startT,endT,date,UserContext.getInstance().getCurrentUser().getUid());
+                       Reserva reservation = new Reserva(spot,startT,endT,date,UserContext.getInstance().getCurrentUser().getUid());
+                       UserContext.getInstance().addDayAndOrHours(date,startT,endT);
                        reservations.add(reservation);
                     }
 
@@ -544,7 +486,7 @@ public class VerReservas extends AppCompatActivity {
                     allReservas.clear();
                     allReservas.addAll(reservations);
                     sortReservas();
-                    for(ReservaOld a : allReservas){
+                    for(Reserva a : allReservas){
                         checkElementStatus(a);
                     }
                     changeDataToActive();

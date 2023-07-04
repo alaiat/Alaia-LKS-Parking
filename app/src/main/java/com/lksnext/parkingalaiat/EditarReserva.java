@@ -3,32 +3,32 @@ package com.lksnext.parkingalaiat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcel;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.datepicker.CalendarConstraints;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentReserva;
-import com.lksnext.parkingalaiat.domain.ReservaOld;
+import com.lksnext.parkingalaiat.domain.Reserva;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class EditarReserva extends AppCompatActivity {
@@ -82,12 +82,12 @@ public class EditarReserva extends AppCompatActivity {
     }
 
     private void showData() {
-        ReservaOld r= CurrentReserva.getInstance().getCurrentReserva();
+        Reserva r= CurrentReserva.getInstance().getCurrentReserva();
         startHour.getEditText().setText(r.getStartTime());
         endHour.getEditText().setText(r.getEndTime());
         date.getEditText().setText(r.getDate());
-        //dropdownField.setText(r.getSpot().getType().toString());
-        //spotDropDown.getEditText().setText(r.getSpot().getNumber());
+        dropdownField.setText(CurrentParking.getInstance().getTypeById(r.getSpot()));
+        spotList.setText(CurrentParking.getInstance().getNumById(r.getSpot()));
 
     }
 
@@ -157,6 +157,9 @@ public class EditarReserva extends AppCompatActivity {
     }
 
     private void showProgressIndicator() {
+
+
+
         progress.setVisibility(View.VISIBLE);
 
         // Start the animation
@@ -175,12 +178,74 @@ public class EditarReserva extends AppCompatActivity {
             }
         }, 3000);
     }
+
+    private void update(String reservaId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference reservaRef = db.collection("reservas").document(reservaId);
+
+        reservaRef.update("startTime", startHour.getEditText().getText().toString())
+                .addOnSuccessListener(aVoid -> {
+                    setResult(RESULT_OK);
+                    finish();
+
+                })
+                .addOnFailureListener(e -> {
+                    // Failed to update start time
+                    // Handle the exception
+                });
+        reservaRef.update("endTime", endHour.getEditText().getText().toString())
+                .addOnSuccessListener(aVoid -> {
+                    // Start time updated successfully
+                    // Proceed with next steps or show a success message
+                })
+                .addOnFailureListener(e -> {
+                    // Failed to update start time
+                    // Handle the exception
+                });
+    }
+    private void findReserva() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference reservasRef = db.collection("reservation");
+        Reserva r=CurrentReserva.getInstance().getCurrentReserva();
+
+        Query query = reservasRef.whereEqualTo("date", r.getDate()).whereEqualTo("startTime",r.getStartTime()).whereEqualTo("endTime",r.getEndTime())
+                .whereEqualTo("spot",r.getSpot()).whereEqualTo("user",r.getUser());
+
+        query.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+
+                    // Iterate through the documents to retrieve the reservas
+                    for (DocumentSnapshot document : documents) {
+                        // Retrieve the reserva data
+                        String reservaId = document.getId();
+                        System.out.println(reservaId);
+                        // ... Retrieve other reserva data as needed
+
+                        // Perform operations with the retrieved reserva data
+                        // For example, update the start time
+                        //update(reservaId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Failed to query reservas
+                    // Handle the exception
+                });
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save_note:
                 // Perform the save action here
-                showProgressIndicator();
+                findReserva();
+                Intent reserva=new Intent();
+                reserva.putExtra(EXTRA_START,startHour.getEditText().getText().toString());
+                reserva.putExtra(EXTRA_END,endHour.getEditText().getText().toString());
+                setResult(RESULT_OK, reserva);
+                finish();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -226,36 +291,6 @@ public class EditarReserva extends AppCompatActivity {
                 .show();
     }
 
-
-/*
-    private void save() {
-        String date=this.date.getEditText().getText().toString();
-        String startHour=this.startHour.getEditText().getText().toString();
-        String endHour=this.endHour.getEditText().getText().toString();
-        String type=this.dropdownField.getEditableText().toString();
-        Boolean status=true;
-
-        if(date.isEmpty() | startHour.isEmpty() | endHour.isEmpty()){
-            spotDropDown.setError(" ");
-            this.date.setError(" ");
-            this.startHour.setError(" ");
-            this.endHour.setError(" ");
-        }else{
-            Intent reserva=new Intent();
-            reserva.putExtra(EXTRA_DATE,date);
-            reserva.putExtra(EXTRA_START,startHour);
-            reserva.putExtra(EXTRA_END,endHour);
-            reserva.putExtra(EXTRA_STATUS,status);
-            reserva.putExtra(EXTRA_TYPE,type);
-            setResult(RESULT_OK, reserva);
-            finish();
-        }
-
-
-
-
-
-    }*/
 
 
 

@@ -23,7 +23,7 @@
         <activity android:name=".Register"/>
         <activity android:name=".NuevaReserva"
             android:parentActivityName=".VerReservas"/>
-        <activity android:name=".NuevaReservaNormal"
+        <activity android:name=".NuevaReserva"
             android:parentActivityName=".VerReservas"/>
         <activity android:name=".EditarReserva"
             android:parentActivityName=".VerReservas"/>
