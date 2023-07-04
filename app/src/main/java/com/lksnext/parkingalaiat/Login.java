@@ -17,11 +17,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.lksnext.parkingalaiat.domain.CurrentParking;
+import com.lksnext.parkingalaiat.domain.ParkingLot;
 import com.lksnext.parkingalaiat.domain.User;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
 
 public class Login extends AppCompatActivity {
+
+    CurrentParking current;
     private Button button;
     private TextInputLayout email;
     private TextInputEditText edEmail;
@@ -40,6 +44,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.login);
         mAuth=FirebaseAuth.getInstance();
         fireManager=fireManager.getInstance();
+        current=CurrentParking.getInstance();
         initUi();
     }
 
@@ -77,6 +82,10 @@ public class Login extends AppCompatActivity {
 
 
     public void login(){
+        current.getIdByNum("2");
+
+
+
         String em=edEmail.getText().toString();
         String pass=edPassword.getText().toString();
         try{

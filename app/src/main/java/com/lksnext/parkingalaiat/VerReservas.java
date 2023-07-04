@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,12 +30,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentReserva;
 import com.lksnext.parkingalaiat.domain.Reserva;
 import com.lksnext.parkingalaiat.domain.ReservaOld;
@@ -90,6 +94,8 @@ public class VerReservas extends AppCompatActivity {
         initData();
         initView();
         initListeners();
+
+        //getAllReservasForUserLast();
 
 
     }
@@ -167,7 +173,7 @@ public class VerReservas extends AppCompatActivity {
         reservas=new ArrayList<>();
         activasList=new ArrayList<>();
         inactivasList=new ArrayList<>();
-        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,1),"08:00","13:00","23/06/2023"));
+/*        allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,1),"08:00","13:00","23/06/2023"));
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,3),"08:00","13:00","22/06/2023"));
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,4),"16:00","19:00","21/06/2023"));
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,1),"11:00","19:00","23/06/2023"));
@@ -181,7 +187,8 @@ public class VerReservas extends AppCompatActivity {
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"07:00","11:00","29/06/2023"));
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"09:00","18:00","05/07/2023"));
         allReservas.add(new ReservaOld(new Spot(Spot.SpotType.CAR,5),"08:30","17:10","08/07/2023"));
-
+*/
+        getAllReservationsForUser();
 
         sortReservas();
         for(ReservaOld a : allReservas){
@@ -313,15 +320,15 @@ public class VerReservas extends AppCompatActivity {
             String start = data.getStringExtra(NuevaReservaNormal.EXTRA_START);
             String end = data.getStringExtra(NuevaReservaNormal.EXTRA_END);
             String type=data.getStringExtra(NuevaReservaNormal.EXTRA_TYPE);
+            String spot=data.getStringExtra(NuevaReservaNormal.EXTRA_SPOT);
 
-            ReservaOld res=new ReservaOld(new Spot(Spot.SpotType.CAR,3),start,end,date);
+            ReservaOld res=new ReservaOld(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
             allReservas.add(res);
             checkElementStatus(res);
             sortReservas();
             changeDataToActive();
-            //toggleGroup.check(R.id.activas);
-            //toggleGroup.uncheck(R.id.pasadas);
             adapter.notifyDataSetChanged();
+            addReservaInFirebase(res);
 
 
             Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
@@ -329,6 +336,56 @@ public class VerReservas extends AppCompatActivity {
             Toast.makeText(this, "Note not saved", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void addReservaInFirebase(ReservaOld res) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference reservationsRef = db.collection("reservations");
+
+        // Add the reservation to the "reservations" collection
+        reservationsRef.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // The "reservations" collection does not exist
+                        // Create the collection dynamically
+                        db.collection("reservations").document();
+                    }
+
+                    // Add the reservation to the "reservations" collection
+                    reservationsRef.add(res)
+                            .addOnSuccessListener(documentReference -> {
+                                // Reservation added successfully
+                                String reservationId = documentReference.getId();
+                                System.out.println("Reservation added with ID: " + reservationId);
+
+                                // Update the spot's reservas list
+                                DocumentReference spotRef = db.collection("spots").document(res.getSpot());
+                                spotRef.update("reservas", FieldValue.arrayUnion(reservationId));
+
+                                // Update the user's reservas list
+                                DocumentReference userRef = db.collection("users").document(UserContext.getInstance().getCurrentUser().getUid());
+                                userRef.update("reservas", FieldValue.arrayUnion(reservationId));
+
+                                // Perform additional tasks or show success message
+                            })
+                            .addOnFailureListener(e -> {
+                                // Error occurred while adding the reservation
+                                System.out.println("Failed to add reservation");
+                                System.out.println(e.toString());
+
+                                // Handle the exception
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while checking the existence of the collection
+                    System.out.println("Failed to check collection existence");
+                    System.out.println(e.toString());
+
+                    // Handle the exception
+                });
+
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -356,16 +413,73 @@ public class VerReservas extends AppCompatActivity {
                 })
                 .show();
     }
+    private void deleteReservationByUserAndSpot(ReservaOld r) {
+        // Get an instance of the Firestore database
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Query reservations collection to find the reservation
+        db.collection("reservations")
+                .whereEqualTo("user", UserContext.getInstance().getCurrentUser().getUid())
+                .whereEqualTo("spot", r.getSpot())
+                .whereEqualTo("date",r.getDate())
+                .whereEqualTo("startTime",r.getStartTime())
+                .whereEqualTo("endTime",r.getEndTime())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        // Get the reservation document reference
+                        DocumentReference reservationRef = documentSnapshot.getReference();
+
+
+                        // Delete the reservation document
+                        reservationRef.delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    // Reservation successfully deleted
+                                    System.out.println("Reservation deleted: " + documentSnapshot.getId());
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while deleting the reservation
+                                    System.out.println("Failed to delete reservation: " + documentSnapshot.getId());
+                                    System.out.println(e.toString());
+
+                                    // Handle the exception
+                                });
+                        DocumentReference userRef = db.collection("users").document(UserContext.getInstance().getCurrentUser().getUid());
+                        userRef.update("reservas", FieldValue.arrayRemove(documentSnapshot.getId()))
+                                .addOnSuccessListener(aVoid1 -> {
+                                    // Reservation ID removed from user document
+                                    System.out.println("Reservation ID removed from user");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while updating user document
+                                    System.out.println(e.toString());
+
+                                    // Handle the exception
+                                });
+                        DocumentReference spotRef = db.collection("spots").document(r.getSpot());
+                        spotRef.update("reservas", FieldValue.arrayRemove(documentSnapshot.getId()))
+                                .addOnSuccessListener(aVoid2 -> {
+                                    // Reservation ID removed from spot document
+                                    System.out.println("Reservation ID removed from spot: " );
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while updating spot document
+                                    System.out.println(e.toString());
+
+                                    // Handle the exception
+                                });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while querying reservations
+                    System.out.println("Failed to query reservations: " + e.toString());
+
+                    // Handle the exception
+                });
+    }
+
 
     private void deleteReservation(int position) {
-
-        /*Map<String, Object> reserva = new HashMap<>();
-        reserva.put("startHour", "08:00");
-        reserva.put("endHour", "10:30");
-        reserva.put("date", "07/11/2023");
-        reserva.put("status","Activo");
-        reserva.put("spot",1);
-        addReservaToUserByEmail("a@a.com",reserva);*/
         ReservaOld r;
         if(tabs.getSelectedTabPosition()==0){
             r=activasList.get(position);
@@ -378,131 +492,76 @@ public class VerReservas extends AppCompatActivity {
             allReservas.remove(r);
             changeDataToInactive();
         }
+        deleteReservationByUserAndSpot(r);
+        Snackbar.make(findViewById(R.id.snackbar), "Reservation deleted successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addReservaInFirebase(r);
+                allReservas.add(r);
+                checkElementStatus(r);
+                sortReservas();
+                if(tabs.getSelectedTabPosition()==0){
+                    changeDataToActive();
+                }else{
+                    changeDataToInactive();
+                }
+
+            }
+        }).show();
 
 
     }
-    /*private void addReservaToUserByEmail(String userEmail, Map<String, Object>  reserva) {
-
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
-
-        Query query = usersRef.orderByChild("email").equalTo(userEmail);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String userId = userSnapshot.getKey();
-
-                    // Update the reservas array list of the user
-                    DatabaseReference userReservasRef = usersRef.child(userId).child("reservas");
-                    userReservasRef.push().setValue(reserva)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    // Reserva added to the user successfully
-                                } else {
-                                    // Failed to add reserva to the user
-                                }
-                            });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Error occurred while accessing the database
-            }
-        });
-    }*/
-    private void addReservaToUserByEmail(String userEmail, Map<String, Object>   reserva) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
-
-        Query query = usersRef.orderByChild("email").equalTo(userEmail);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        String userId = userSnapshot.getKey();
-
-                        // Update the reservas array list of the user
-                        DatabaseReference userReservasRef = usersRef.child(userId).child("reservas");
-                        userReservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                ArrayList<Reserva> reservas;
-                                if (dataSnapshot.exists()) {
-                                    reservas = dataSnapshot.getValue(new GenericTypeIndicator<ArrayList<Reserva>>() {});
-                                } else {
-                                    reservas = new ArrayList<>();
-                                }
-
-                                // Add the new reserva item to the reservas list
-                                //reservas.add(reserva);
-
-                                // Update the user reference with the modified reservas list
-                                userReservasRef.setValue(reservas)
-                                        .addOnCompleteListener(task -> {
-                                            if (task.isSuccessful()) {
-                                                // Reserva added to the user successfully
-                                            } else {
-                                                // Failed to add reserva to the user
-                                            }
-                                        });
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                // Error occurred while accessing the database
-                            }
-                        });
-                    }
-                } else {
-                    // User does not exist in the database
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Error occurred while accessing the database
-            }
-        });
-    }
-    private void getAllReservasForUser() {
+    private void getAllReservationsForUser() {
+        // Get an instance of the Firestore database
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser user=UserContext.getInstance().getCurrentUser();
-        DocumentReference userRef = db.collection("users").document(user.getUid());
 
+        // Get a reference to the "reservations" collection
+        CollectionReference reservationsRef = db.collection("reservations");
 
-        userRef.get()
-        .continueWith(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-                if (documentSnapshot.exists()) {
-                    if (documentSnapshot.exists()) {
-                        Map<String, Object> userData = documentSnapshot.getData();
-                        if (userData != null) {
-                            //Map<String, Object> reservasMap = (Map<String, Object>) userData.get("reservas");
-                            //System.out.println( userData.get("reservas"));
-                            List<ReservaOld> lista = (List<ReservaOld>) ((Map<?, ?>) userData.get("reservas")).get(0);
-                            allReservas = lista;
-                            System.out.println("\n\n\n"+lista);
+        // Query the reservations collection based on the user ID
+        Query query = reservationsRef.whereEqualTo("user", UserContext.getInstance().getCurrentUser().getUid());
 
+        // Execute the query
+        query.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<ReservaOld> reservations = new ArrayList<>();
 
-
-
-
-                        }
+                    // Iterate through the query results
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        // Convert each document to a Reservation object
+                        String date= documentSnapshot.getString("date");
+                        String endT= documentSnapshot.getString("endTime");
+                        String startT= documentSnapshot.getString("startTime");
+                        String spot= documentSnapshot.getString("spot");
+                        System.out.println(date+" "+endT+" "+startT+ " "+spot);
+                       ReservaOld reservation = new ReservaOld(spot,startT,endT,date,UserContext.getInstance().getCurrentUser().getUid());
+                       reservations.add(reservation);
                     }
-                } else {
-                    // User document does not exist
-                    System.out.println("User document does not exist.");
-                }
-            } else {
-                // Error occurred while retrieving the document
-                Exception exception = task.getException();
-                System.out.println("Failed to retrieve document: " + exception.toString());
-            }
-            return null;
-        });
+
+                    // Handle the retrieved reservations
+                    // You can pass the reservations list to another method for further processing
+                    //handleRetrievedReservations(reservations);
+                    allReservas.clear();
+                    allReservas.addAll(reservations);
+                    sortReservas();
+                    for(ReservaOld a : allReservas){
+                        checkElementStatus(a);
+                    }
+                    changeDataToActive();
+
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while retrieving the reservations
+
+                    System.out.println(e.toString());
+
+                    // Handle the exception
+                });
     }
+
+
+
+
 
 
 

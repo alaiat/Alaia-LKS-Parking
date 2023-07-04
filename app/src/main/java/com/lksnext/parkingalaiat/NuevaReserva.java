@@ -6,19 +6,16 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -28,10 +25,19 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.ReservaOld;
+import com.lksnext.parkingalaiat.domain.Spot;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
 import java.util.Calendar;
@@ -48,6 +54,7 @@ public class NuevaReserva extends DialogFragment implements View.OnClickListener
     private Callback callback;
     String[] items={"Normal","Motor", "Electric"};
     String[] spots={"1","2","3","4"};
+    List<String> spotLista=CurrentParking.getInstance().getSpotListaId();
     AutoCompleteTextView dropdownField,spotList;
     ArrayAdapter<String> adapterItems;
     ArrayAdapter<String> adapterItemsSpot;
@@ -96,6 +103,8 @@ public class NuevaReserva extends DialogFragment implements View.OnClickListener
         startHour.setStartIconOnClickListener(view->{showStartTimePicker();});
         endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
         search.setOnClickListener(view->{showProgressIndicator();});
+
+        System.out.println(spotLista+"\n");
 
 
     }
@@ -204,8 +213,37 @@ public class NuevaReserva extends DialogFragment implements View.OnClickListener
         spotList.setAdapter(adapterItemsSpot);
 
         initListeners();
+        for(String id: CurrentParking.getInstance().getSpotListaId()){
+           getSpotNumberByIdFromFirebase(id);
+
+        }
+
 
         return view;
+    }
+    public void getSpotNumberByIdFromFirebase(String spotId) {
+        Query databaseReference = FirebaseDatabase.getInstance().getReference("spots");
+        Query query = databaseReference.orderByChild("id").equalTo(spotId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Spot spot = snapshot.getValue(Spot.class);
+                        int spotNumber = spot.getNumber();
+                        System.out.println("Spot Number: " + spotNumber);
+                    }
+                } else {
+                    System.out.println("Spot not found.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("Error: " + databaseError.getMessage());
+            }
+        });
     }
 
     @Override
@@ -277,6 +315,30 @@ public class NuevaReserva extends DialogFragment implements View.OnClickListener
                     System.out.println("Failed to add reservation: " + e.toString());
                 });
     }
+
+    private void retrieveParkingSpots() {
+        System.out.println(CurrentParking.getInstance().getSpotListaId());
+
+    }
+    private void retrieveAllParkingDocuments() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference parkingCollectionRef = db.collection("parking");
+
+        parkingCollectionRef.get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                        // Process each document here
+                        String documentId = documentSnapshot.getId();
+                        // Retrieve other fields as needed
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Failed to retrieve the "parking" collection
+                    System.out.println("Failed to retrieve parking collection: " + e.toString());
+                });
+    }
+
+
 
 
 

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.Reserva;
 import com.lksnext.parkingalaiat.domain.ReservaOld;
 
@@ -91,7 +92,7 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
 
         void bindData(final ReservaOld item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
-            String type=item.getSpot().toString();
+            String type=CurrentParking.getInstance().getTypeById(item.getSpot());
             if(type.equals("CAR")){
                 iconImage.setImageResource(R.drawable.normal_imagen);
 
@@ -111,7 +112,7 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
             startH.setText(item.getStartTime());
             endH.setText(item.getEndTime());
             date.setText(item.getDate());
-            number.setText("Nº"+item.getSpot().getNumber());
+            number.setText("Nº"+ CurrentParking.getInstance().getNumById(item.getSpot()));
 
 
         }

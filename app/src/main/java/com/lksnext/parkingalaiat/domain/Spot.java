@@ -1,21 +1,25 @@
 package com.lksnext.parkingalaiat.domain;
 
 
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Spot {
 
 
     private int number;
-    private SpotType type;
+    private String type;
     private boolean available;
 
+   // private List<String> reservas;
 
-    public Spot( SpotType type, int number) {
+
+    public Spot( String type, int number) {
         this.type = type;
         this.available = true;
         this.number=number;
 
+        //reservas=new ArrayList<>();
     }
 
 
@@ -35,11 +39,11 @@ public class Spot {
         this.number = number;
     }
 
-    public SpotType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(SpotType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -50,6 +54,9 @@ public class Spot {
     public void setAvailable(boolean available) {
         this.available = available;
     }
+
+
+
 
     @Override
     public String toString() {

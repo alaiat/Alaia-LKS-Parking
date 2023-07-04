@@ -4,18 +4,20 @@ import java.util.Date;
 
 public class ReservaOld {
 
-    private Spot spot;
+    private String spot;
+    private String user;
     private String startTime;
     private String endTime;
     private String date;
     private String activo;
 
-    public ReservaOld(Spot spot, String startTime, String endTime, String date) {
+    public ReservaOld(String spot, String startTime, String endTime, String date,String user) {
         this.spot = spot;
         this.startTime = startTime;
         this.endTime = endTime;
         this.date=date;
-        activo="Activo";
+        activo="";
+        this.user=user;
     }
 
 
@@ -27,11 +29,11 @@ public class ReservaOld {
         this.activo = activo;
     }
 
-    public Spot getSpot() {
+    public String getSpot() {
         return spot;
     }
 
-    public void setSpot(Spot spot) {
+    public void setSpot(String spot) {
         this.spot = spot;
     }
 
@@ -63,6 +65,15 @@ public class ReservaOld {
         //return startTime.before(other.getEndTime()) && other.getStartTime().before(endTime);
         return false;
     }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "ReservaOld{" +

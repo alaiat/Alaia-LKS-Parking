@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.lksnext.parkingalaiat.domain.User;
 
@@ -401,8 +402,16 @@ public class Register extends AppCompatActivity {
         userRef.set(user)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // User data saved successfully
-                        // Proceed with next steps or show a success message
+                        DocumentReference parkingRef = db.collection("parking").document("ZVEFi53OQtszxreNsBbN");
+
+                        parkingRef.update("users", FieldValue.arrayUnion(userId))
+                                .addOnSuccessListener(aVoid -> {
+                                    // User ID added to the "users" list successfully
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Failed to add the user ID to the "users" list
+                                    System.out.println("Failed to add user ID to the 'users' list: " + e.toString());
+                                });
                     } else {
                         // User data save failed
                         Exception exception = task.getException();

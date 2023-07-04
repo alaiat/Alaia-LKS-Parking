@@ -5,5 +5,3 @@ K
 .github/workflows/build.yml,f\e\fe77d5d1439f26e353a42bbd38dece2467ff6558
 p
 @app/src/main/java/com/lksnext/parkingalaiat/FirebaseManager.java,c\4\c44363affb467dc3bf34b35311e93782d4d9c766
-<
-build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35

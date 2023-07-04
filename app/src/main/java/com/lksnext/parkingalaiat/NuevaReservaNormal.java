@@ -12,9 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,15 +22,15 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.lksnext.parkingalaiat.domain.Reserva;
-
-import org.checkerframework.common.returnsreceiver.qual.This;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.domain.CurrentParking;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class NuevaReservaNormal extends AppCompatActivity {
 
@@ -41,13 +39,19 @@ public class NuevaReservaNormal extends AppCompatActivity {
     public static final String EXTRA_START="com.lksnext.parkingalaiat.EXTRA_START";
     public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
     public static final String EXTRA_TYPE="com.lksnext.parkingalaiat.EXTRA_TYPE";
+    public static final String EXTRA_SPOT = "com.lksnext.parkingalaiat.EXTRA_SPOT";
+    CurrentParking current=CurrentParking.getInstance();
 
     Boolean typeSel=false;
     Boolean dateSel=false;
     Boolean startSel=false;
     Boolean endSel=false;
-    String[] items={"Normal","Motor", "Electric","Handicapped"};
-    String[] spots={"1","2","3","4","5","6","7"};
+    String[] items={"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
+    String[]spots={"-1"};
+
+
+
+
     AutoCompleteTextView dropdownField,spotList;
     ArrayAdapter<String> adapterItems;
     ArrayAdapter<String> adapterItemsSpot;
@@ -59,11 +63,47 @@ public class NuevaReservaNormal extends AppCompatActivity {
 
     TextView action;
 
+    private void getSpots(String type) {
+        List<CurrentParking.Spota> a=new ArrayList<>();
+        List<String> drop=new ArrayList<>();
+
+        switch (type) {
+            case "CAR":
+                // Code for handling the "CAR" option
+                a=current.getCar();
+                break;
+            case "MOTORCYCLE":
+                // Code for handling the "MOTORCYCLE" option
+                a=current.getMotor();
+                break;
+            case "ELECTRIC":
+                // Code for handling the "ELECTRIC" option
+                a=current.getElec();
+                break;
+            case "HANDICAPPED":
+                // Code for handling the "HANDICAPPED" option
+                a=current.getHand();
+                break;
+            default:
+                // Code for handling unrecognized options
+                break;
+        }
+
+        for(CurrentParking.Spota s:a){
+            drop.add(s.getNum());
+        }
+        adapterItemsSpot=new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
+        spotList.setAdapter(adapterItemsSpot);
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nueva_reserva_sin_top_bar);
         initUi();
+        getSpots("CAR");
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -110,6 +150,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
                 String item=parent.getItemAtPosition(position).toString();
+                getSpots(item);
                // Toast.makeText(getContext(),"Item "+item,Toast.LENGTH_SHORT).show();
                 typeSel=true;
                 checkAllDataFill();
@@ -312,6 +353,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
         String startHour=this.startHour.getEditText().getText().toString();
         String endHour=this.endHour.getEditText().getText().toString();
         String type=this.dropdownField.getEditableText().toString();
+        String spot=this.spotList.getEditableText().toString();
         Boolean status=true;
 
         if(date.isEmpty() | startHour.isEmpty() | endHour.isEmpty()){
@@ -326,6 +368,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
             reserva.putExtra(EXTRA_END,endHour);
             reserva.putExtra(EXTRA_STATUS,status);
             reserva.putExtra(EXTRA_TYPE,type);
+            reserva.putExtra(EXTRA_SPOT,current.getIdByNum(spot));
             setResult(RESULT_OK, reserva);
             finish();
         }
@@ -335,6 +378,40 @@ public class NuevaReservaNormal extends AppCompatActivity {
 
 
     }
+    public void saveInFirebase(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String num=this.spotList.getEditableText().toString();
+        current.getIdByNum("2");
+        //ReservaOld r=new ReservaOld()
+    }/*
+    private void createReservation(String userId, String spotId, String date, String startTime, String endTime) {
+        // Get an instance of the Firestore database
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new reservation object
+        Reservation reservation = new Reservation(userId, spotId, date, startTime, endTime);
+
+        // Get a reference to the "reservations" collection
+        CollectionReference reservationsRef = db.collection("reservations");
+
+        // Add the reservation to the "reservations" collection
+        reservationsRef.add(reservation)
+                .addOnSuccessListener(documentReference -> {
+                    // Reservation added successfully
+                    String reservationId = documentReference.getId();
+                    System.out.println("Reservation added with ID: " + reservationId);
+
+                    // Perform additional tasks or show success message
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while adding the reservation
+                    System.out.println("Failed to add reservation");
+                    System.out.println(e.toString());
+
+                    // Handle the exception
+                });
+    }*/
+
 
 
 
