@@ -27,6 +27,12 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.domain.ReservaOld;
+import com.lksnext.parkingalaiat.domain.UserContext;
 
 import java.util.Calendar;
 import java.util.List;
@@ -243,6 +249,33 @@ public class NuevaReserva extends DialogFragment implements View.OnClickListener
         this.dismiss();
 
 
+    }
+
+
+
+
+
+
+
+
+
+
+    private void addReservaToUser(ReservaOld reserva) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user= UserContext.getInstance().getCurrentUser();
+        DocumentReference userRef = db.collection("users").document(user.getUid());
+
+        // Update the user document to add the reserva to the reservas list
+        userRef.update("reservas", FieldValue.arrayUnion(reserva))
+                .addOnSuccessListener(aVoid -> {
+                    // Reservation added successfully
+                    // Proceed with next steps or show a success message
+                })
+                .addOnFailureListener(e -> {
+                    // Reservation addition failed
+                    // Handle the failure
+                    System.out.println("Failed to add reservation: " + e.toString());
+                });
     }
 
 

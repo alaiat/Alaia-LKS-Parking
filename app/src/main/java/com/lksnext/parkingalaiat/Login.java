@@ -22,8 +22,6 @@ import com.lksnext.parkingalaiat.domain.UserContext;
 
 
 public class Login extends AppCompatActivity {
-    FirebaseUser user;
-
     private Button button;
     private TextInputLayout email;
     private TextInputEditText edEmail;
@@ -72,7 +70,6 @@ public class Login extends AppCompatActivity {
     private void initListeners(){
         button.setOnClickListener(v ->{ login(); });
         createAcco.setOnClickListener(view -> {changeToRegister();});
-        //changeP.setOnClickListener(view -> {changeToChangePassword();});
         edPassword.setOnClickListener(view ->{password.setError(null);});
 
     }
@@ -86,15 +83,11 @@ public class Login extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            // Login successful
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            UserContext.getInstance().setCurrentUser(user);
-                            //showSuccessDialog();
+                            FirebaseUser actualUser = mAuth.getCurrentUser();
+                            UserContext.getInstance().setCurrentUser(actualUser);
                             changeToVerReservas();
                         } else {
-                            // Login failed
                             showErrorDialog();
-                            // Handle the failure scenario (e.g., display an error message)
 
                         }
                     });
@@ -139,18 +132,6 @@ public class Login extends AppCompatActivity {
         startActivity(intent);
         password.setError(null);
     }
-    private void showSuccessDialog() {
-        new MaterialAlertDialogBuilder(context)
-                .setTitle("Loggin successfull")
-                .setMessage("Este dialogo desaparecera y ira directamente a mis reservas, pero la he liado y es paar ver que login funciona.")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Handle positive button click
-                    dialog.dismiss();
-                    password.setError(null);
 
-
-                })
-                .show();
-    }
 
 }

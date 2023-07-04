@@ -22,7 +22,7 @@ public class Perfil extends AppCompatActivity {
     private ImageView image;
     private TextInputLayout name,phone,email;
     private Button edit,save;
-    private String nameD,emailD,phoneD;
+    private String nameD,phoneD;
     private FirebaseUser user=UserContext.getInstance().getCurrentUser();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +54,13 @@ public class Perfil extends AppCompatActivity {
     private void save() {
         Boolean error=false;
         String na=name.getEditText().getText().toString();
-        //String ema=email.getEditText().getText().toString();
         String pn=phone.getEditText().getText().toString();
 
         if(na.isEmpty()){
             name.setError(" ");
             error=true;
         }
-        /*if(ema.isEmpty()){
-            email.setError(" ");
-            error=true;
 
-        }*/
         if(pn.isEmpty()){
             phone.setError(" ");
             error=true;
@@ -73,7 +68,6 @@ public class Perfil extends AppCompatActivity {
         }
         if(!error){
             nameD=na;
-            //emailD=ema;
             phoneD=pn;
             updateUserData(user.getUid(),nameD,phoneD);
             save.setEnabled(false);
@@ -88,7 +82,6 @@ public class Perfil extends AppCompatActivity {
 
     private void enableEdit() {
         name.setEnabled(true);
-        //email.setEnabled(true);
         phone.setEnabled(true);
         save.setEnabled(true);
     }
@@ -120,15 +113,15 @@ public class Perfil extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("name");
+                            String name1 = documentSnapshot.getString("name");
                             String phoneNumber = documentSnapshot.getString("phoneNumber");
-                            String email = documentSnapshot
+                            String email1 = documentSnapshot
                                     .getString("email");
 
                             System.out.println(phoneNumber+"\n\n\n\n\n\n\n\n");
-                            this.name.getEditText().setText(name);
+                            this.name.getEditText().setText(name1);
                             this.phone.getEditText().setText(phoneNumber);
-                            this.email.getEditText().setText(email);
+                            this.email.getEditText().setText(email1);
 
                             // Use the retrieved values as needed
                         } else {

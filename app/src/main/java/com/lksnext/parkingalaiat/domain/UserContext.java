@@ -24,4 +24,6 @@ public class UserContext {
     public void setCurrentUser(FirebaseUser user) {
         currentUser = user;
     }
+
+
 }

@@ -25,6 +25,8 @@
             android:parentActivityName=".VerReservas"/>
         <activity android:name=".NuevaReservaNormal"
             android:parentActivityName=".VerReservas"/>
+        <activity android:name=".EditarReserva"
+            android:parentActivityName=".VerReservas"/>
         <activity android:name=".Perfil"
             android:parentActivityName=".VerReservas"/>
         <activity android:name=".VerReservas"/>

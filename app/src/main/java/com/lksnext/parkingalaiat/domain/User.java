@@ -1,30 +1,24 @@
 package com.lksnext.parkingalaiat.domain;
 
+import com.google.firebase.database.PropertyName;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String userId;
     private String name;
     private String email;
     private String phoneNumber;
-
-
+    @PropertyName("reservas")
     private List<ReservaOld> reservas;
 
 
-    public User(String id,String nombre, String correoElectronico, String phoneNum) {
-        //this.userId = id;
-        this.name = nombre;
-        this.email = correoElectronico;
-        this.phoneNumber=phoneNum;
-        //reservas=new ArrayList<Reserva>();
-    }
+
     public User(String nombre, String correoElectronico, String phoneNum) {
-        //this.userId = id;
         this.name = nombre;
         this.email = correoElectronico;
         this.phoneNumber=phoneNum;
-        //reservas=new ArrayList<Reserva>();
+        reservas=new ArrayList<ReservaOld>();
     }
 
     // Getters y setters

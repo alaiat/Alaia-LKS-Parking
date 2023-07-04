@@ -13,17 +13,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lksnext.parkingalaiat.domain.Reserva;
+import com.lksnext.parkingalaiat.domain.ReservaOld;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHolder> {
-    private List<Reserva> reservas=new ArrayList<>();
+    private List<ReservaOld> reservas=new ArrayList<>();
     private LayoutInflater mInflater;
     private Context context;
+    private OnItemClickListener onItemClickListener;
 
 
-    public ReservaAdapter(List<Reserva> reservas, Context context) {
+    public ReservaAdapter(List<ReservaOld> reservas, Context context) {
         this.reservas = reservas;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
@@ -49,10 +51,16 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
         return reservas.size();
     }
 
-    public void setItems(List<Reserva> items) {
+    public void setItems(List<ReservaOld> items) {
         reservas = items;
         notifyDataSetChanged();
 
+    }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
+    public interface OnItemClickListener {
+        void onItemClick(int position);
     }
 
 
@@ -67,32 +75,43 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
             endH = itemView.findViewById(R.id.endHour);
             date = itemView.findViewById(R.id.date);
             number = itemView.findViewById(R.id.number);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onItemClick(position);
+                        }
+                    }
+                }
+            });
 
         }
 
-        void bindData(final Reserva item) {
+        void bindData(final ReservaOld item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
-            String type=item.getType();
-            if(type.equals("Normal")){
+            String type=item.getSpot().toString();
+            if(type.equals("CAR")){
                 iconImage.setImageResource(R.drawable.normal_imagen);
 
 
-            }else if(type.equals("Motor" )){
+            }else if(type.equals("MOTORCYCLE" )){
                 iconImage.setImageResource(R.drawable.moto_imagen);
 
 
-            }else if(type.equals("Electric")){
+            }else if(type.equals("ELECTRIC")){
                 iconImage.setImageResource(R.drawable.electrico_imagen);
 
-            }else if(type.equals("Handicapped")){
+            }else if(type.equals("HANDICAPPED")){
                 iconImage.setImageResource(R.drawable.discapacitados_icono);
             }
 
 
-            startH.setText(item.getStartHour());
-            endH.setText(item.getEndHour());
+            startH.setText(item.getStartTime());
+            endH.setText(item.getEndTime());
             date.setText(item.getDate());
-            number.setText("Nº"+item.getSpot().toString());
+            number.setText("Nº"+item.getSpot().getNumber());
 
 
         }

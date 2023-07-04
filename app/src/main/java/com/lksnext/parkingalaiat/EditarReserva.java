@@ -12,57 +12,45 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.lksnext.parkingalaiat.domain.Reserva;
-
-import org.checkerframework.common.returnsreceiver.qual.This;
+import com.lksnext.parkingalaiat.domain.CurrentReserva;
+import com.lksnext.parkingalaiat.domain.ReservaOld;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-public class NuevaReservaNormal extends AppCompatActivity {
+public class EditarReserva extends AppCompatActivity {
 
-    public static final String EXTRA_DATE="com.lksnext.parkingalaiat.EXTRA_DATE";
-    public static final String EXTRA_STATUS="com.lksnext.parkingalaiat.EXTRA_STATUS";
     public static final String EXTRA_START="com.lksnext.parkingalaiat.EXTRA_START";
     public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
-    public static final String EXTRA_TYPE="com.lksnext.parkingalaiat.EXTRA_TYPE";
 
-    Boolean typeSel=false;
-    Boolean dateSel=false;
     Boolean startSel=false;
     Boolean endSel=false;
-    String[] items={"Normal","Motor", "Electric","Handicapped"};
-    String[] spots={"1","2","3","4","5","6","7"};
-    AutoCompleteTextView dropdownField,spotList;
-    ArrayAdapter<String> adapterItems;
-    ArrayAdapter<String> adapterItemsSpot;
-    TextInputLayout date,spotDropDown;
+
     TextInputLayout startHour,endHour;
     LinearProgressIndicator progress;
-    MaterialDatePicker<Long> datePicker;
-    Button search, mapSelect;
+    TextInputLayout date,spotDropDown;
+    AutoCompleteTextView dropdownField,spotList;
+
 
     TextView action;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nueva_reserva_sin_top_bar);
+        setContentView(R.layout.edit_reserva);
         initUi();
     }
     @Override
@@ -70,80 +58,49 @@ public class NuevaReservaNormal extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.add_reserva, menu);
 
-        setTitle("Nueva reserva");
+        setTitle("Editar reserva");
         return true;
     }
 
     private void initUi() {
         initView();
-        initListeners();
+       initListeners();
     }
 
     private void initView() {
         //close = findViewById(R.id.fullscreen_dialog_close);
         action = findViewById(R.id.save_note);
-        search=findViewById(R.id.searchButton);
-        date=findViewById(R.id.date);
-        mapSelect=findViewById(R.id.selectMap);
         progress=findViewById(R.id.progress);
         startHour=findViewById(R.id.startHour);
         endHour=findViewById(R.id.endHour);
+        date=findViewById(R.id.date);
         spotList=findViewById(R.id.spots);
         spotDropDown=findViewById(R.id.spotDropdwon);
         dropdownField=findViewById(R.id.dropdownField);
 
-        adapterItems= new ArrayAdapter<String>(this,R.layout.dropdown_list_item,items);
+        showData();
+    }
 
-        dropdownField.setAdapter(adapterItems);
+    private void showData() {
+        ReservaOld r= CurrentReserva.getInstance().getCurrentReserva();
+        startHour.getEditText().setText(r.getStartTime());
+        endHour.getEditText().setText(r.getEndTime());
+        date.getEditText().setText(r.getDate());
+        //dropdownField.setText(r.getSpot().getType().toString());
+        //spotDropDown.getEditText().setText(r.getSpot().getNumber());
 
-        adapterItemsSpot=new ArrayAdapter<String>(this,R.layout.dropdown_list_item,spots);
-        spotList.setAdapter(adapterItemsSpot);
-
-        dropdownField.setBackgroundColor(date.getBoxBackgroundColor());
     }
 
     private void initListeners() {
-       // close.setOnClickListener(view -> {close();});
 
-       // action.setOnClickListener(view -> {/*save();*/});
-        dropdownField.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                String item=parent.getItemAtPosition(position).toString();
-               // Toast.makeText(getContext(),"Item "+item,Toast.LENGTH_SHORT).show();
-                typeSel=true;
-                checkAllDataFill();
-            }
-        });
-        spotList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent,View view,int position,long id){
-                String item=parent.getItemAtPosition(position).toString();
-               // Toast.makeText(this,"Item "+item,Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        date.setStartIconOnClickListener(view ->{showDatePicker();});
         startHour.setStartIconOnClickListener(view->{showStartTimePicker();});
         endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
-        search.setOnClickListener(view->{showProgressIndicator();});
+
     }
 
     private void checkAllDataFill() {
-        if(typeSel && dateSel && startSel && endSel){
-            search.setEnabled(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_note:
-                // Perform the save action here
-                save();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if(startSel && endSel){
+            showProgressIndicator();
         }
     }
 
@@ -212,10 +169,22 @@ public class NuevaReservaNormal extends AppCompatActivity {
             public void run() {
                 // Hide the progress indicator
                 progress.setVisibility(View.INVISIBLE);
-                mapSelect.setVisibility(View.VISIBLE);
-                spotDropDown.setVisibility(View.VISIBLE);
+                showErrorDialog();
+                startHour.setError(" ");
+                endHour.setError(" ");
             }
         }, 3000);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_note:
+                // Perform the save action here
+                showProgressIndicator();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void showStartTimePicker() {
@@ -247,66 +216,18 @@ public class NuevaReservaNormal extends AppCompatActivity {
 
         });
     }
-
-    private void showDatePicker() {
-        Calendar calendarStart = Calendar.getInstance();
-
-        long today = MaterialDatePicker.todayInUtcMilliseconds();
-        calendarStart.setTimeInMillis(today);
-
-        calendarStart.add(Calendar.DAY_OF_MONTH, 14);
-        long endDate = calendarStart.getTimeInMillis();
-        CalendarConstraints.Builder constraints = new CalendarConstraints.Builder();
-                       // .setStart( MaterialDatePicker.todayInUtcMilliseconds())
-                        //.setEnd( MaterialDatePicker.todayInUtcMilliseconds() + TimeUnit.DAYS.toMillis(14))
-                        //.build();
-        constraints.setStart(today);
-        constraints.setEnd(endDate);
-        CalendarConstraints.DateValidator dateValidator = new CalendarConstraints.DateValidator() {
-            @Override
-            public boolean isValid(long date) {
-                return date >= today && date <= endDate;
-            }
-
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel parcel, int flags) {
-                // No-op
-            }
-        };
-
-// Set the custom date validator
-        constraints.setValidator(dateValidator);
-
-
-        datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .setCalendarConstraints(constraints.build())
-                .build();
-
-
-        datePicker.show(getSupportFragmentManager(),"tag");
-        datePicker.addOnPositiveButtonClickListener(selection->{
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(selection);
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month + 1, year);
-
-
-            date.getEditText().setText(formattedDate);
-            dateSel=true;
-            checkAllDataFill();
-        });
-
+    private void showErrorDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setMessage("Reserve could not be edited. It is not free for the selected hours.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Handle positive button click
+                    dialog.dismiss();
+                })
+                .show();
     }
 
+
+/*
     private void save() {
         String date=this.date.getEditText().getText().toString();
         String startHour=this.startHour.getEditText().getText().toString();
@@ -334,7 +255,7 @@ public class NuevaReservaNormal extends AppCompatActivity {
 
 
 
-    }
+    }*/
 
 
 

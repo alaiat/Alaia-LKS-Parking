@@ -11,9 +11,10 @@ public class Spot {
     private boolean available;
 
 
-    public Spot( SpotType type) {
+    public Spot( SpotType type, int number) {
         this.type = type;
         this.available = true;
+        this.number=number;
 
     }
 
@@ -48,5 +49,10 @@ public class Spot {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    @Override
+    public String toString() {
+        return type.toString();
     }
 }

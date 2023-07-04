@@ -45,9 +45,6 @@ public class Register extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
-    private String errorDialogTitle="";
-    private String errorDialogBody="";
     private Context context=this;
     private TextInputLayout name;
     private TextInputEditText edName;
@@ -264,13 +261,13 @@ public class Register extends AppCompatActivity {
                                 try {
                                     throw task.getException();
                                 } catch (FirebaseAuthInvalidCredentialsException invalidCredentialsException) {
-                                    showErrorDialog("Error","The email must have a valid email format");
+                                    showErrorDialog("Email error","The email must have a valid email format");
                                     email.setError("");
                                 } catch (FirebaseAuthUserCollisionException userCollisionException) {
                                     showErrorDialog("Error", "Email already is linked with an account.");
                                     email.setError("");
                                 } catch (Exception e) {
-                                    showErrorDialog("Error", "Error creating the user.");
+                                    showErrorDialog("User error", "Error creating the user.");
                                 }
                             }
                         });
@@ -409,6 +406,7 @@ public class Register extends AppCompatActivity {
                     } else {
                         // User data save failed
                         Exception exception = task.getException();
+                        System.out.println(exception.toString());
                         // Handle the exception
                     }
                 });
