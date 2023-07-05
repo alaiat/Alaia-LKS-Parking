@@ -1,9 +1,12 @@
 package com.lksnext.parkingalaiat.domain;
 
 import com.lksnext.parkingalaiat.FirebaseManager;
+import com.lksnext.parkingalaiat.interfaces.OnReservationsListener;
 import com.lksnext.parkingalaiat.interfaces.OnSpotIdsLoadedListener;
 import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 public class CurrentParking {
@@ -21,11 +24,16 @@ public class CurrentParking {
         spotListaId =new ArrayList<>();
         addSpotsById();
     }
-    private void addSpotsById(){
+    public void addSpotsById(){
         fm.getAllSpotsId(new OnSpotIdsLoadedListener() {
             @Override
             public void onSpotIdsLoaded(List<String> spotIds) {
                 if (spotIds != null) {
+                    spotListaId.clear();
+                    car.clear();
+                    motor.clear();
+                    hand.clear();
+                    elec.clear();
                     spotListaId=spotIds;
                     addSpotToCorrepondingList();
                 } else {
@@ -142,9 +150,19 @@ public class CurrentParking {
         private String num;
         private String id;
         private String type;
+        private List<DayHours> listDayTime;
+        FirebaseManager fm=FirebaseManager.getInstance();
 
         public String getNum() {
             return num;
+        }
+
+        public List<DayHours> getListDayTime() {
+            return listDayTime;
+        }
+
+        public void setListDayTime(List<DayHours> listDayTime) {
+            this.listDayTime = listDayTime;
         }
 
         public void setNum(String num) {
@@ -163,6 +181,73 @@ public class CurrentParking {
             this.num = num;
             this.id = id;
             this.type=type;
+            listDayTime=new ArrayList<>();
+            findReservations(id);
+        }
+
+        private void findReservations(String id) {
+            fm.getReservationsForSpot(id, new OnReservationsListener() {
+                @Override
+                public void onReservationsLoaded(List<Reserva> reservations) {
+                    // Handle the reservations list
+                    // ...
+                    addListtoList(reservations);
+                    System.out.println(listDayTime);
+
+                }
+
+
+            });
+
+        }
+        public void addListtoList(List<Reserva> reservations) {
+
+            for(Reserva r:reservations){
+                Boolean found=false;
+                DayHours dh=null;
+                for(DayHours d:listDayTime){
+                    if(d.getDate().equals(r.getDate())){
+                        found=true;
+                        dh=d;
+                    }
+                }
+                if(!found){
+                    dh=new DayHours(r.getDate());
+                    found=false;
+                }
+
+                dh.addStartHour(r.getStartTime());
+                dh.addEndHour(r.getEndTime());
+                dh.addAndCalculateNewTime(r.getStartTime(),r.getEndTime());
+                System.out.println(dh.getStartHours());
+                listDayTime.add(dh);
+            }
+        }
+        public void addReservaToList(Reserva r){
+            DayHours d=null;
+            boolean found=false;
+            for(DayHours dh:listDayTime){
+                if(dh.getDate().equals(r.getDate())){
+                    found=true;
+                    d=dh;
+                }
+            }
+            if(!found){
+                d= new DayHours(r.getDate());
+                listDayTime.add(d);
+
+            }
+            d.addStartHour(r.getStartTime());
+            d.addEndHour(r.getEndTime());
+            d.addAndCalculateNewTime(r.getStartTime(),r.getEndTime());
+        }
+        public DayHours getDayHoursByDay(String date){
+            for(DayHours dh:listDayTime){
+                if(dh.getDate().equals(date)){
+                    return dh;
+                }
+            }
+            return null;
         }
 
         public String getType() {
@@ -171,6 +256,16 @@ public class CurrentParking {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return "Spota{" +
+                    "num='" + num + '\'' +
+                    ", id='" + id + '\'' +
+                    ", type='" + type + '\'' +
+                    ", listDayTime=" + listDayTime +
+                    '}';
         }
     }
 

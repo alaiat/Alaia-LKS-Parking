@@ -66,47 +66,5 @@ public class UserContext {
 
 
 
-    private class DayHours {
-        private String date;
-        private int spentMinutesOfDay;
 
-        public DayHours(String date) {
-            this.date = date;
-            this.spentMinutesOfDay =0;
-        }
-        public void addMinutesPerDay(int min) {
-            int m= getSpentMinutesOfDay()+min;
-            setSpentMinutesOfDay(m);
-        }
-        public void addAndCalculateNewTime(String time1,String time2){
-            LocalTime start = LocalTime.parse(time1);
-            LocalTime end = LocalTime.parse(time2);
-            Duration duration = Duration.between(start, end);
-
-            // Get the number of hours in the duration
-            int hours = (int) duration.toMinutes();
-
-            addMinutesPerDay(hours);
-
-
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        public int getSpentMinutesOfDay() {
-            return spentMinutesOfDay;
-        }
-
-        public void setSpentMinutesOfDay(int spentMinutesOfDay) {
-            this.spentMinutesOfDay = spentMinutesOfDay;
-        }
-
-
-    }
 }

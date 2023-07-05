@@ -197,7 +197,9 @@ public class FirebaseManager {
                     if (documentSnapshot.exists()) {
                         String type = (String) documentSnapshot.get("type");
                         Object num = documentSnapshot.get("number");
-                        all.add(new CurrentParking.Spota(num.toString(), id, type));
+                        CurrentParking.Spota s=new CurrentParking.Spota(num.toString(), id, type);
+                        all.add(s);
+                        System.out.println(s+"\n");
                     }
                 }
 
@@ -255,6 +257,39 @@ public class FirebaseManager {
                     listener.OnReservationUpdatedListener(false);
                 });
     }
+    public void getReservationsForSpot(String spotId, OnReservationsListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference reservationsRef = db.collection("reservations");
+
+        Query query = reservationsRef.whereEqualTo("spot", spotId);
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Reserva> reservations = new ArrayList<>();
+                QuerySnapshot querySnapshot = task.getResult();
+
+                for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                    // Get the reservation data from the document
+                    String date = documentSnapshot.getString("date");
+                    String endT = documentSnapshot.getString("endTime");
+                    String startT = documentSnapshot.getString("startTime");
+                    String userId = documentSnapshot.getString("user");
+
+                    // Create a Reserva object and add it to the list
+                    Reserva reservation = new Reserva(spotId, startT, endT, date, userId);
+                    reservations.add(reservation);
+                }
+
+                // Pass the reservations list to the listener
+                listener.onReservationsLoaded(reservations);
+            } else {
+                // Handle the failure case
+                Exception exception = task.getException();
+                // Handle the exception
+            }
+        });
+    }
+
 
 
 

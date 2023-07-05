@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
+import com.lksnext.parkingalaiat.domain.DayHours;
 import com.lksnext.parkingalaiat.domain.Reserva;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
@@ -68,11 +70,12 @@ public class NuevaReserva extends AppCompatActivity {
     TextInputLayout startHour,endHour;
     LinearProgressIndicator progress;
     MaterialDatePicker<Long> datePicker;
-    Button search, mapSelect;
+    Button search, mapSelect,change;
 
     TextView action;
 
     List<String> notAvailable=new ArrayList<>();
+    List<CurrentParking.Spota> selectedTypeSpots=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -117,6 +120,7 @@ public class NuevaReserva extends AppCompatActivity {
         endHour=findViewById(R.id.endHour);
         search=findViewById(R.id.searchButton);
         mapSelect=findViewById(R.id.selectMap);
+        change=findViewById(R.id.changeData);
         availableSpotListText =findViewById(R.id.spots);
         availableSpotListDropdown =findViewById(R.id.spotDropdwon);
         spotTypeOptionsText =findViewById(R.id.dropdownField);
@@ -149,6 +153,19 @@ public class NuevaReserva extends AppCompatActivity {
         startHour.setStartIconOnClickListener(view->{ startHour.setError(null); endHour.setError(null); showStartTimePicker();});
         endHour.setStartIconOnClickListener(view->{endHour.setError(null); startHour.setError(null); showEndTimePicker();});
         search.setOnClickListener(view->{showProgressIndicator();});
+        change.setOnClickListener(view -> {enable();});
+    }
+
+    private void enable() {
+        spotTypeOptionsText.clearListSelection();
+        date.getEditText().setText("");
+        startHour.getEditText().setText("");
+        endHour.getEditText().setText("");
+        spotTypeOptionsText.setEnabled(true);
+        date.setEnabled(true);
+        startHour.setEnabled(true);
+        endHour.setEnabled(true);
+
     }
 
     private void checkAllDataFill() {
@@ -157,34 +174,35 @@ public class NuevaReserva extends AppCompatActivity {
         }
     }
     private void getSpotsForType(String type) {
-        List<CurrentParking.Spota> a=new ArrayList<>();
+        selectedTypeSpots.clear();
         List<String> drop=new ArrayList<>();
 
         switch (type) {
             case "CAR":
                 // Code for handling the "CAR" option
-                a=current.getCar();
+                selectedTypeSpots=current.getCar();
                 break;
             case "MOTORCYCLE":
                 // Code for handling the "MOTORCYCLE" option
-                a=current.getMotor();
+                selectedTypeSpots=current.getMotor();
                 break;
             case "ELECTRIC":
                 // Code for handling the "ELECTRIC" option
-                a=current.getElec();
+                selectedTypeSpots=current.getElec();
                 break;
             case "HANDICAPPED":
                 // Code for handling the "HANDICAPPED" option
-                a=current.getHand();
+                selectedTypeSpots=current.getHand();
                 break;
             default:
                 // Code for handling unrecognized options
                 break;
         }
 
-        for(CurrentParking.Spota s:a){
+        for(CurrentParking.Spota s:selectedTypeSpots){
             drop.add(s.getNum());
         }
+        System.out.println(drop);
         availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
         availableSpotListText.setAdapter(availableSpotAdapter);
 
@@ -259,86 +277,41 @@ public class NuevaReserva extends AppCompatActivity {
     }
 
     private void showProgressIndicator() {
-        getSpotsForType(typeToFound);
-        noAvailableSpots(date.getEditText().getText().toString(),startHour.getEditText().getText().toString(),endHour.getEditText().getText().toString());
-        progress.setVisibility(View.VISIBLE);
+        availableSpotListText.setText("");
+        getSpotsForType(spotTypeOptionsText.getEditableText().toString());
+        String newS=startHour.getEditText().getText().toString();
+        String newE=endHour.getEditText().getText().toString();
+        String dat=date.getEditText().getText().toString();
 
-        // Start the animation
-        progress.setProgressCompat(0, true);
+        if(deleteNotAvailableSpots(dat,newS,newE)){
+            progress.setVisibility(View.VISIBLE);
 
-        // Delay the stop of the animation by 3 seconds (3000 milliseconds)
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Hide the progress indicator
-                progress.setVisibility(View.INVISIBLE);
-                mapSelect.setVisibility(View.VISIBLE);
-                availableSpotListDropdown.setVisibility(View.VISIBLE);
-            }
-        }, 3000);
-    }
+            // Start the animation
+            progress.setProgressCompat(0, true);
 
-    private void noAvailableSpots(String date, String start,String end) {
-        getSpotsForType(this.spotTypeOptionsText.getEditableText().toString());
-        notAvailable.clear();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Construct the query
-        CollectionReference reservationsRef = db.collection("reservations");
-        Query query = reservationsRef
-                .whereEqualTo("date", date);
-
-        // Execute the query
-        query.get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        // Convert each document to a Reservation object
-                        String endT= documentSnapshot.getString("endTime");
-                        String startT= documentSnapshot.getString("startTime");
-
-                        String spot= documentSnapshot.getString("spot");
-                        System.out.println(date+" "+endT+" "+startT+ " "+spot+"\n");
-                        Reserva reservation = new Reserva(spot,startT,endT,date,UserContext.getInstance().getCurrentUser().getUid());
-                        checkOverlapp(reservation,start,end);
-                    }
-
-
-        });
-    }
-
-    private void checkOverlapp(Reserva reservation,String start,String end) {
-        LocalTime s2 = LocalTime.parse(start);
-        LocalTime e2 = LocalTime.parse(end);
-        LocalTime s1 = LocalTime.parse(reservation.getStartTime());
-        LocalTime e1 = LocalTime.parse(reservation.getEndTime());
-
-        String tipoa= spotTypeOptionsText.getEditableText().toString();
-
-        if(s2.isBefore(e1) && e2.isAfter(s1)){
-            DocumentReference ref=FirebaseFirestore.getInstance().collection("spots").document(reservation.getSpot());
-            ref.get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if (documentSnapshot.exists()) {
-                                Object number = documentSnapshot.get("number");
-                                String type=(String) documentSnapshot.get("type");
-                                if(type.equals(tipoa)){
-                                    notAvailable.add(number.toString());
-                                    System.out.println(number);
-                                }
-
-                                // Use the retrieved values as needed
-                            }
-                        } else {
-                            // Error occurred while fetching the user document
-                            Exception exception = task.getException();
-                            // Handle the exception
-                        }
-                    });
+            // Delay the stop of the animation by 3 seconds (3000 milliseconds)
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Hide the progress indicator
+                    progress.setVisibility(View.INVISIBLE);
+                    mapSelect.setVisibility(View.VISIBLE);
+                    availableSpotListDropdown.setVisibility(View.VISIBLE);
+                }
+            }, 3000);
+            search.setEnabled(false);
+            spotTypeOptionsText.setEnabled(false);
+            date.setEnabled(false);
+            startHour.setEnabled(false);
+            endHour.setEnabled(false);
         }
+
+
     }
+
+
+
 
     private void showStartTimePicker() {
         startHour.setError(null);
@@ -367,7 +340,69 @@ public class NuevaReserva extends AppCompatActivity {
                 checkAllDataFill();
             }
 
+
         });
+
+    }
+    public boolean checkOverlap(String oldEnd,String oldStart,String newEnd,String newStart){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime end1 = LocalTime.parse(oldEnd, formatter);
+        LocalTime start1 = LocalTime.parse(oldStart, formatter);
+        LocalTime end2 = LocalTime.parse(newEnd, formatter);
+        LocalTime start2 = LocalTime.parse(newStart, formatter);
+        boolean overlap = !(end1.isBefore(start2) || start1.isAfter(end2));
+
+        if (overlap) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
+    private boolean deleteNotAvailableSpots(String dat,String startT,String endT) {
+        List<CurrentParking.Spota> toRemove=new ArrayList<>();
+        List<String> libreak=new ArrayList<>();
+        for(CurrentParking.Spota s:selectedTypeSpots){
+            DayHours dh=s.getDayHoursByDay(dat);
+            if(dh!=null){
+                System.out.println(dh+"\n");
+            for(int i=0; i<dh.getStartHours().size();i++){
+                System.out.println(dh.getStartHours().get(i)+dh.getEndHours().get(i)+"\n");
+                if(!checkOverlap(dh.getStartHours().get(i),dh.getEndHours().get(i),startT,endT)){
+                    System.out.println("barruen");
+                    toRemove.add(s);
+                    break;
+                }
+            }
+            }
+
+        }
+        System.out.println(toRemove);
+        for(CurrentParking.Spota s: selectedTypeSpots){
+            if(!toRemove.contains(s)){
+                libreak.add(s.getNum());
+            }
+        }
+        if(libreak.size()==0){
+            showDialog();
+            return false;
+        }
+        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,libreak);
+        availableSpotListText.setAdapter(availableSpotAdapter);
+        return true;
+    }
+    private void showDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setMessage("There are not free spots for the introduced data.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Handle positive button click
+                    dialog.dismiss();
+                    setResult(-7);
+                    finish();
+                })
+                .show();
     }
 
     private void showDatePicker() {
@@ -434,6 +469,7 @@ public class NuevaReserva extends AppCompatActivity {
     }
 
     private void save() {
+        current.addSpotsById();
         String date=this.date.getEditText().getText().toString();
         String startHour=this.startHour.getEditText().getText().toString();
         String endHour=this.endHour.getEditText().getText().toString();
