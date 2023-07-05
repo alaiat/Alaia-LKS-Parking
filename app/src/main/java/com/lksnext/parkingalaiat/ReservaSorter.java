@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ReservaSorter {
     public ReservaSorter(){
-
+        ///
     }
 
     public void sortElementsByProximity(List<Reserva> elements) {

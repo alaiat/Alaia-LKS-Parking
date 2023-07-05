@@ -1,9 +1,8 @@
 package com.lksnext.parkingalaiat.domain;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.lksnext.parkingalaiat.FirebaseManager;
+import com.lksnext.parkingalaiat.interfaces.OnSpotIdsLoadedListener;
+import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,83 +14,63 @@ public class CurrentParking {
     private List<Spota> hand=new ArrayList<>();
     private List<Spota> elec=new ArrayList<>();
     private List<Spota> motor=new ArrayList<>();
+    FirebaseManager fm;
 
     private CurrentParking() {
+        fm= FirebaseManager.getInstance();
         spotListaId =new ArrayList<>();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        addSpotsById();
+    }
+    private void addSpotsById(){
+        fm.getAllSpotsId(new OnSpotIdsLoadedListener() {
+            @Override
+            public void onSpotIdsLoaded(List<String> spotIds) {
+                if (spotIds != null) {
+                    spotListaId=spotIds;
+                    addSpotToCorrepondingList();
+                } else {
+                    // Handle the failure case
+                    // ...
+                }
+            }
+        });
+    }
 
-        // Get a reference to the "spots" collection
-        CollectionReference spotsRef = db.collection("spots");
-
-        // Query all documents in the "spots" collection
-        spotsRef.get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot documentSnapshot : task.getResult().getDocuments()) {
-                            // Get the spot ID from the document
-                            String spotId = documentSnapshot.getId();
-                            //System.out.println(spotId);
-
-                            // Add the spot ID to the list
-                            spotListaId.add(spotId);
-                        }
-
-                        // Print or use the spot IDs as needed
-                        System.out.println("Spot IDs: " + spotListaId);
-                        System.out.println("Gordea");
-                        sort();
-
+    private void addSpotToCorrepondingList() {
+       fm.sortList(spotListaId, new OnSpotsLoaderByTypeListener() {
+            @Override
+            public void OnSpotsLoaderByTypeListener(List<Spota> sortedList) {
+                all=sortedList;
+                for(Spota s:all){
+                    switch (s.type) {
+                        case "CAR":
+                            car.add(s);
+                            break;
+                        case "HANDICAPPED":
+                            hand.add(s);
+                            break;
+                        case "MOTORCYCLE":
+                            motor.add(s);
+                            break;
+                        case "ELECTRIC":
+                            elec.add(s);
+                            break;
+                        default:
+                            break;
                     }
-                });
+                }
+            }
+        });
+
     }
 
-    private void sort() {
-        for(String id: spotListaId){
-            DocumentReference spotRef = FirebaseFirestore.getInstance().collection("spots").document(id);
 
-            spotRef.get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if (documentSnapshot.exists()) {
-                               String type =  (String) documentSnapshot.get("type");
-                                Object num= documentSnapshot.get("number");
-                               //System.out.println(num.toString());
-                                all.add(new Spota(num.toString(),id,type));
-                                proccessType(type,id,num.toString());
-
-                                // Use the retrieved values as needed
-                            }
-
-                        } else {
-                            // Error occurred while fetching the user document
-                            Exception exception = task.getException();
-                            // Handle the exception
-                        }
-                    });
-        }
-    }
-
-    private void proccessType(String type,String id,String num){
-        System.out.println(type);
-        if(type.equals("CAR")){
-            car.add(new Spota(num,id,type));
-        }else if(type.equals("HANDICAPPED")){
-            hand.add(new Spota(num,id,type));
-        }else if(type.equals("ELECTRIC")){
-            elec.add(new Spota(num,id,type));
-        }else{
-            motor.add(new Spota(num,id,type));
-        }
-    }
 
     public String getIdByNum(String num){
 
         for (Spota spota : all) {
             if (spota.getNum().equals(num)) {
-                String id=spota.getId();
-                System.out.println(id);
-                return id; // Return the id if num matches
+                return spota.getId();
             }
         }
         return null; // Return null if no matching num is found
@@ -101,9 +80,7 @@ public class CurrentParking {
 
         for (Spota spota : all) {
             if (spota.getId().equals(id)) {
-                String num=spota.getNum();
-                System.out.println(num);
-                return num; // Return the id if num matches
+                return spota.getNum();
             }
         }
         return null; // Return null if no matching num is found
@@ -113,9 +90,7 @@ public class CurrentParking {
 
         for (Spota spota : all) {
             if (spota.getId().equals(id)) {
-                String type=spota.getType();
-                System.out.println(type);
-                return type; // Return the id if num matches
+                return spota.getType();
             }
         }
         return null; // Return null if no matching num is found
@@ -163,7 +138,7 @@ public class CurrentParking {
         return motor;
     }
 
-    public class Spota{
+    public static class Spota{
         private String num;
         private String id;
         private String type;

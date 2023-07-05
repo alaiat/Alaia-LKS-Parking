@@ -78,9 +78,6 @@ public class Login extends AppCompatActivity {
 
 
     public void login(){
-        current.getIdByNum("2");
-
-
 
         String em=edEmail.getText().toString();
         String pass=edPassword.getText().toString();
@@ -99,18 +96,6 @@ public class Login extends AppCompatActivity {
         }catch(Exception e){
            showErrorDialog();
         }
-       /* try{
-            boolean success=fireManager.login(em,pass);
-            if(success){
-                changeToVerReservas();
-
-            }else{
-                showErrorDialog();
-
-            }
-        }catch(Exception e){
-            showErrorDialog();
-        }*/
 
     }
 

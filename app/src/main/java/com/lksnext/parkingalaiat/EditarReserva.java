@@ -17,18 +17,13 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentReserva;
 import com.lksnext.parkingalaiat.domain.Reserva;
+import com.lksnext.parkingalaiat.interfaces.OnReservationUpdatedListener;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 
 public class EditarReserva extends AppCompatActivity {
@@ -43,9 +38,12 @@ public class EditarReserva extends AppCompatActivity {
     LinearProgressIndicator progress;
     TextInputLayout date,spotDropDown;
     AutoCompleteTextView dropdownField,spotList;
+    FirebaseManager fm;
 
 
     TextView action;
+    private CurrentReserva currentReserva;
+    private CurrentParking currentParking;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -65,10 +63,10 @@ public class EditarReserva extends AppCompatActivity {
     private void initUi() {
         initView();
        initListeners();
+       initData();
     }
 
     private void initView() {
-        //close = findViewById(R.id.fullscreen_dialog_close);
         action = findViewById(R.id.save_note);
         progress=findViewById(R.id.progress);
         startHour=findViewById(R.id.startHour);
@@ -78,24 +76,24 @@ public class EditarReserva extends AppCompatActivity {
         spotDropDown=findViewById(R.id.spotDropdwon);
         dropdownField=findViewById(R.id.dropdownField);
 
-        showData();
     }
 
-    private void showData() {
-        Reserva r= CurrentReserva.getInstance().getCurrentReserva();
+    private void initData() {
+        fm=FirebaseManager.getInstance();
+        currentParking=CurrentParking.getInstance();
+        currentReserva= CurrentReserva.getInstance();
+        Reserva r= currentReserva.getCurrent();
         startHour.getEditText().setText(r.getStartTime());
         endHour.getEditText().setText(r.getEndTime());
         date.getEditText().setText(r.getDate());
-        dropdownField.setText(CurrentParking.getInstance().getTypeById(r.getSpot()));
-        spotList.setText(CurrentParking.getInstance().getNumById(r.getSpot()));
+        dropdownField.setText(currentParking.getTypeById(r.getSpot()));
+        spotList.setText(currentParking.getNumById(r.getSpot()));
 
     }
 
     private void initListeners() {
-
         startHour.setStartIconOnClickListener(view->{showStartTimePicker();});
         endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
-
     }
 
     private void checkAllDataFill() {
@@ -180,58 +178,23 @@ public class EditarReserva extends AppCompatActivity {
     }
 
     private void update(String reservaId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference reservaRef = db.collection("reservas").document(reservaId);
-
-        reservaRef.update("startTime", startHour.getEditText().getText().toString())
-                .addOnSuccessListener(aVoid -> {
+        String start=startHour.getEditText().getText().toString();
+        String end=endHour.getEditText().getText().toString();
+        fm.updateReserva(reservaId,start,end, new OnReservationUpdatedListener() {
+            @Override
+            public void OnReservationUpdatedListener(boolean success) {
+                if (success) {
+                    // Reservation updated successfully
                     setResult(RESULT_OK);
                     finish();
-
-                })
-                .addOnFailureListener(e -> {
-                    // Failed to update start time
-                    // Handle the exception
-                });
-        reservaRef.update("endTime", endHour.getEditText().getText().toString())
-                .addOnSuccessListener(aVoid -> {
-                    // Start time updated successfully
-                    // Proceed with next steps or show a success message
-                })
-                .addOnFailureListener(e -> {
-                    // Failed to update start time
-                    // Handle the exception
-                });
+                } else {
+                    // Error occurred while updating the reservation
+                    // Handle the failure case
+                }
+            }
+        });
     }
-    private void findReserva() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference reservasRef = db.collection("reservation");
-        Reserva r=CurrentReserva.getInstance().getCurrentReserva();
 
-        Query query = reservasRef.whereEqualTo("date", r.getDate()).whereEqualTo("startTime",r.getStartTime()).whereEqualTo("endTime",r.getEndTime())
-                .whereEqualTo("spot",r.getSpot()).whereEqualTo("user",r.getUser());
-
-        query.get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
-
-                    // Iterate through the documents to retrieve the reservas
-                    for (DocumentSnapshot document : documents) {
-                        // Retrieve the reserva data
-                        String reservaId = document.getId();
-                        System.out.println(reservaId);
-                        // ... Retrieve other reserva data as needed
-
-                        // Perform operations with the retrieved reserva data
-                        // For example, update the start time
-                        //update(reservaId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    // Failed to query reservas
-                    // Handle the exception
-                });
-    }
 
 
     @Override
@@ -239,7 +202,7 @@ public class EditarReserva extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save_note:
                 // Perform the save action here
-                findReserva();
+                update(currentReserva.getId());
                 Intent reserva=new Intent();
                 reserva.putExtra(EXTRA_START,startHour.getEditText().getText().toString());
                 reserva.putExtra(EXTRA_END,endHour.getEditText().getText().toString());

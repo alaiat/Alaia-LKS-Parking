@@ -59,11 +59,6 @@ public class Reserva {
         this.date = date;
     }
 
-    public boolean isOverlapping(Reserva other) {
-        //return startTime.before(other.getEndTime()) && other.getStartTime().before(endTime);
-        return false;
-    }
-
     public String getUser() {
         return user;
     }

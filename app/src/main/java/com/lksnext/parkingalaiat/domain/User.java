@@ -18,7 +18,7 @@ public class User {
         this.name = nombre;
         this.email = correoElectronico;
         this.phoneNumber=phoneNum;
-        reservas=new ArrayList<Reserva>();
+        reservas=new ArrayList<>();
     }
 
     // Getters y setters
@@ -54,30 +54,5 @@ public class User {
         this.phoneNumber=phoneNumber;
     }
 
-    /*public int obtenerDuracionTotalReservasEnDia(Date fecha) {
-        int duracionTotal = 0;
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(fecha);
-
-        for (Reserva reserva : reservas) {
-            Calendar reservaCalendar = Calendar.getInstance();
-            reservaCalendar.setTime(reserva.getFechaInicio());
-
-            if (calendar.get(Calendar.YEAR) == reservaCalendar.get(Calendar.YEAR)
-                    && calendar.get(Calendar.MONTH) == reservaCalendar.get(Calendar.MONTH)
-                    && calendar.get(Calendar.DAY_OF_MONTH) == reservaCalendar.get(Calendar.DAY_OF_MONTH)) {
-                // La reserva se encuentra en el día especificado
-                duracionTotal += calcularDuracionReservaEnHoras(reserva);
-            }
-        }
-
-        return duracionTotal;
-    }*/
-
-   /* private int calcularDuracionReservaEnHoras(Reserva reserva) {
-        long duracionEnMilisegundos = reserva.getFechaFin().getTime() - reserva.getFechaInicio().getTime();
-        int duracionEnHoras = (int) (duracionEnMilisegundos / (1000 * 60 * 60));
-        return duracionEnHoras;
-    }*/
 }

@@ -1,9 +1,5 @@
 package com.lksnext.parkingalaiat.domain;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Spot {
 
 
@@ -11,7 +7,6 @@ public class Spot {
     private String type;
     private boolean available;
 
-   // private List<String> reservas;
 
 
     public Spot( String type, int number) {
@@ -19,7 +14,6 @@ public class Spot {
         this.available = true;
         this.number=number;
 
-        //reservas=new ArrayList<>();
     }
 
 
@@ -60,6 +54,6 @@ public class Spot {
 
     @Override
     public String toString() {
-        return type.toString();
+        return type;
     }
 }

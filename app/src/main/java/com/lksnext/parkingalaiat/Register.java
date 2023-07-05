@@ -154,9 +154,8 @@ public class Register extends AppCompatActivity {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     // Update the progress of the LinearProgressIndicator
-                    String password = s.toString();
-                    System.out.println(password+"\n\n\n\n");
-                    int progress = calculateProgress(password); // Calculate the progress based on password complexity or criteria
+                    String pass = s.toString();
+                    int progress = calculateProgress(pass);
                     progressIndicator.setProgressCompat(progress, true);
                 }
 
@@ -288,8 +287,7 @@ public class Register extends AppCompatActivity {
 
 
     private boolean makeAllRegisterCheckings(String name, String email, String phoneN,String passw,String pass2){
-        boolean isEverythingCorrect= !checkEmpty(name,email,phoneN,passw,pass2) && checkEveryThingWithPasswords(passw,pass2);
-        return isEverythingCorrect;
+        return !checkEmpty(name,email,phoneN,passw,pass2) && checkEveryThingWithPasswords(passw,pass2);
     }
     private boolean checkPasswordsAreTheSame(String pass1, String pass2) {
         if(pass1.equals(pass2)){
@@ -366,34 +364,6 @@ public class Register extends AppCompatActivity {
     }
 
 
-
-
-/*
-    private void saveUserData(String email, String name, String phoneNumber) {
-        // Create a new user with a first and last name
-        Map<String, Object> user = new HashMap<>();
-        user.put("name", name);
-        user.put("email", email);
-        user.put("phone number", phoneNumber);
-        user.put("image","profile_image.jpg");
-        user.put("reservas",new ArrayList<>());
-
-        // Add a new document with a generated ID
-        db.collection("users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
-    }*/
     private void saveUserDataToFirestore(String userId, String email, String name, String phoneNumber) {
         DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(userId);
 

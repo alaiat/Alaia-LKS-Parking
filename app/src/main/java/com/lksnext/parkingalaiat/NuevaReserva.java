@@ -28,7 +28,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.Reserva;
 import com.lksnext.parkingalaiat.domain.UserContext;
@@ -55,16 +54,17 @@ public class NuevaReserva extends AppCompatActivity {
     Boolean dateSel=false;
     Boolean startSel=false;
     Boolean endSel=false;
-    String[] items={"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
+    String[] spotTypes ={"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
     String[]spots={"-1"};
 
 
     String typeToFound="";
+    UserContext userContext;
 
-    AutoCompleteTextView dropdownField,spotList;
-    ArrayAdapter<String> adapterItems;
-    ArrayAdapter<String> adapterItemsSpot;
-    TextInputLayout date,spotDropDown;
+    AutoCompleteTextView spotTypeOptionsText, availableSpotListText;
+
+    ArrayAdapter<String> availableSpotAdapter;
+    TextInputLayout date, availableSpotListDropdown;
     TextInputLayout startHour,endHour;
     LinearProgressIndicator progress;
     MaterialDatePicker<Long> datePicker;
@@ -74,7 +74,89 @@ public class NuevaReserva extends AppCompatActivity {
 
     List<String> notAvailable=new ArrayList<>();
 
-    private void getSpots(String type) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.nueva_reserva);
+        initUi();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.add_reserva, menu);
+
+        setTitle("Nueva reserva");
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_note:
+                // Perform the save action here
+                save();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    private void initUi() {
+        initView();
+        initListeners();
+        initData();
+    }
+
+    private void initData() {
+        userContext=UserContext.getInstance();
+    }
+
+    private void initView() {
+        action = findViewById(R.id.save_note);
+        date=findViewById(R.id.date);
+        progress=findViewById(R.id.progress);
+        startHour=findViewById(R.id.startHour);
+        endHour=findViewById(R.id.endHour);
+        search=findViewById(R.id.searchButton);
+        mapSelect=findViewById(R.id.selectMap);
+        availableSpotListText =findViewById(R.id.spots);
+        availableSpotListDropdown =findViewById(R.id.spotDropdwon);
+        spotTypeOptionsText =findViewById(R.id.dropdownField);
+
+        ArrayAdapter<String> typeAdapter= new ArrayAdapter<String>(this,R.layout.dropdown_list_item, spotTypes);
+        spotTypeOptionsText.setAdapter(typeAdapter);
+
+        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,spots);
+        availableSpotListText.setAdapter(availableSpotAdapter);
+
+    }
+
+    private void initListeners() {
+        spotTypeOptionsText.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                String item=parent.getItemAtPosition(position).toString();
+                typeSel=true;
+                checkAllDataFill();
+            }
+        });
+        availableSpotListText.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent,View view,int position,long id){
+                String item=parent.getItemAtPosition(position).toString();
+                typeToFound=item;
+            }
+        });
+        date.setStartIconOnClickListener(view ->{ date.setError(null); showDatePicker();});
+        startHour.setStartIconOnClickListener(view->{ startHour.setError(null); endHour.setError(null); showStartTimePicker();});
+        endHour.setStartIconOnClickListener(view->{endHour.setError(null); startHour.setError(null); showEndTimePicker();});
+        search.setOnClickListener(view->{showProgressIndicator();});
+    }
+
+    private void checkAllDataFill() {
+        if(typeSel && dateSel && startSel && endSel){
+            search.setEnabled(true);
+        }
+    }
+    private void getSpotsForType(String type) {
         List<CurrentParking.Spota> a=new ArrayList<>();
         List<String> drop=new ArrayList<>();
 
@@ -103,101 +185,14 @@ public class NuevaReserva extends AppCompatActivity {
         for(CurrentParking.Spota s:a){
             drop.add(s.getNum());
         }
-        adapterItemsSpot=new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
-        spotList.setAdapter(adapterItemsSpot);
+        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
+        availableSpotListText.setAdapter(availableSpotAdapter);
 
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.nueva_reserva);
-        initUi();
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.add_reserva, menu);
 
-        setTitle("Nueva reserva");
-        return true;
-    }
 
-    private void initUi() {
-        initView();
-        initListeners();
-    }
-
-    private void initView() {
-        //close = findViewById(R.id.fullscreen_dialog_close);
-        action = findViewById(R.id.save_note);
-        search=findViewById(R.id.searchButton);
-        date=findViewById(R.id.date);
-        mapSelect=findViewById(R.id.selectMap);
-        progress=findViewById(R.id.progress);
-        startHour=findViewById(R.id.startHour);
-        endHour=findViewById(R.id.endHour);
-        spotList=findViewById(R.id.spots);
-        spotDropDown=findViewById(R.id.spotDropdwon);
-        dropdownField=findViewById(R.id.dropdownField);
-
-        adapterItems= new ArrayAdapter<String>(this,R.layout.dropdown_list_item,items);
-
-        dropdownField.setAdapter(adapterItems);
-
-        adapterItemsSpot=new ArrayAdapter<String>(this,R.layout.dropdown_list_item,spots);
-        spotList.setAdapter(adapterItemsSpot);
-
-        dropdownField.setBackgroundColor(date.getBoxBackgroundColor());
-
-    }
-
-    private void initListeners() {
-       // close.setOnClickListener(view -> {close();});
-
-       // action.setOnClickListener(view -> {/*save();*/});
-        dropdownField.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                String item=parent.getItemAtPosition(position).toString();
-               // Toast.makeText(getContext(),"Item "+item,Toast.LENGTH_SHORT).show();
-                typeSel=true;
-                checkAllDataFill();
-            }
-        });
-        spotList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent,View view,int position,long id){
-                String item=parent.getItemAtPosition(position).toString();
-                typeToFound=item;
-               // Toast.makeText(this,"Item "+item,Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        date.setStartIconOnClickListener(view ->{ date.setError(null); showDatePicker();});
-        startHour.setStartIconOnClickListener(view->{ showStartTimePicker();});
-        endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
-        search.setOnClickListener(view->{showProgressIndicator();});
-    }
-
-    private void checkAllDataFill() {
-        if(typeSel && dateSel && startSel && endSel){
-            search.setEnabled(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_note:
-                // Perform the save action here
-                save();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     private void showEndTimePicker() {
         endHour.setError(null);
@@ -206,7 +201,7 @@ public class NuevaReserva extends AppCompatActivity {
                         .setTimeFormat(TimeFormat.CLOCK_24H)
                         .setHour(12)
                         .setMinute(10)
-                        .setTitleText("Select Appointment time")
+                        .setTitleText("Select end time")
                         .build();
         picker.show(getSupportFragmentManager(),"tag");
 
@@ -225,7 +220,6 @@ public class NuevaReserva extends AppCompatActivity {
                 endSel=true;
                 checkAllDataFill();
             }
-
 
             endSel=true;
             checkAllDataFill();
@@ -265,7 +259,7 @@ public class NuevaReserva extends AppCompatActivity {
     }
 
     private void showProgressIndicator() {
-        getSpots(typeToFound);
+        getSpotsForType(typeToFound);
         noAvailableSpots(date.getEditText().getText().toString(),startHour.getEditText().getText().toString(),endHour.getEditText().getText().toString());
         progress.setVisibility(View.VISIBLE);
 
@@ -280,13 +274,13 @@ public class NuevaReserva extends AppCompatActivity {
                 // Hide the progress indicator
                 progress.setVisibility(View.INVISIBLE);
                 mapSelect.setVisibility(View.VISIBLE);
-                spotDropDown.setVisibility(View.VISIBLE);
+                availableSpotListDropdown.setVisibility(View.VISIBLE);
             }
         }, 3000);
     }
 
     private void noAvailableSpots(String date, String start,String end) {
-        getSpots(this.dropdownField.getEditableText().toString());
+        getSpotsForType(this.spotTypeOptionsText.getEditableText().toString());
         notAvailable.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -319,7 +313,7 @@ public class NuevaReserva extends AppCompatActivity {
         LocalTime s1 = LocalTime.parse(reservation.getStartTime());
         LocalTime e1 = LocalTime.parse(reservation.getEndTime());
 
-        String tipoa=dropdownField.getEditableText().toString();
+        String tipoa= spotTypeOptionsText.getEditableText().toString();
 
         if(s2.isBefore(e1) && e2.isAfter(s1)){
             DocumentReference ref=FirebaseFirestore.getInstance().collection("spots").document(reservation.getSpot());
@@ -443,12 +437,12 @@ public class NuevaReserva extends AppCompatActivity {
         String date=this.date.getEditText().getText().toString();
         String startHour=this.startHour.getEditText().getText().toString();
         String endHour=this.endHour.getEditText().getText().toString();
-        String type=this.dropdownField.getEditableText().toString();
-        String spot=this.spotList.getEditableText().toString();
+        String type=this.spotTypeOptionsText.getEditableText().toString();
+        String spot=this.availableSpotListText.getEditableText().toString();
         Boolean status=true;
 
         if(date.isEmpty() | startHour.isEmpty() | endHour.isEmpty()){
-            spotDropDown.setError(" ");
+            availableSpotListDropdown.setError(" ");
             this.date.setError(" ");
             this.startHour.setError(" ");
             this.endHour.setError(" ");

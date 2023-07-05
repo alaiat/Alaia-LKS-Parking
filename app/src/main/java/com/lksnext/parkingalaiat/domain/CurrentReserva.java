@@ -3,7 +3,8 @@ package com.lksnext.parkingalaiat.domain;
 public class CurrentReserva {
 
     private static CurrentReserva instance;
-    private Reserva currentReserva;
+    private Reserva current;
+    private String id;
 
     private CurrentReserva() {
         // Private constructor to prevent instantiation from outside
@@ -16,12 +17,20 @@ public class CurrentReserva {
         return instance;
     }
 
-    public Reserva getCurrentReserva() {
-        return currentReserva;
+    public Reserva getCurrent() {
+        return current;
     }
 
-    public void setCurrentReserva(Reserva reserva) {
-        currentReserva = reserva;
+    public void setCurrent(Reserva reserva) {
+        current = reserva;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
 

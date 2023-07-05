@@ -22,10 +22,7 @@ import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity {
-    private CurrentParking current;
-    private Button loginB;
-    private Button registerB;
-    private FirebaseFirestore db;
+
 
 
 
@@ -34,31 +31,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        current= CurrentParking.getInstance();
         Intent intent = new Intent(MainActivity.this, Login.class);
         startActivity(intent);
 
-        initUi();
 
 
 
 
     }
-
-    private void initUi() {
-
-        //initializeSpots();
-
-
-
-    }
-
-
 
     private void initializeSpots() {
 
-        db=FirebaseFirestore.getInstance();
-        CollectionReference spotsCollection = db.collection("spots");
+        FirebaseFirestore db=FirebaseFirestore.getInstance();
         List<Spot> spotsList = new ArrayList<>();
         spotsList.add(new Spot("CAR",1));
         spotsList.add(new Spot("CAR",2));
