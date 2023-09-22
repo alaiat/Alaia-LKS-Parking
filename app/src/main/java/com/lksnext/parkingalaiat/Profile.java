@@ -7,18 +7,14 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.Query;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.lksnext.parkingalaiat.domain.User;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
-public class Perfil extends AppCompatActivity {
+public class Profile extends AppCompatActivity {
     private ImageView image;
     private TextInputLayout name,phone,email;
     private Button edit,save;
@@ -37,7 +33,7 @@ public class Perfil extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu){
 
 
-        setTitle("Perfil");
+        setTitle("Profile");
         return true;
     }
 

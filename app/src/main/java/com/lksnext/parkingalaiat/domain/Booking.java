@@ -1,30 +1,30 @@
 package com.lksnext.parkingalaiat.domain;
 
-public class Reserva {
+public class Booking {
 
     private String spot;
     private String user;
     private String startTime;
     private String endTime;
     private String date;
-    private String activo;
+    private String active;
 
-    public Reserva(String spot, String startTime, String endTime, String date, String user) {
+    public Booking(String spot, String startTime, String endTime, String date, String user) {
         this.spot = spot;
         this.startTime = startTime;
         this.endTime = endTime;
         this.date=date;
-        activo="";
+        active ="";
         this.user=user;
     }
 
 
-    public String getActivo() {
-        return activo;
+    public String getActive() {
+        return active;
     }
 
-    public void setActivo(String activo) {
-        this.activo = activo;
+    public void setActive(String active) {
+        this.active = active;
     }
 
     public String getSpot() {
@@ -69,7 +69,7 @@ public class Reserva {
 
     @Override
     public String toString() {
-        return "ReservaOld{" +
+        return "Booking{" +
                 ", spot=" + spot +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +

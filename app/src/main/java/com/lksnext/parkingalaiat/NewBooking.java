@@ -23,15 +23,8 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.DayHours;
-import com.lksnext.parkingalaiat.domain.Reserva;
 import com.lksnext.parkingalaiat.domain.UserContext;
 
 import java.time.Duration;
@@ -42,7 +35,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class NuevaReserva extends AppCompatActivity {
+public class NewBooking extends AppCompatActivity {
 
     public static final String EXTRA_DATE="com.lksnext.parkingalaiat.EXTRA_DATE";
     public static final String EXTRA_STATUS="com.lksnext.parkingalaiat.EXTRA_STATUS";
@@ -50,45 +43,45 @@ public class NuevaReserva extends AppCompatActivity {
     public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
     public static final String EXTRA_TYPE="com.lksnext.parkingalaiat.EXTRA_TYPE";
     public static final String EXTRA_SPOT = "com.lksnext.parkingalaiat.EXTRA_SPOT";
-    CurrentParking current=CurrentParking.getInstance();
+    private CurrentParking current=CurrentParking.getInstance();
 
-    Boolean typeSel=false;
-    Boolean dateSel=false;
-    Boolean startSel=false;
-    Boolean endSel=false;
-    String[] spotTypes ={"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
-    String[]spots={"-1"};
+    private Boolean typeSel=false;
+    private Boolean dateSel=false;
+    private Boolean startSel=false;
+    private Boolean endSel=false;
+    private String[] spotTypes ={"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
+    private String[]spots={"-1"};
 
 
-    String typeToFound="";
-    UserContext userContext;
+    private String typeToFound="";
+    private UserContext userContext;
 
-    AutoCompleteTextView spotTypeOptionsText, availableSpotListText;
+    private AutoCompleteTextView spotTypeOptionsText, availableSpotListText;
 
-    ArrayAdapter<String> availableSpotAdapter;
-    TextInputLayout date, availableSpotListDropdown;
-    TextInputLayout startHour,endHour;
-    LinearProgressIndicator progress;
-    MaterialDatePicker<Long> datePicker;
-    Button search, mapSelect,change;
+    private ArrayAdapter<String> availableSpotAdapter;
+    private TextInputLayout date, availableSpotListDropdown;
+    private TextInputLayout startHour,endHour;
+    private LinearProgressIndicator progress;
+    private MaterialDatePicker<Long> datePicker;
+    private Button search, mapSelect,change;
 
-    TextView action;
+    private TextView action;
 
-    List<String> notAvailable=new ArrayList<>();
-    List<CurrentParking.Spota> selectedTypeSpots=new ArrayList<>();
+    private List<String> notAvailable=new ArrayList<>();
+    private List<CurrentParking.Area> selectedTypeSpots=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nueva_reserva);
+        setContentView(R.layout.new_booking);
         initUi();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.add_reserva, menu);
+        menuInflater.inflate(R.menu.add_booking, menu);
 
-        setTitle("Nueva reserva");
+        setTitle("New booking");
         return true;
     }
     @Override
@@ -199,8 +192,8 @@ public class NuevaReserva extends AppCompatActivity {
                 break;
         }
 
-        for(CurrentParking.Spota s:selectedTypeSpots){
-            drop.add(s.getNum());
+        for(CurrentParking.Area s:selectedTypeSpots){
+            drop.add(s.getNumber());
         }
         System.out.println(drop);
         availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
@@ -362,10 +355,10 @@ public class NuevaReserva extends AppCompatActivity {
 
 
     private boolean deleteNotAvailableSpots(String dat,String startT,String endT) {
-        List<CurrentParking.Spota> toRemove=new ArrayList<>();
+        List<CurrentParking.Area> toRemove=new ArrayList<>();
         List<String> libreak=new ArrayList<>();
-        for(CurrentParking.Spota s:selectedTypeSpots){
-            DayHours dh=s.getDayHoursByDay(dat);
+        for(CurrentParking.Area s:selectedTypeSpots){
+            DayHours dh=s.getDayHoursByDate(dat);
             if(dh!=null){
                 System.out.println(dh+"\n");
             for(int i=0; i<dh.getStartHours().size();i++){
@@ -380,9 +373,9 @@ public class NuevaReserva extends AppCompatActivity {
 
         }
         System.out.println(toRemove);
-        for(CurrentParking.Spota s: selectedTypeSpots){
+        for(CurrentParking.Area s: selectedTypeSpots){
             if(!toRemove.contains(s)){
-                libreak.add(s.getNum());
+                libreak.add(s.getNumber());
             }
         }
         if(libreak.size()==0){

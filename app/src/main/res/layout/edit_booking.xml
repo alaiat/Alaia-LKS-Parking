@@ -59,7 +59,7 @@
             app:layout_constraintTop_toBottomOf="@id/dropdownField1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:startIconDrawable="@drawable/baseline_calendar_month_24"
+            app:startIconDrawable="@drawable/calendar_icon"
             app:endIconMode="clear_text"
             app:boxBackgroundColor="@android:color/system_accent2_200"
             android:enabled="false"
@@ -94,7 +94,7 @@
                 app:layout_constraintTop_toBottomOf="@id/date"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:startIconDrawable="@drawable/baseline_access_time_24"
+                app:startIconDrawable="@drawable/time_clock_icon"
                 app:boxBackgroundColor="@android:color/system_accent2_200"
 
 
@@ -121,7 +121,7 @@
                 app:layout_constraintTop_toBottomOf="@id/date"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:startIconDrawable="@drawable/baseline_access_time_24"
+                app:startIconDrawable="@drawable/time_clock_icon"
                 app:boxBackgroundColor="@android:color/system_accent2_200"
 
 

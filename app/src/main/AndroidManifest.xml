@@ -6,7 +6,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/logo_app"
+        android:icon="@drawable/app_logo_image"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ParkingAlaiaT"
@@ -21,13 +21,13 @@
         </activity>
         <activity android:name=".Login"/>
         <activity android:name=".Register"/>
-        <activity android:name=".NuevaReserva"
-            android:parentActivityName=".VerReservas"/>
-        <activity android:name=".EditarReserva"
-            android:parentActivityName=".VerReservas"/>
-        <activity android:name=".Perfil"
-            android:parentActivityName=".VerReservas"/>
-        <activity android:name=".VerReservas" />
+        <activity android:name=".NewBooking"
+            android:parentActivityName=".SeeBookings"/>
+        <activity android:name=".EditBooking"
+            android:parentActivityName=".SeeBookings"/>
+        <activity android:name=".Profile"
+            android:parentActivityName=".SeeBookings"/>
+        <activity android:name=".SeeBookings" />
         <meta-data
             android:name="com.google.firebase.firestore.FirebaseFirestoreRegistrar"
             android:value="firestore_prod" />

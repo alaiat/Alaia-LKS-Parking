@@ -5,7 +5,7 @@
     <item
         android:title="perfil"
         android:id="@+id/perfil"
-        android:icon="@drawable/profile_icon_white"
+        android:icon="@drawable/account_icon_white"
         android:actionLayout="@layout/menu_item_layout"
         app:showAsAction="ifRoom" />
 

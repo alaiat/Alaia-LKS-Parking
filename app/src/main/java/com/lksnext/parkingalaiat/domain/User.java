@@ -9,26 +9,24 @@ public class User {
     private String name;
     private String email;
     private String phoneNumber;
-    @PropertyName("reservas")
-    private List<Reserva> reservas;
+    private List<Booking> bookings;
 
 
 
-    public User(String nombre, String correoElectronico, String phoneNum) {
-        this.name = nombre;
-        this.email = correoElectronico;
-        this.phoneNumber=phoneNum;
-        reservas=new ArrayList<>();
+    public User(String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber=phone;
+        bookings =new ArrayList<>();
     }
 
-    // Getters y setters
 
-    public List<Reserva> getReservas() {
-        return reservas;
+    public List<Booking> getReservas() {
+        return bookings;
     }
 
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
+    public void setReservas(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 
     public String getName() {

@@ -23,61 +23,12 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(MainActivity.this, Login.class);
         startActivity(intent);
-
-
-
-
-
     }
-
-    private void initializeSpots() {
-
-        FirebaseFirestore db=FirebaseFirestore.getInstance();
-        List<Spot> spotsList = new ArrayList<>();
-        spotsList.add(new Spot("CAR",1));
-        spotsList.add(new Spot("CAR",2));
-        spotsList.add(new Spot("CAR",3));
-        spotsList.add(new Spot("CAR",4));
-        spotsList.add(new Spot("CAR",5));
-        spotsList.add(new Spot("MOTORCYCLE",6));
-        spotsList.add(new Spot("HANDICAPPED",7));
-        spotsList.add(new Spot("ELECTRIC",8));
-
-
-        for (Spot spot : spotsList) {
-            // Generate a unique spot ID (or use spot number as the document ID)
-            String spotId = UUID.randomUUID().toString();
-
-            // Create a document reference for the spot using the spot ID
-            DocumentReference spotRef = db.collection("spots").document(spotId);
-
-            // Set the spot data to the document
-            spotRef.set(spot)
-                    .addOnSuccessListener(aVoid -> {
-                        // Spot data saved successfully
-                        System.out.println("Spot saved: " + spotId);
-                    })
-                    .addOnFailureListener(e -> {
-                        // Error occurred while saving spot data
-                        System.out.println("Failed to save spot: " + spotId);
-                        System.out.println(e.toString());
-                    });
-        }
-
-    }
-
-
-
-
 
 }

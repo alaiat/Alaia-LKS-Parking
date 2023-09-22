@@ -11,46 +11,45 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lksnext.parkingalaiat.domain.CurrentParking;
-import com.lksnext.parkingalaiat.domain.Reserva;
+import com.lksnext.parkingalaiat.domain.Booking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHolder> {
-    private List<Reserva> reservas=new ArrayList<>();
+public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHolder> {
+    private List<Booking> bookings =new ArrayList<>();
     private LayoutInflater mInflater;
     private Context context;
     private OnItemClickListener onItemClickListener;
 
 
-    public ReservaAdapter(List<Reserva> reservas, Context context) {
-        this.reservas = reservas;
+    public BookingAdapter(List<Booking> bookings, Context context) {
+        this.bookings = bookings;
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
     }
-    public ReservaAdapter() {
+    public BookingAdapter() {
 
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //View view = mInflater.inflate(R.layout.reserva_item, null);
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.reserva_item,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.booking_item,parent,false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ReservaAdapter.ViewHolder holder, final int position) {
-        holder.bindData(reservas.get(position));
+    public void onBindViewHolder(final BookingAdapter.ViewHolder holder, final int position) {
+        holder.bindData(bookings.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return reservas.size();
+        return bookings.size();
     }
 
-    public void setItems(List<Reserva> items) {
-        reservas = items;
+    public void setItems(List<Booking> items) {
+        bookings = items;
         notifyDataSetChanged();
 
     }
@@ -87,22 +86,22 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ViewHold
 
         }
 
-        void bindData(final Reserva item) {
+        void bindData(final Booking item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
             String type=CurrentParking.getInstance().getTypeById(item.getSpot());
             if(type.equals("CAR")){
-                iconImage.setImageResource(R.drawable.normal_imagen);
+                iconImage.setImageResource(R.drawable.normal_image);
 
 
             }else if(type.equals("MOTORCYCLE" )){
-                iconImage.setImageResource(R.drawable.moto_imagen);
+                iconImage.setImageResource(R.drawable.moto_image);
 
 
             }else if(type.equals("ELECTRIC")){
-                iconImage.setImageResource(R.drawable.electrico_imagen);
+                iconImage.setImageResource(R.drawable.electric_image);
 
             }else if(type.equals("HANDICAPPED")){
-                iconImage.setImageResource(R.drawable.discapacitados_icono);
+                iconImage.setImageResource(R.drawable.handicapped_image);
             }
 
 

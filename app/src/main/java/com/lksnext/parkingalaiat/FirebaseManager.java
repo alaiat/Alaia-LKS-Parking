@@ -10,12 +10,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
-import com.lksnext.parkingalaiat.domain.CurrentReserva;
-import com.lksnext.parkingalaiat.domain.Reserva;
+import com.lksnext.parkingalaiat.domain.CurrentBooking;
+import com.lksnext.parkingalaiat.domain.Booking;
 import com.lksnext.parkingalaiat.domain.UserContext;
-import com.lksnext.parkingalaiat.interfaces.OnReservationUpdatedListener;
-import com.lksnext.parkingalaiat.interfaces.OnReservationsListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotIdsLoadedListener;
+import com.lksnext.parkingalaiat.interfaces.OnBookingUpdatedListener;
+import com.lksnext.parkingalaiat.interfaces.OnBookingsListener;
+import com.lksnext.parkingalaiat.interfaces.OnSpotsIdLoadedListener;
 import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class FirebaseManager {
     private CollectionReference reservaRef;
     private CollectionReference spotRef;
     private UserContext user;
-    private CurrentReserva currentReserva;
+    private CurrentBooking currentBooking;
 
 
     private FirebaseManager(){
@@ -40,7 +40,7 @@ public class FirebaseManager {
         userRef = db.collection("users");
         spotRef = db.collection("spots");
         user=UserContext.getInstance();
-        currentReserva=CurrentReserva.getInstance();
+        currentBooking = CurrentBooking.getInstance();
 
     }
     public static synchronized FirebaseManager getInstance() {
@@ -50,12 +50,12 @@ public class FirebaseManager {
         return instance;
     }
 
-    public void getAllReservationsForUser(OnReservationsListener listener) {
+    public void getAllBookingsForUser(OnBookingsListener listener) {
         String userId = user.getCurrentUser().getUid();
         Query query = reservaRef.whereEqualTo("user", userId);
 
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
-            List<Reserva> reservations = new ArrayList<>();
+            List<Booking> reservations = new ArrayList<>();
 
             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                 String date = documentSnapshot.getString("date");
@@ -63,19 +63,19 @@ public class FirebaseManager {
                 String startT = documentSnapshot.getString("startTime");
                 String spot = documentSnapshot.getString("spot");
 
-                Reserva reservation = new Reserva(spot, startT, endT, date, userId);
+                Booking reservation = new Booking(spot, startT, endT, date, userId);
                 user.addMinutesToDay(date, startT, endT);
                 reservations.add(reservation);
             }
 
             // Invoke the listener with the loaded reservations
-            listener.onReservationsLoaded(reservations);
+            listener.onBookingsLoaded(reservations);
         }).addOnFailureListener(e -> {
             // Invoke the listener with null to indicate failure
-            listener.onReservationsLoaded(null);
+            listener.onBookingsLoaded(null);
         });
     }
-    public void deleteReservationByAllData(Reserva r) {
+    public void deleteBookingByAllData(Booking r) {
         String userId=user.getCurrentUser().getUid();
         reservaRef
                 .whereEqualTo("user", userId)
@@ -90,11 +90,11 @@ public class FirebaseManager {
                         reservationRef.delete()
                                 .addOnSuccessListener(aVoid -> {
                                     // Reservation successfully deleted
-                                    System.out.println("Reservation deleted: " + documentSnapshot.getId());
+                                    System.out.println("Booking deleted: " + documentSnapshot.getId());
                                 })
                                 .addOnFailureListener(e -> {
                                     // Error occurred while deleting the reservation
-                                    System.out.println("Failed to delete reservation: " + documentSnapshot.getId());
+                                    System.out.println("Failed to delete booking: " + documentSnapshot.getId());
                                     System.out.println(e.toString());
 
                                     // Handle the exception
@@ -112,27 +112,24 @@ public class FirebaseManager {
                                     // Handle the exception
                                 });
                         DocumentReference spotRef = db.collection("spots").document(r.getSpot());
+                        //It has to be reservas because we have reservas as database name in firebase
                         spotRef.update("reservas", FieldValue.arrayRemove(documentSnapshot.getId()))
                                 .addOnSuccessListener(aVoid2 -> {
                                     // Reservation ID removed from spot document
-                                    System.out.println("Reservation ID removed from spot: " );
+                                    System.out.println("Booking ID removed from spot: " );
                                 })
                                 .addOnFailureListener(e -> {
                                     // Error occurred while updating spot document
                                     System.out.println(e.toString());
-
-                                    // Handle the exception
                                 });
                     }
                 })
                 .addOnFailureListener(e -> {
                     // Error occurred while querying reservations
                     System.out.println("Failed to query reservations: " + e.toString());
-
-                    // Handle the exception
                 });
     }
-    public void addReservaInFirebase(Reserva res) {
+    public void addBookingInFirebase(Booking res) {
         String userId=user.getCurrentUser().getUid();
         reservaRef.get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -157,8 +154,8 @@ public class FirebaseManager {
 
 
     }
-    public void getAllSpotsId(OnSpotIdsLoadedListener listener) {
-        List<String> spotListaId = new ArrayList<>();
+    public void getAllSpotsId(OnSpotsIdLoadedListener listener) {
+        List<String> spotListId = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Get a reference to the "spots" collection
@@ -172,23 +169,23 @@ public class FirebaseManager {
                     String spotId = documentSnapshot.getId();
 
                     // Add the spot ID to the list
-                    spotListaId.add(spotId);
+                    spotListId.add(spotId);
                 }
 
                 // Invoke the listener with the loaded spot IDs
-                listener.onSpotIdsLoaded(spotListaId);
+                listener.onSpotIdsLoaded(spotListId);
             } else {
                 // Handle the failure case
                 listener.onSpotIdsLoaded(null);
             }
         });
     }
-    public void sortList(List<String> spotListaId, OnSpotsLoaderByTypeListener listener) {
-        List<CurrentParking.Spota> all = new ArrayList<>();
-        int totalQueries = spotListaId.size();
+    public void sortList(List<String> spotListId, OnSpotsLoaderByTypeListener listener) {
+        List<CurrentParking.Area> all = new ArrayList<>();
+        int totalQueries = spotListId.size();
         AtomicInteger completedQueries = new AtomicInteger();
 
-        for (String id : spotListaId) {
+        for (String id : spotListId) {
             DocumentReference spotRef = FirebaseFirestore.getInstance().collection("spots").document(id);
 
             spotRef.get().addOnCompleteListener(task -> {
@@ -197,7 +194,7 @@ public class FirebaseManager {
                     if (documentSnapshot.exists()) {
                         String type = (String) documentSnapshot.get("type");
                         Object num = documentSnapshot.get("number");
-                        CurrentParking.Spota s=new CurrentParking.Spota(num.toString(), id, type);
+                        CurrentParking.Area s=new CurrentParking.Area(num.toString(), id, type);
                         all.add(s);
                         System.out.println(s+"\n");
                     }
@@ -214,8 +211,8 @@ public class FirebaseManager {
             });
         }
     }
-    public void setCurrentReserva(Reserva r){
-        currentReserva.setCurrent(r);
+    public void setCurrentBooking(Booking r){
+        currentBooking.setCurrent(r);
         String userId=user.getCurrentUser().getUid();
         reservaRef
                 .whereEqualTo("user", userId)
@@ -230,13 +227,13 @@ public class FirebaseManager {
                         for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                             String documentId = documentSnapshot.getId();
                             // Use the document ID as needed
-                            currentReserva.setId(documentId);
+                            currentBooking.setId(documentId);
                             System.out.println("Document ID: " + documentId);
                         }
                     }
                 });
     }
-    public void updateReserva(String reservaId, String start, String end, OnReservationUpdatedListener listener) {
+    public void updateBooking(String reservaId, String start, String end, OnBookingUpdatedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference reservaRef = db.collection("reservations").document(reservaId);
 
@@ -245,19 +242,19 @@ public class FirebaseManager {
                     reservaRef.update("endTime", end)
                             .addOnSuccessListener(aVoid1 -> {
                                 // Reservation updated successfully
-                                listener.OnReservationUpdatedListener(true);
+                                listener.OnBookingUpdatedListener(true);
                             })
                             .addOnFailureListener(e -> {
                                 // Error occurred while updating endTime
-                                listener.OnReservationUpdatedListener(false);
+                                listener.OnBookingUpdatedListener(false);
                             });
                 })
                 .addOnFailureListener(e -> {
                     // Error occurred while updating startTime
-                    listener.OnReservationUpdatedListener(false);
+                    listener.OnBookingUpdatedListener(false);
                 });
     }
-    public void getReservationsForSpot(String spotId, OnReservationsListener listener) {
+    public void getBookingsForSpot(String spotId, OnBookingsListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference reservationsRef = db.collection("reservations");
 
@@ -265,7 +262,7 @@ public class FirebaseManager {
 
         query.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                List<Reserva> reservations = new ArrayList<>();
+                List<Booking> reservations = new ArrayList<>();
                 QuerySnapshot querySnapshot = task.getResult();
 
                 for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
@@ -276,12 +273,12 @@ public class FirebaseManager {
                     String userId = documentSnapshot.getString("user");
 
                     // Create a Reserva object and add it to the list
-                    Reserva reservation = new Reserva(spotId, startT, endT, date, userId);
+                    Booking reservation = new Booking(spotId, startT, endT, date, userId);
                     reservations.add(reservation);
                 }
 
                 // Pass the reservations list to the listener
-                listener.onReservationsLoaded(reservations);
+                listener.onBookingsLoaded(reservations);
             } else {
                 // Handle the failure case
                 Exception exception = task.getException();

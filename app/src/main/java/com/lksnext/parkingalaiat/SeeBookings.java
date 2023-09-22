@@ -17,10 +17,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
-import com.lksnext.parkingalaiat.domain.CurrentReserva;
-import com.lksnext.parkingalaiat.domain.Reserva;
+import com.lksnext.parkingalaiat.domain.CurrentBooking;
+import com.lksnext.parkingalaiat.domain.Booking;
 import com.lksnext.parkingalaiat.domain.UserContext;
-import com.lksnext.parkingalaiat.interfaces.OnReservationsListener;
+import com.lksnext.parkingalaiat.interfaces.OnBookingsListener;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VerReservas extends AppCompatActivity {
+public class SeeBookings extends AppCompatActivity {
     public static final int ADD_RESERVA_REQUEST = 1;
     public static final int EDIT_RESERVA_REQUEST = 2;
 
@@ -36,12 +36,12 @@ public class VerReservas extends AppCompatActivity {
 
 
 
-    private List<Reserva> reservasToShow;
-    private List<Reserva> allReservas;
-    private List<Reserva> activasList;
-    private List<Reserva> inactivasList;
+    private List<Booking> bookinhgsToShow;
+    private List<Booking> allBookings;
+    private List<Booking> activasList;
+    private List<Booking> inactivasList;
 
-    private ReservaAdapter adapter;
+    private BookingAdapter adapter;
 
     private RecyclerView recyclerView;
     private TabLayout tabs;
@@ -50,7 +50,7 @@ public class VerReservas extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ver_reserva_view);
+        setContentView(R.layout.show_booking_view);
         initUi();
 
     }
@@ -59,7 +59,7 @@ public class VerReservas extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.top_bar_app, menu);
 
-        setTitle("Mis reservas");
+        setTitle("My bookings");
         return true;
     }
 
@@ -70,16 +70,16 @@ public class VerReservas extends AppCompatActivity {
 
     }
     public void initData(){
-        allReservas=new ArrayList<>();
-        reservasToShow =new ArrayList<>();
+        allBookings =new ArrayList<>();
+        bookinhgsToShow =new ArrayList<>();
         activasList=new ArrayList<>();
         inactivasList=new ArrayList<>();
         fm=FirebaseManager.getInstance();
 
-        getAllReservationsForUser();
+        getAllBookingsForUser();
 
         sortReservas();
-        for(Reserva a : allReservas){
+        for(Booking a : allBookings){
             checkElementStatus(a);
         }
 
@@ -92,7 +92,7 @@ public class VerReservas extends AppCompatActivity {
 
     }
     private void initListeners() {
-        nReservaButton.setOnClickListener(view ->{ changeToNuevaReserva();});
+        nReservaButton.setOnClickListener(view ->{ changeToNewBooking();});
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -130,15 +130,15 @@ public class VerReservas extends AppCompatActivity {
             }
 
         }).attachToRecyclerView(recyclerView);
-        adapter.setOnItemClickListener(new ReservaAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new BookingAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 // Handle item click event here
-                Reserva r;
+                Booking r;
                 if(tabs.getSelectedTabPosition()==0){
                     r=activasList.get(position);
-                    fm.setCurrentReserva(r);
-                    Intent intent = new Intent(VerReservas.this, EditarReserva.class);
+                    fm.setCurrentBooking(r);
+                    Intent intent = new Intent(SeeBookings.this, EditBooking.class);
                     startActivityForResult(intent,EDIT_RESERVA_REQUEST);
                 }
 
@@ -151,34 +151,34 @@ public class VerReservas extends AppCompatActivity {
 
 
     private void sortReservas(){
-        ReservaSorter rs = new ReservaSorter();
-        rs.sortElementsByProximity(allReservas);
+        BookingSorter rs = new BookingSorter();
+        rs.sortElementsByProximity(allBookings);
         rs.sortElementsByProximity(activasList);
         rs.sortElementsByProximity(inactivasList);
     }
 
-    private void changeToNuevaReserva() {
-        Intent intent = new Intent(VerReservas.this, NuevaReserva.class);
+    private void changeToNewBooking() {
+        Intent intent = new Intent(SeeBookings.this, NewBooking.class);
         startActivityForResult(intent,ADD_RESERVA_REQUEST);
     }
 
 
 
     public void changeDataToActive(){
-        reservasToShow.clear();
-        reservasToShow.addAll(activasList);
+        bookinhgsToShow.clear();
+        bookinhgsToShow.addAll(activasList);
         adapter.notifyDataSetChanged();
     }
 
     public void changeDataToInactive(){
-        reservasToShow.clear();
-        reservasToShow.addAll(inactivasList);
+        bookinhgsToShow.clear();
+        bookinhgsToShow.addAll(inactivasList);
         adapter.notifyDataSetChanged();
     }
 
 
     public void setAdapter(){
-        adapter=new ReservaAdapter(reservasToShow,this);
+        adapter=new BookingAdapter(bookinhgsToShow,this);
         recyclerView= findViewById(R.id.listRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -186,7 +186,7 @@ public class VerReservas extends AppCompatActivity {
 
         changeDataToActive();
     }
-    public void checkElementStatus(Reserva element) {
+    public void checkElementStatus(Booking element) {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate elementDate = LocalDate.parse(element.getDate(), formatter);
@@ -196,19 +196,19 @@ public class VerReservas extends AppCompatActivity {
             LocalTime time=LocalTime.parse(element.getEndTime());
 
             if(now.isAfter(time)){
-                element.setActivo("Inactivo");
+                element.setActive("Inactivo");
                 inactivasList.add(element);
             }else{
-                element.setActivo("Activo");
+                element.setActive("Activo");
                 activasList.add(element);
             }
 
         } else if (elementDate.isAfter(currentDate)) {
-            element.setActivo("Activo");
+            element.setActive("Activo");
             activasList.add(element);
 
         } else {
-            element.setActivo("Inactivo");
+            element.setActive("Inactivo");
             inactivasList.add(element);
 
         }
@@ -220,14 +220,14 @@ public class VerReservas extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_RESERVA_REQUEST && resultCode == RESULT_OK) {
-            String date = data.getStringExtra(NuevaReserva.EXTRA_DATE);
-            String start = data.getStringExtra(NuevaReserva.EXTRA_START);
-            String end = data.getStringExtra(NuevaReserva.EXTRA_END);
-            String spot=data.getStringExtra(NuevaReserva.EXTRA_SPOT);
+            String date = data.getStringExtra(NewBooking.EXTRA_DATE);
+            String start = data.getStringExtra(NewBooking.EXTRA_START);
+            String end = data.getStringExtra(NewBooking.EXTRA_END);
+            String spot=data.getStringExtra(NewBooking.EXTRA_SPOT);
 
-            Reserva res=new Reserva(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
-            addReservaInFirebase(res);
-            allReservas.add(res);
+            Booking res=new Booking(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
+            addBookingInFirebase(res);
+            allBookings.add(res);
             checkElementStatus(res);
             sortReservas();
             changeDataToActive();
@@ -236,9 +236,9 @@ public class VerReservas extends AppCompatActivity {
 
             Toast.makeText(this, "Reserva saved", Toast.LENGTH_SHORT).show();
         } else if(requestCode == EDIT_RESERVA_REQUEST && resultCode == RESULT_OK){
-            Reserva berria= CurrentReserva.getInstance().getCurrent();
-            berria.setStartTime(data.getStringExtra(NuevaReserva.EXTRA_START));
-            berria.setEndTime(data.getStringExtra(NuevaReserva.EXTRA_END));
+            Booking berria= CurrentBooking.getInstance().getCurrent();
+            berria.setStartTime(data.getStringExtra(NewBooking.EXTRA_START));
+            berria.setEndTime(data.getStringExtra(NewBooking.EXTRA_END));
             sortReservas();
             changeDataToActive();
 
@@ -247,15 +247,15 @@ public class VerReservas extends AppCompatActivity {
         }
     }
 
-    private void addReservaInFirebase(Reserva res) {
-        fm.addReservaInFirebase(res);
+    private void addBookingInFirebase(Booking res) {
+        fm.addBookingInFirebase(res);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.perfil:
-                Intent intent = new Intent(VerReservas.this, Perfil.class);
+                Intent intent = new Intent(SeeBookings.this, Profile.class);
                 startActivity(intent);
                 return true;
             default:
@@ -266,37 +266,37 @@ public class VerReservas extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setMessage("Are you sure you want to delete the reservation?")
                 .setPositiveButton("DELETE", (dialog, which) -> {
-                    deleteReservation(position);
+                    deleteBooking(position);
                     dialog.dismiss();
                 }).setNegativeButton("CANCEL", (dialog,which)->{
                     dialog.dismiss();
                 })
                 .show();
     }
-    private void deleteReservationByAllData(Reserva r) {
-        fm.deleteReservationByAllData(r);
+    private void deleteBookingByAllData(Booking r) {
+        fm.deleteBookingByAllData(r);
     }
 
 
-    private void deleteReservation(int position) {
-        Reserva r;
+    private void deleteBooking(int position) {
+        Booking r;
         if(tabs.getSelectedTabPosition()==0){
             r=activasList.get(position);
             activasList.remove(position);
-            allReservas.remove(r);
+            allBookings.remove(r);
             changeDataToActive();
         }else{
             r=inactivasList.get(position);
             inactivasList.remove(position);
-            allReservas.remove(r);
+            allBookings.remove(r);
             changeDataToInactive();
         }
-        deleteReservationByAllData(r);
+        deleteBookingByAllData(r);
         Snackbar.make(findViewById(R.id.snackbar), "Reservation deleted successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addReservaInFirebase(r);
-                allReservas.add(r);
+                addBookingInFirebase(r);
+                allBookings.add(r);
                 checkElementStatus(r);
                 sortReservas();
                 if(tabs.getSelectedTabPosition()==0){
@@ -310,15 +310,15 @@ public class VerReservas extends AppCompatActivity {
 
 
     }
-    private void getAllReservationsForUser() {
-        fm.getAllReservationsForUser(new OnReservationsListener() {
+    private void getAllBookingsForUser() {
+        fm.getAllBookingsForUser(new OnBookingsListener() {
             @Override
-            public void onReservationsLoaded(List<Reserva> reservations) {
-                if (reservations != null) {
-                    allReservas.clear();
-                    allReservas.addAll(reservations);
+            public void onBookingsLoaded(List<Booking> bookings) {
+                if (bookings != null) {
+                    allBookings.clear();
+                    allBookings.addAll(bookings);
                     sortReservas();
-                    for(Reserva a : allReservas){
+                    for(Booking a : allBookings){
                         checkElementStatus(a);
                     }
                     changeDataToActive();

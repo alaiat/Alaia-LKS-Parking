@@ -9,8 +9,8 @@ public class DayHours {
     private String date;
     private int spentMinutesOfDay;
 
-    List<String> startHours;
-    List<String> endHours;
+    private List<String> startHours;
+    private List<String> endHours;
 
     public DayHours(String date) {
         this.date = date;

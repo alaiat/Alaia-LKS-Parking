@@ -1,22 +1,20 @@
 package com.lksnext.parkingalaiat.domain;
 
 import com.lksnext.parkingalaiat.FirebaseManager;
-import com.lksnext.parkingalaiat.interfaces.OnReservationsListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotIdsLoadedListener;
+import com.lksnext.parkingalaiat.interfaces.OnBookingsListener;
+import com.lksnext.parkingalaiat.interfaces.OnSpotsIdLoadedListener;
 import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 public class CurrentParking {
     private static CurrentParking instance;
     private List<String> spotListaId;
-    private List<Spota> all=new ArrayList<>();
-    private List<Spota> car=new ArrayList<>();
-    private List<Spota> hand=new ArrayList<>();
-    private List<Spota> elec=new ArrayList<>();
-    private List<Spota> motor=new ArrayList<>();
+    private List<Area> all=new ArrayList<>();
+    private List<Area> car=new ArrayList<>();
+    private List<Area> hand=new ArrayList<>();
+    private List<Area> elec=new ArrayList<>();
+    private List<Area> motor=new ArrayList<>();
     FirebaseManager fm;
 
     private CurrentParking() {
@@ -25,7 +23,7 @@ public class CurrentParking {
         addSpotsById();
     }
     public void addSpotsById(){
-        fm.getAllSpotsId(new OnSpotIdsLoadedListener() {
+        fm.getAllSpotsId(new OnSpotsIdLoadedListener() {
             @Override
             public void onSpotIdsLoaded(List<String> spotIds) {
                 if (spotIds != null) {
@@ -47,9 +45,9 @@ public class CurrentParking {
     private void addSpotToCorrepondingList() {
        fm.sortList(spotListaId, new OnSpotsLoaderByTypeListener() {
             @Override
-            public void OnSpotsLoaderByTypeListener(List<Spota> sortedList) {
+            public void OnSpotsLoaderByTypeListener(List<Area> sortedList) {
                 all=sortedList;
-                for(Spota s:all){
+                for(Area s:all){
                     switch (s.type) {
                         case "CAR":
                             car.add(s);
@@ -76,9 +74,9 @@ public class CurrentParking {
 
     public String getIdByNum(String num){
 
-        for (Spota spota : all) {
-            if (spota.getNum().equals(num)) {
-                return spota.getId();
+        for (Area area : all) {
+            if (area.getNumber().equals(num)) {
+                return area.getId();
             }
         }
         return null; // Return null if no matching num is found
@@ -86,9 +84,9 @@ public class CurrentParking {
     }
     public String getNumById(String id){
 
-        for (Spota spota : all) {
-            if (spota.getId().equals(id)) {
-                return spota.getNum();
+        for (Area area : all) {
+            if (area.getId().equals(id)) {
+                return area.getNumber();
             }
         }
         return null; // Return null if no matching num is found
@@ -96,17 +94,14 @@ public class CurrentParking {
     }
     public String getTypeById(String id){
 
-        for (Spota spota : all) {
-            if (spota.getId().equals(id)) {
-                return spota.getType();
+        for (Area area : all) {
+            if (area.getId().equals(id)) {
+                return area.getType();
             }
         }
         return null; // Return null if no matching num is found
 
     }
-
-
-
     public  static synchronized CurrentParking getInstance() {
 
                 if (instance == null) {
@@ -117,44 +112,43 @@ public class CurrentParking {
         return instance;
     }
 
-
-    public List<String> getSpotListaId() {
-        return spotListaId;
-    }
-
-    public void setSpotListaId(List<String> spotListaId) {
-        this.spotListaId = spotListaId;
-    }
-
-    public List<Spota> getAll() {
+    public List<Area> getAll() {
         return all;
     }
 
-    public List<Spota> getCar() {
+    public List<Area> getCar() {
         return car;
     }
 
-    public List<Spota> getHand() {
+    public List<Area> getHand() {
         return hand;
     }
 
-    public List<Spota> getElec() {
+    public List<Area> getElec() {
         return elec;
     }
 
-    public List<Spota> getMotor() {
+    public List<Area> getMotor() {
         return motor;
     }
 
-    public static class Spota{
-        private String num;
+    public static class Area {
+        private String number;
         private String id;
         private String type;
         private List<DayHours> listDayTime;
         FirebaseManager fm=FirebaseManager.getInstance();
 
-        public String getNum() {
-            return num;
+        public Area(String number, String id, String type) {
+            this.number = number;
+            this.id = id;
+            this.type=type;
+            listDayTime=new ArrayList<>();
+            findBookings(id);
+        }
+
+        public String getNumber() {
+            return number;
         }
 
         public List<DayHours> getListDayTime() {
@@ -165,8 +159,8 @@ public class CurrentParking {
             this.listDayTime = listDayTime;
         }
 
-        public void setNum(String num) {
-            this.num = num;
+        public void setNumber(String number) {
+            this.number = number;
         }
 
         public String getId() {
@@ -177,21 +171,15 @@ public class CurrentParking {
             this.id = id;
         }
 
-        public Spota(String num, String id, String type) {
-            this.num = num;
-            this.id = id;
-            this.type=type;
-            listDayTime=new ArrayList<>();
-            findReservations(id);
-        }
 
-        private void findReservations(String id) {
-            fm.getReservationsForSpot(id, new OnReservationsListener() {
+
+        private void findBookings(String id) {
+            fm.getBookingsForSpot(id, new OnBookingsListener() {
                 @Override
-                public void onReservationsLoaded(List<Reserva> reservations) {
+                public void onBookingsLoaded(List<Booking> bookings) {
                     // Handle the reservations list
                     // ...
-                    addListtoList(reservations);
+                    addListToList(bookings);
                     System.out.println(listDayTime);
 
                 }
@@ -200,48 +188,31 @@ public class CurrentParking {
             });
 
         }
-        public void addListtoList(List<Reserva> reservations) {
+        public void addListToList(List<Booking> bookings) {
 
-            for(Reserva r:reservations){
+            for(Booking b:bookings){
                 Boolean found=false;
                 DayHours dh=null;
                 for(DayHours d:listDayTime){
-                    if(d.getDate().equals(r.getDate())){
+                    if(d.getDate().equals(b.getDate())){
                         found=true;
                         dh=d;
                     }
                 }
                 if(!found){
-                    dh=new DayHours(r.getDate());
+                    dh=new DayHours(b.getDate());
                     found=false;
                 }
 
-                dh.addStartHour(r.getStartTime());
-                dh.addEndHour(r.getEndTime());
-                dh.addAndCalculateNewTime(r.getStartTime(),r.getEndTime());
+                dh.addStartHour(b.getStartTime());
+                dh.addEndHour(b.getEndTime());
+                dh.addAndCalculateNewTime(b.getStartTime(),b.getEndTime());
                 System.out.println(dh.getStartHours());
                 listDayTime.add(dh);
             }
         }
-        public void addReservaToList(Reserva r){
-            DayHours d=null;
-            boolean found=false;
-            for(DayHours dh:listDayTime){
-                if(dh.getDate().equals(r.getDate())){
-                    found=true;
-                    d=dh;
-                }
-            }
-            if(!found){
-                d= new DayHours(r.getDate());
-                listDayTime.add(d);
 
-            }
-            d.addStartHour(r.getStartTime());
-            d.addEndHour(r.getEndTime());
-            d.addAndCalculateNewTime(r.getStartTime(),r.getEndTime());
-        }
-        public DayHours getDayHoursByDay(String date){
+        public DayHours getDayHoursByDate(String date){
             for(DayHours dh:listDayTime){
                 if(dh.getDate().equals(date)){
                     return dh;
@@ -260,8 +231,8 @@ public class CurrentParking {
 
         @Override
         public String toString() {
-            return "Spota{" +
-                    "num='" + num + '\'' +
+            return "Area{" +
+                    "num='" + number + '\'' +
                     ", id='" + id + '\'' +
                     ", type='" + type + '\'' +
                     ", listDayTime=" + listDayTime +

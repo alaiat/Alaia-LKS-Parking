@@ -18,45 +18,44 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
-import com.lksnext.parkingalaiat.domain.CurrentReserva;
-import com.lksnext.parkingalaiat.domain.Reserva;
-import com.lksnext.parkingalaiat.interfaces.OnReservationUpdatedListener;
+import com.lksnext.parkingalaiat.domain.CurrentBooking;
+import com.lksnext.parkingalaiat.domain.Booking;
+import com.lksnext.parkingalaiat.interfaces.OnBookingUpdatedListener;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class EditarReserva extends AppCompatActivity {
+public class EditBooking extends AppCompatActivity {
 
     public static final String EXTRA_START="com.lksnext.parkingalaiat.EXTRA_START";
     public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
 
-    Boolean startSel=false;
-    Boolean endSel=false;
+    private Boolean startSel=false;
+    private Boolean endSel=false;
 
-    TextInputLayout startHour,endHour;
-    LinearProgressIndicator progress;
-    TextInputLayout date,spotDropDown;
-    AutoCompleteTextView dropdownField,spotList;
-    FirebaseManager fm;
-
-
-    TextView action;
-    private CurrentReserva currentReserva;
+    private TextInputLayout startHour,endHour;
+    private LinearProgressIndicator progress;
+    private TextInputLayout date;
+    private TextInputLayout spotDropDown;
+    private AutoCompleteTextView dropdownField,spotList;
+    private FirebaseManager fm;
+    private TextView action;
+    private CurrentBooking currentBooking;
     private CurrentParking currentParking;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_reserva);
+        setContentView(R.layout.edit_booking);
         initUi();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.add_reserva, menu);
+        menuInflater.inflate(R.menu.add_booking, menu);
 
-        setTitle("Editar reserva");
+        setTitle("Edit booking");
         return true;
     }
 
@@ -81,8 +80,8 @@ public class EditarReserva extends AppCompatActivity {
     private void initData() {
         fm=FirebaseManager.getInstance();
         currentParking=CurrentParking.getInstance();
-        currentReserva= CurrentReserva.getInstance();
-        Reserva r= currentReserva.getCurrent();
+        currentBooking = CurrentBooking.getInstance();
+        Booking r= currentBooking.getCurrent();
         startHour.getEditText().setText(r.getStartTime());
         endHour.getEditText().setText(r.getEndTime());
         date.getEditText().setText(r.getDate());
@@ -127,8 +126,6 @@ public class EditarReserva extends AppCompatActivity {
                 endSel=true;
                 checkAllDataFill();
             }
-
-
             endSel=true;
             checkAllDataFill();
         });
@@ -177,12 +174,12 @@ public class EditarReserva extends AppCompatActivity {
         }, 3000);
     }
 
-    private void update(String reservaId) {
+    private void update(String bookingID) {
         String start=startHour.getEditText().getText().toString();
         String end=endHour.getEditText().getText().toString();
-        fm.updateReserva(reservaId,start,end, new OnReservationUpdatedListener() {
+        fm.updateBooking(bookingID,start,end, new OnBookingUpdatedListener() {
             @Override
-            public void OnReservationUpdatedListener(boolean success) {
+            public void OnBookingUpdatedListener(boolean success) {
                 if (success) {
                     // Reservation updated successfully
                     setResult(RESULT_OK);
@@ -202,7 +199,7 @@ public class EditarReserva extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.save_note:
                 // Perform the save action here
-                update(currentReserva.getId());
+                update(currentBooking.getId());
                 Intent reserva=new Intent();
                 reserva.putExtra(EXTRA_START,startHour.getEditText().getText().toString());
                 reserva.putExtra(EXTRA_END,endHour.getEditText().getText().toString());

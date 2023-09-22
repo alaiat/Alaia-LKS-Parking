@@ -21,7 +21,7 @@ import com.lksnext.parkingalaiat.domain.UserContext;
 
 public class Login extends AppCompatActivity {
 
-    CurrentParking current;
+    private CurrentParking current;
     private Button button;
     private TextInputLayout email;
     private TextInputEditText edEmail;
@@ -87,7 +87,7 @@ public class Login extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser actualUser = mAuth.getCurrentUser();
                             UserContext.getInstance().setCurrentUser(actualUser);
-                            changeToVerReservas();
+                            changeToSeeBookings();
                         } else {
                             showErrorDialog();
 
@@ -99,8 +99,8 @@ public class Login extends AppCompatActivity {
 
     }
 
-    private void changeToVerReservas() {
-        Intent intent = new Intent(Login.this, VerReservas.class);
+    private void changeToSeeBookings() {
+        Intent intent = new Intent(Login.this, SeeBookings.class);
         startActivity(intent);
         password.setError(null);
     }

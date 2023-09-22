@@ -1,28 +1,28 @@
 package com.lksnext.parkingalaiat.domain;
 
-public class CurrentReserva {
+public class CurrentBooking {
 
-    private static CurrentReserva instance;
-    private Reserva current;
+    private static CurrentBooking instance;
+    private Booking current;
     private String id;
 
-    private CurrentReserva() {
+    private CurrentBooking() {
         // Private constructor to prevent instantiation from outside
     }
 
-    public static synchronized CurrentReserva getInstance() {
+    public static synchronized CurrentBooking getInstance() {
         if (instance == null) {
-            instance = new CurrentReserva();
+            instance = new CurrentBooking();
         }
         return instance;
     }
 
-    public Reserva getCurrent() {
+    public Booking getCurrent() {
         return current;
     }
 
-    public void setCurrent(Reserva reserva) {
-        current = reserva;
+    public void setCurrent(Booking booking) {
+        current = booking;
     }
 
     public String getId() {

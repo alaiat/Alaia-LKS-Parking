@@ -5,5 +5,5 @@ import com.lksnext.parkingalaiat.domain.CurrentParking;
 import java.util.List;
 
 public interface OnSpotsLoaderByTypeListener {
-    void OnSpotsLoaderByTypeListener(List<CurrentParking.Spota> sortedList);
+    void OnSpotsLoaderByTypeListener(List<CurrentParking.Area> sortedList);
 }

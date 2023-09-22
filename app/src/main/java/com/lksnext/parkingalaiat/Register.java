@@ -42,8 +42,6 @@ public class Register extends AppCompatActivity {
 
     private Button button;
     private TextView link;
-
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private Context context=this;
