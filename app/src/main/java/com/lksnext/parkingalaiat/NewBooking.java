@@ -470,20 +470,20 @@ public class NewBooking extends AppCompatActivity {
         String spot=this.availableSpotListText.getEditableText().toString();
         Boolean status=true;
 
-        if(date.isEmpty() | startHour.isEmpty() | endHour.isEmpty()){
+        if(date.isEmpty() || startHour.isEmpty() || endHour.isEmpty()){
             availableSpotListDropdown.setError(" ");
             this.date.setError(" ");
             this.startHour.setError(" ");
             this.endHour.setError(" ");
         }else{
-            Intent reserva=new Intent();
-            reserva.putExtra(EXTRA_DATE,date);
-            reserva.putExtra(EXTRA_START,startHour);
-            reserva.putExtra(EXTRA_END,endHour);
-            reserva.putExtra(EXTRA_STATUS,status);
-            reserva.putExtra(EXTRA_TYPE,type);
-            reserva.putExtra(EXTRA_SPOT,current.getIdByNum(spot));
-            setResult(RESULT_OK, reserva);
+            Intent booking=getIntent();
+            booking.putExtra(EXTRA_DATE,date);
+            booking.putExtra(EXTRA_START,startHour);
+            booking.putExtra(EXTRA_END,endHour);
+            booking.putExtra(EXTRA_STATUS,status);
+            booking.putExtra(EXTRA_TYPE,type);
+            booking.putExtra(EXTRA_SPOT,current.getIdByNum(spot));
+            setResult(RESULT_OK, booking);
             finish();
         }
 

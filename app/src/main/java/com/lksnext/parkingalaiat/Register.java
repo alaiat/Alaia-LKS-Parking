@@ -1,8 +1,5 @@
 package com.lksnext.parkingalaiat;
 
-import static android.content.ContentValues.TAG;
-
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,16 +7,11 @@ import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,16 +19,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.lksnext.parkingalaiat.domain.User;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Register extends AppCompatActivity {
 
@@ -246,7 +232,7 @@ public class Register extends AppCompatActivity {
         String pass=password.getEditText().getText().toString();
         String pass2=secondPassword.getEditText().getText().toString();
 
-            if(makeAllRegisterCheckings(nam,ema,pn,pass,pass2)) {
+            if(makeAllRegisterChecking(nam,ema,pn,pass,pass2)) {
 
                 mAuth.createUserWithEmailAndPassword(ema, pass)
                         .addOnCompleteListener(task -> {
@@ -284,7 +270,7 @@ public class Register extends AppCompatActivity {
     }
 
 
-    private boolean makeAllRegisterCheckings(String name, String email, String phoneN,String passw,String pass2){
+    private boolean makeAllRegisterChecking(String name, String email, String phoneN, String passw, String pass2){
         return !checkEmpty(name,email,phoneN,passw,pass2) && checkEveryThingWithPasswords(passw,pass2);
     }
     private boolean checkPasswordsAreTheSame(String pass1, String pass2) {

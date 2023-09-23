@@ -3,12 +3,12 @@ package com.lksnext.parkingalaiat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,13 +34,13 @@ public class EditBooking extends AppCompatActivity {
     private Boolean startSel=false;
     private Boolean endSel=false;
 
-    private TextInputLayout startHour,endHour;
+    private TextInputLayout startHour;
+    private TextInputLayout endHour;
     private LinearProgressIndicator progress;
     private TextInputLayout date;
-    private TextInputLayout spotDropDown;
-    private AutoCompleteTextView dropdownField,spotList;
+    private AutoCompleteTextView dropdownField;
+    private AutoCompleteTextView spotList;
     private FirebaseManager fm;
-    private TextView action;
     private CurrentBooking currentBooking;
     private CurrentParking currentParking;
 
@@ -66,13 +66,11 @@ public class EditBooking extends AppCompatActivity {
     }
 
     private void initView() {
-        action = findViewById(R.id.save_note);
         progress=findViewById(R.id.progress);
         startHour=findViewById(R.id.startHour);
         endHour=findViewById(R.id.endHour);
         date=findViewById(R.id.date);
         spotList=findViewById(R.id.spots);
-        spotDropDown=findViewById(R.id.spotDropdwon);
         dropdownField=findViewById(R.id.dropdownField);
 
     }
@@ -136,17 +134,12 @@ public class EditBooking extends AppCompatActivity {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         String start=startHour.getEditText().getText().toString();
         String end=endHour.getEditText().getText().toString();
-        if(start.isEmpty() | end.isEmpty()){
+        if(start.isEmpty() || end.isEmpty()){
             return true;
         }else{
             LocalTime localTime1 = LocalTime.parse(startHour.getEditText().getText(), formatter);
             LocalTime localTime2 = LocalTime.parse(endHour.getEditText().getText(), formatter);
-            if (localTime2.isAfter(localTime1)) {
-                System.out.println("Time 2 is later than Time 1");
-                return true;
-            } else {
-                return false;
-            }
+            return localTime2.isAfter(localTime1);
         }
 
     }
@@ -161,8 +154,7 @@ public class EditBooking extends AppCompatActivity {
         progress.setProgressCompat(0, true);
 
         // Delay the stop of the animation by 3 seconds (3000 milliseconds)
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 // Hide the progress indicator
@@ -172,6 +164,7 @@ public class EditBooking extends AppCompatActivity {
                 endHour.setError(" ");
             }
         }, 3000);
+
     }
 
     private void update(String bookingID) {
@@ -196,20 +189,19 @@ public class EditBooking extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_note:
-                // Perform the save action here
-                update(currentBooking.getId());
-                Intent reserva=new Intent();
-                reserva.putExtra(EXTRA_START,startHour.getEditText().getText().toString());
-                reserva.putExtra(EXTRA_END,endHour.getEditText().getText().toString());
-                setResult(RESULT_OK, reserva);
-                finish();
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.save_note) {
+            // Perform the save action here
+            update(currentBooking.getId());
+            Intent booking = getIntent();
+            booking.putExtra(EXTRA_START, startHour.getEditText().getText().toString());
+            booking.putExtra(EXTRA_END, endHour.getEditText().getText().toString());
+            setResult(RESULT_OK, booking);
+            finish();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
+
     }
 
     private void showStartTimePicker() {
