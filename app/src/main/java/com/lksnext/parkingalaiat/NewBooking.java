@@ -3,6 +3,7 @@ package com.lksnext.parkingalaiat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcel;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,21 +54,21 @@ public class NewBooking extends AppCompatActivity {
     private String[]spots={"-1"};
 
 
-    private String typeToFound="";
-    private UserContext userContext;
-
-    private AutoCompleteTextView spotTypeOptionsText, availableSpotListText;
+    private AutoCompleteTextView spotTypeOptionsText;
+    private AutoCompleteTextView availableSpotListText;
 
     private ArrayAdapter<String> availableSpotAdapter;
-    private TextInputLayout date, availableSpotListDropdown;
-    private TextInputLayout startHour,endHour;
+    private TextInputLayout date;
+    private TextInputLayout availableSpotListDropdown;
+    private TextInputLayout startHour;
+    private TextInputLayout endHour;
     private LinearProgressIndicator progress;
     private MaterialDatePicker<Long> datePicker;
-    private Button search, mapSelect,change;
+    private Button search;
+    private Button mapSelect;
+    private Button change;
 
-    private TextView action;
 
-    private List<String> notAvailable=new ArrayList<>();
     private List<CurrentParking.Area> selectedTypeSpots=new ArrayList<>();
 
     @Override
@@ -86,27 +87,22 @@ public class NewBooking extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_note:
-                // Perform the save action here
-                save();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.save_note) {
+            // Perform the save action here
+            save();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
+
     }
     private void initUi() {
         initView();
         initListeners();
-        initData();
     }
 
-    private void initData() {
-        userContext=UserContext.getInstance();
-    }
 
     private void initView() {
-        action = findViewById(R.id.save_note);
         date=findViewById(R.id.date);
         progress=findViewById(R.id.progress);
         startHour=findViewById(R.id.startHour);
@@ -118,29 +114,23 @@ public class NewBooking extends AppCompatActivity {
         availableSpotListDropdown =findViewById(R.id.spotDropdwon);
         spotTypeOptionsText =findViewById(R.id.dropdownField);
 
-        ArrayAdapter<String> typeAdapter= new ArrayAdapter<String>(this,R.layout.dropdown_list_item, spotTypes);
+        ArrayAdapter<String> typeAdapter= new ArrayAdapter<>(this,R.layout.dropdown_list_item, spotTypes);
         spotTypeOptionsText.setAdapter(typeAdapter);
 
-        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,spots);
+        availableSpotAdapter =new ArrayAdapter<>(this,R.layout.dropdown_list_item,spots);
         availableSpotListText.setAdapter(availableSpotAdapter);
 
     }
 
     private void initListeners() {
-        spotTypeOptionsText.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                String item=parent.getItemAtPosition(position).toString();
-                typeSel=true;
-                checkAllDataFill();
-            }
+        spotTypeOptionsText.setOnItemClickListener((parent, view, position, id) -> {
+            parent.getItemAtPosition(position).toString();
+            typeSel = true;
+            checkAllDataFill();
         });
-        availableSpotListText.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent,View view,int position,long id){
-                String item=parent.getItemAtPosition(position).toString();
-                typeToFound=item;
-            }
+
+        availableSpotListText.setOnItemClickListener((parent,view,position,id)->{
+                parent.getItemAtPosition(position).toString();
         });
         date.setStartIconOnClickListener(view ->{ date.setError(null); showDatePicker();});
         startHour.setStartIconOnClickListener(view->{ startHour.setError(null); endHour.setError(null); showStartTimePicker();});
@@ -195,8 +185,7 @@ public class NewBooking extends AppCompatActivity {
         for(CurrentParking.Area s:selectedTypeSpots){
             drop.add(s.getNumber());
         }
-        System.out.println(drop);
-        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,drop);
+        availableSpotAdapter =new ArrayAdapter<>(this,R.layout.dropdown_list_item,drop);
         availableSpotListText.setAdapter(availableSpotAdapter);
 
 
@@ -242,7 +231,7 @@ public class NewBooking extends AppCompatActivity {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         String start=startHour.getEditText().getText().toString();
         String end=endHour.getEditText().getText().toString();
-        if(start.isEmpty() | end.isEmpty()){
+        if(start.isEmpty() || end.isEmpty()){
             return true;
         }else{
             LocalTime localTime1 = LocalTime.parse(startHour.getEditText().getText(), formatter);
@@ -251,9 +240,7 @@ public class NewBooking extends AppCompatActivity {
 
             // Get the number of hours in the duration
             int min = (int) duration.toMinutes();
-            System.out.println(min);
             if (localTime2.isAfter(localTime1) && min<=480) {
-                System.out.println("Time 2 is later than Time 1");
                 return true;
             }else if(min>480){
                 endHour.setError(" ");
@@ -282,16 +269,13 @@ public class NewBooking extends AppCompatActivity {
             // Start the animation
             progress.setProgressCompat(0, true);
 
-            // Delay the stop of the animation by 3 seconds (3000 milliseconds)
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+           new Handler(Looper.getMainLooper()).postDelayed(()-> {
+
                     // Hide the progress indicator
                     progress.setVisibility(View.INVISIBLE);
                     mapSelect.setVisibility(View.VISIBLE);
                     availableSpotListDropdown.setVisibility(View.VISIBLE);
-                }
+
             }, 3000);
             search.setEnabled(false);
             spotTypeOptionsText.setEnabled(false);
@@ -323,10 +307,7 @@ public class NewBooking extends AppCompatActivity {
             String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
 
             startHour.getEditText().setText(formattedTime);
-            if(!compareHours()){
-
-
-            }else{
+            if(compareHours()){
                 endHour.setError(null);
                 startHour.setError(null);
                 startSel=true;
@@ -343,13 +324,8 @@ public class NewBooking extends AppCompatActivity {
         LocalTime start1 = LocalTime.parse(oldStart, formatter);
         LocalTime end2 = LocalTime.parse(newEnd, formatter);
         LocalTime start2 = LocalTime.parse(newStart, formatter);
-        boolean overlap = !(end1.isBefore(start2) || start1.isAfter(end2));
+        return !(end1.isBefore(start2) || start1.isAfter(end2));
 
-        if (overlap) {
-            return true;
-        } else {
-            return false;
-        }
 
     }
 
@@ -360,11 +336,8 @@ public class NewBooking extends AppCompatActivity {
         for(CurrentParking.Area s:selectedTypeSpots){
             DayHours dh=s.getDayHoursByDate(dat);
             if(dh!=null){
-                System.out.println(dh+"\n");
             for(int i=0; i<dh.getStartHours().size();i++){
-                System.out.println(dh.getStartHours().get(i)+dh.getEndHours().get(i)+"\n");
                 if(!checkOverlap(dh.getStartHours().get(i),dh.getEndHours().get(i),startT,endT)){
-                    System.out.println("barruen");
                     toRemove.add(s);
                     break;
                 }
@@ -372,17 +345,16 @@ public class NewBooking extends AppCompatActivity {
             }
 
         }
-        System.out.println(toRemove);
         for(CurrentParking.Area s: selectedTypeSpots){
             if(!toRemove.contains(s)){
                 libreak.add(s.getNumber());
             }
         }
-        if(libreak.size()==0){
+        if(libreak.isEmpty()){
             showDialog();
             return false;
         }
-        availableSpotAdapter =new ArrayAdapter<String>(this,R.layout.dropdown_list_item,libreak);
+        availableSpotAdapter =new ArrayAdapter<>(this,R.layout.dropdown_list_item,libreak);
         availableSpotListText.setAdapter(availableSpotAdapter);
         return true;
     }
@@ -449,7 +421,6 @@ public class NewBooking extends AppCompatActivity {
 
 
             date.getEditText().setText(formattedDate);
-            System.out.println(UserContext.getInstance().getMinutesOfDay(formattedDate));
             if(UserContext.getInstance().getMinutesOfDay(formattedDate)>=480){
                 date.setError("You already have 8h reserved for this day.");
             }else{
@@ -463,23 +434,23 @@ public class NewBooking extends AppCompatActivity {
 
     private void save() {
         current.addSpotsById();
-        String date=this.date.getEditText().getText().toString();
-        String startHour=this.startHour.getEditText().getText().toString();
-        String endHour=this.endHour.getEditText().getText().toString();
+        String date2=this.date.getEditText().getText().toString();
+        String startH=this.startHour.getEditText().getText().toString();
+        String endH=this.endHour.getEditText().getText().toString();
         String type=this.spotTypeOptionsText.getEditableText().toString();
         String spot=this.availableSpotListText.getEditableText().toString();
         Boolean status=true;
 
-        if(date.isEmpty() || startHour.isEmpty() || endHour.isEmpty()){
+        if(date2.isEmpty() || startH.isEmpty() || endH.isEmpty()){
             availableSpotListDropdown.setError(" ");
             this.date.setError(" ");
             this.startHour.setError(" ");
             this.endHour.setError(" ");
         }else{
             Intent booking=getIntent();
-            booking.putExtra(EXTRA_DATE,date);
-            booking.putExtra(EXTRA_START,startHour);
-            booking.putExtra(EXTRA_END,endHour);
+            booking.putExtra(EXTRA_DATE,date2);
+            booking.putExtra(EXTRA_START,startH);
+            booking.putExtra(EXTRA_END,endH);
             booking.putExtra(EXTRA_STATUS,status);
             booking.putExtra(EXTRA_TYPE,type);
             booking.putExtra(EXTRA_SPOT,current.getIdByNum(spot));
