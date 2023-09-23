@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -41,7 +42,6 @@ public class Register extends AppCompatActivity {
     private TextInputEditText edPassword;
 
     private TextInputLayout secondPassword;
-    private TextInputEditText edSecondPassword;
 
     private LinearProgressIndicator progressIndicator;
 
@@ -87,11 +87,10 @@ public class Register extends AppCompatActivity {
         edPassword= (TextInputEditText) password.getEditText();
 
         secondPassword=findViewById(R.id.password2Field);
-        edSecondPassword= (TextInputEditText) secondPassword.getEditText();
 
         progressIndicator=findViewById(R.id.progressIndicator);
         progressIndicator.setProgressCompat(0, true);
-        progressIndicator.setIndicatorColor(getResources().getColor(R.color.red));
+        progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.red));
 
         setTitle("");
 
@@ -183,11 +182,12 @@ public class Register extends AppCompatActivity {
         }
 
         if(progress==100){
-            progressIndicator.setIndicatorColor(getResources().getColor(R.color.teal_200));
+            progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.teal_200));
         }else{
-            progressIndicator.setIndicatorColor(getResources().getColor(R.color.red));
+            progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.red));
 
         }
+
 
         return progress;
     }
@@ -256,8 +256,6 @@ public class Register extends AppCompatActivity {
                             }
                         });
 
-            }else{
-                System.out.println("malmalmal");
             }
         }
 
