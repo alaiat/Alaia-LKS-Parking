@@ -29,23 +29,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeeBookings extends AppCompatActivity {
-    public static final int ADD_RESERVA_REQUEST = 1;
-    public static final int EDIT_RESERVA_REQUEST = 2;
+    public static final int ADD_BOOKING_REQUEST = 1;
+    public static final int EDIT_BOOKING_REQUEST = 2;
 
     private FirebaseManager fm;
 
 
 
-    private List<Booking> bookinhgsToShow;
+    private List<Booking> bookingsToShow;
     private List<Booking> allBookings;
-    private List<Booking> activasList;
-    private List<Booking> inactivasList;
+    private List<Booking> activeList;
+    private List<Booking> inactiveList;
 
     private BookingAdapter adapter;
 
     private RecyclerView recyclerView;
     private TabLayout tabs;
-    private FloatingActionButton nReservaButton;
+    private FloatingActionButton newBookButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -71,14 +71,14 @@ public class SeeBookings extends AppCompatActivity {
     }
     public void initData(){
         allBookings =new ArrayList<>();
-        bookinhgsToShow =new ArrayList<>();
-        activasList=new ArrayList<>();
-        inactivasList=new ArrayList<>();
+        bookingsToShow =new ArrayList<>();
+        activeList =new ArrayList<>();
+        inactiveList =new ArrayList<>();
         fm=FirebaseManager.getInstance();
 
         getAllBookingsForUser();
 
-        sortReservas();
+        sortBookings();
         for(Booking a : allBookings){
             checkElementStatus(a);
         }
@@ -87,12 +87,12 @@ public class SeeBookings extends AppCompatActivity {
     }
     public void initView(){
         tabs=findViewById(R.id.tabs);
-        nReservaButton=findViewById(R.id.nReservaButton);
+        newBookButton =findViewById(R.id.nReservaButton);
         setAdapter();
 
     }
     private void initListeners() {
-        nReservaButton.setOnClickListener(view ->{ changeToNewBooking();});
+        newBookButton.setOnClickListener(view ->{ changeToNewBooking();});
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -136,10 +136,10 @@ public class SeeBookings extends AppCompatActivity {
                 // Handle item click event here
                 Booking r;
                 if(tabs.getSelectedTabPosition()==0){
-                    r=activasList.get(position);
+                    r= activeList.get(position);
                     fm.setCurrentBooking(r);
                     Intent intent = new Intent(SeeBookings.this, EditBooking.class);
-                    startActivityForResult(intent,EDIT_RESERVA_REQUEST);
+                    startActivityForResult(intent, EDIT_BOOKING_REQUEST);
                 }
 
 
@@ -150,35 +150,35 @@ public class SeeBookings extends AppCompatActivity {
     }
 
 
-    private void sortReservas(){
+    private void sortBookings(){
         BookingSorter rs = new BookingSorter();
         rs.sortElementsByProximity(allBookings);
-        rs.sortElementsByProximity(activasList);
-        rs.sortElementsByProximity(inactivasList);
+        rs.sortElementsByProximity(activeList);
+        rs.sortElementsByProximity(inactiveList);
     }
 
     private void changeToNewBooking() {
         Intent intent = new Intent(SeeBookings.this, NewBooking.class);
-        startActivityForResult(intent,ADD_RESERVA_REQUEST);
+        startActivityForResult(intent, ADD_BOOKING_REQUEST);
     }
 
 
 
     public void changeDataToActive(){
-        bookinhgsToShow.clear();
-        bookinhgsToShow.addAll(activasList);
+        bookingsToShow.clear();
+        bookingsToShow.addAll(activeList);
         adapter.notifyDataSetChanged();
     }
 
     public void changeDataToInactive(){
-        bookinhgsToShow.clear();
-        bookinhgsToShow.addAll(inactivasList);
+        bookingsToShow.clear();
+        bookingsToShow.addAll(inactiveList);
         adapter.notifyDataSetChanged();
     }
 
 
     public void setAdapter(){
-        adapter=new BookingAdapter(bookinhgsToShow,this);
+        adapter=new BookingAdapter(bookingsToShow,this);
         recyclerView= findViewById(R.id.listRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -196,20 +196,20 @@ public class SeeBookings extends AppCompatActivity {
             LocalTime time=LocalTime.parse(element.getEndTime());
 
             if(now.isAfter(time)){
-                element.setActive("Inactivo");
-                inactivasList.add(element);
+                element.setActive("Inactive");
+                inactiveList.add(element);
             }else{
-                element.setActive("Activo");
-                activasList.add(element);
+                element.setActive("Active");
+                activeList.add(element);
             }
 
         } else if (elementDate.isAfter(currentDate)) {
-            element.setActive("Activo");
-            activasList.add(element);
+            element.setActive("Active");
+            activeList.add(element);
 
         } else {
-            element.setActive("Inactivo");
-            inactivasList.add(element);
+            element.setActive("Inactive");
+            inactiveList.add(element);
 
         }
 
@@ -219,7 +219,7 @@ public class SeeBookings extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ADD_RESERVA_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == ADD_BOOKING_REQUEST && resultCode == RESULT_OK) {
             String date = data.getStringExtra(NewBooking.EXTRA_DATE);
             String start = data.getStringExtra(NewBooking.EXTRA_START);
             String end = data.getStringExtra(NewBooking.EXTRA_END);
@@ -229,21 +229,21 @@ public class SeeBookings extends AppCompatActivity {
             addBookingInFirebase(res);
             allBookings.add(res);
             checkElementStatus(res);
-            sortReservas();
+            sortBookings();
             changeDataToActive();
             adapter.notifyDataSetChanged();
 
 
-            Toast.makeText(this, "Reserva saved", Toast.LENGTH_SHORT).show();
-        } else if(requestCode == EDIT_RESERVA_REQUEST && resultCode == RESULT_OK){
-            Booking berria= CurrentBooking.getInstance().getCurrent();
-            berria.setStartTime(data.getStringExtra(NewBooking.EXTRA_START));
-            berria.setEndTime(data.getStringExtra(NewBooking.EXTRA_END));
-            sortReservas();
+            Toast.makeText(this, "Booking saved", Toast.LENGTH_SHORT).show();
+        } else if(requestCode == EDIT_BOOKING_REQUEST && resultCode == RESULT_OK){
+            Booking newB= CurrentBooking.getInstance().getCurrent();
+            newB.setStartTime(data.getStringExtra(NewBooking.EXTRA_START));
+            newB.setEndTime(data.getStringExtra(NewBooking.EXTRA_END));
+            sortBookings();
             changeDataToActive();
 
         }else {
-            Toast.makeText(this, "Reserva not saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Booking not saved", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -264,7 +264,7 @@ public class SeeBookings extends AppCompatActivity {
     }
     private void showDeleteDialog(int position){
         new MaterialAlertDialogBuilder(this)
-                .setMessage("Are you sure you want to delete the reservation?")
+                .setMessage("Are you sure you want to delete the booking?")
                 .setPositiveButton("DELETE", (dialog, which) -> {
                     deleteBooking(position);
                     dialog.dismiss();
@@ -281,24 +281,24 @@ public class SeeBookings extends AppCompatActivity {
     private void deleteBooking(int position) {
         Booking r;
         if(tabs.getSelectedTabPosition()==0){
-            r=activasList.get(position);
-            activasList.remove(position);
+            r= activeList.get(position);
+            activeList.remove(position);
             allBookings.remove(r);
             changeDataToActive();
         }else{
-            r=inactivasList.get(position);
-            inactivasList.remove(position);
+            r= inactiveList.get(position);
+            inactiveList.remove(position);
             allBookings.remove(r);
             changeDataToInactive();
         }
         deleteBookingByAllData(r);
-        Snackbar.make(findViewById(R.id.snackbar), "Reservation deleted successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
+        Snackbar.make(findViewById(R.id.snackbar), "Booking deleted successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addBookingInFirebase(r);
                 allBookings.add(r);
                 checkElementStatus(r);
-                sortReservas();
+                sortBookings();
                 if(tabs.getSelectedTabPosition()==0){
                     changeDataToActive();
                 }else{
@@ -317,7 +317,7 @@ public class SeeBookings extends AppCompatActivity {
                 if (bookings != null) {
                     allBookings.clear();
                     allBookings.addAll(bookings);
-                    sortReservas();
+                    sortBookings();
                     for(Booking a : allBookings){
                         checkElementStatus(a);
                     }
