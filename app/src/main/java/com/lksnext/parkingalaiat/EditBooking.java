@@ -154,33 +154,29 @@ public class EditBooking extends AppCompatActivity {
         progress.setProgressCompat(0, true);
 
         // Delay the stop of the animation by 3 seconds (3000 milliseconds)
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Hide the progress indicator
-                progress.setVisibility(View.INVISIBLE);
-                showErrorDialog();
-                startHour.setError(" ");
-                endHour.setError(" ");
-            }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // Hide the progress indicator
+            progress.setVisibility(View.INVISIBLE);
+            showErrorDialog();
+            startHour.setError(" ");
+            endHour.setError(" ");
         }, 3000);
+
 
     }
 
     private void update(String bookingID) {
         String start=startHour.getEditText().getText().toString();
         String end=endHour.getEditText().getText().toString();
-        fm.updateBooking(bookingID,start,end, new OnBookingUpdatedListener() {
-            @Override
-            public void OnBookingUpdatedListener(boolean success) {
-                if (success) {
-                    // Reservation updated successfully
-                    setResult(RESULT_OK);
-                    finish();
-                } else {
-                    // Error occurred while updating the reservation
-                    // Handle the failure case
-                }
+
+        fm.updateBooking(bookingID, start, end, success -> {
+            if (success) {
+                // Reservation updated successfully
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                // Error occurred while updating the reservation
+                // Handle the failure case
             }
         });
     }

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.lksnext.parkingalaiat.domain.CurrentBooking;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeeBookings extends AppCompatActivity {
+    private static final String OPERATION = "OPERATION";
     private FirebaseManager fm;
 
     private List<Booking> bookingsToShow;
@@ -129,9 +131,8 @@ public class SeeBookings extends AppCompatActivity {
             }
 
         }).attachToRecyclerView(recyclerView);
-        adapter.setOnItemClickListener(new BookingAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
+        adapter.setOnItemClickListener(position ->  {
+
                 // Handle item click event here
                 Booking r;
                 if(tabs.getSelectedTabPosition()==0){
@@ -139,10 +140,10 @@ public class SeeBookings extends AppCompatActivity {
                     fm.setCurrentBooking(r);
 
                     Intent intent = new Intent(SeeBookings.this, EditBooking.class);
-                    intent.putExtra("OPERATION", "EDIT_REQ");
+                    intent.putExtra(OPERATION, "EDIT_REQ");
                     bookingActivityLauncher.launch(intent);
                 }
-            }
+
         });
     }
 
@@ -156,7 +157,7 @@ public class SeeBookings extends AppCompatActivity {
 
     private void changeToNewBooking() {
         Intent intent = new Intent(SeeBookings.this, NewBooking.class);
-        intent.putExtra("OPERATION", "ADD_REQ");
+        intent.putExtra(OPERATION, "ADD_REQ");
         bookingActivityLauncher.launch(intent);
     }
 
@@ -215,12 +216,10 @@ public class SeeBookings extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> bookingActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
+            result -> {
                     int resultCode = result.getResultCode();
                     Intent data = result.getData();
-                    String operation = data.getStringExtra("OPERATION");
+                    String operation = data.getStringExtra(OPERATION);
 
                     if (operation != null) {
                         if (operation.equals("ADD_REQ") && resultCode == RESULT_OK) {
@@ -252,7 +251,7 @@ public class SeeBookings extends AppCompatActivity {
                     } else {
                         Toast.makeText(SeeBookings.this, "Unknown operation", Toast.LENGTH_SHORT).show();
                     }
-                }
+
             }
     );
 
@@ -263,14 +262,14 @@ public class SeeBookings extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.perfil:
-                Intent intent = new Intent(SeeBookings.this, Profile.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.perfil) {
+            Intent intent = new Intent(SeeBookings.this, Profile.class);
+            startActivity(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
+
     }
     private void showDeleteDialog(int position){
         new MaterialAlertDialogBuilder(this)
@@ -302,39 +301,39 @@ public class SeeBookings extends AppCompatActivity {
             changeDataToInactive();
         }
         deleteBookingByAllData(r);
-        Snackbar.make(findViewById(R.id.snackbar), "Booking deleted successfully", Snackbar.LENGTH_LONG).setDuration(7000).setAction("Undo", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addBookingInFirebase(r);
-                allBookings.add(r);
-                checkElementStatus(r);
-                sortBookings();
-                if(tabs.getSelectedTabPosition()==0){
-                    changeDataToActive();
-                }else{
-                    changeDataToInactive();
-                }
+        Snackbar.make(findViewById(R.id.snackbar), "Booking deleted successfully", BaseTransientBottomBar.LENGTH_LONG)
+                .setDuration(7000)
+                .setAction("Undo", v -> {
 
-            }
-        }).show();
+                        addBookingInFirebase(r);
+                        allBookings.add(r);
+                        checkElementStatus(r);
+                        sortBookings();
+                        if (tabs.getSelectedTabPosition() == 0) {
+                            changeDataToActive();
+                        } else {
+                            changeDataToInactive();
+                        }
+
+                })
+                .show();
+
 
 
     }
     private void getAllBookingsForUser() {
-        fm.getAllBookingsForUser(new OnBookingsListener() {
-            @Override
-            public void onBookingsLoaded(List<Booking> bookings) {
-                if (bookings != null) {
-                    allBookings.clear();
-                    allBookings.addAll(bookings);
-                    sortBookings();
-                    for(Booking a : allBookings){
-                        checkElementStatus(a);
-                    }
-                    changeDataToActive();
+        fm.getAllBookingsForUser(bookings -> {
+            if (bookings != null) {
+                allBookings.clear();
+                allBookings.addAll(bookings);
+                sortBookings();
+                for (Booking a : allBookings) {
+                    checkElementStatus(a);
                 }
+                changeDataToActive();
             }
         });
+
 
     }
 
