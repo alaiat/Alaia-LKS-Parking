@@ -35,8 +35,6 @@ import java.util.List;
 public class SeeBookings extends AppCompatActivity {
     private FirebaseManager fm;
 
-
-
     private List<Booking> bookingsToShow;
     private List<Booking> allBookings;
     private List<Booking> activeList;
@@ -142,6 +140,7 @@ public class SeeBookings extends AppCompatActivity {
 
                     Intent intent = new Intent(SeeBookings.this, EditBooking.class);
                     intent.putExtra("OPERATION", "EDIT_REQ");
+                    bookingActivityLauncher.launch(intent);
                 }
             }
         });
@@ -236,7 +235,6 @@ public class SeeBookings extends AppCompatActivity {
                         sortBookings();
                         changeDataToActive();
                         adapter.notifyDataSetChanged();
-
 
                         Toast.makeText(SeeBookings.this, "Booking saved", Toast.LENGTH_SHORT).show();
 
