@@ -8,6 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,9 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeeBookings extends AppCompatActivity {
-    public static final int ADD_BOOKING_REQUEST = 1;
-    public static final int EDIT_BOOKING_REQUEST = 2;
-
     private FirebaseManager fm;
 
 
@@ -138,15 +139,12 @@ public class SeeBookings extends AppCompatActivity {
                 if(tabs.getSelectedTabPosition()==0){
                     r= activeList.get(position);
                     fm.setCurrentBooking(r);
+
                     Intent intent = new Intent(SeeBookings.this, EditBooking.class);
-                    startActivityForResult(intent, EDIT_BOOKING_REQUEST);
+                    intent.putExtra("OPERATION", "EDIT_REQ");
                 }
-
-
             }
         });
-
-
     }
 
 
@@ -159,7 +157,8 @@ public class SeeBookings extends AppCompatActivity {
 
     private void changeToNewBooking() {
         Intent intent = new Intent(SeeBookings.this, NewBooking.class);
-        startActivityForResult(intent, ADD_BOOKING_REQUEST);
+        intent.putExtra("OPERATION", "ADD_REQ");
+        bookingActivityLauncher.launch(intent);
     }
 
 
@@ -215,37 +214,46 @@ public class SeeBookings extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    ActivityResultLauncher<Intent> bookingActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    int resultCode = result.getResultCode();
+                    Intent data = result.getData();
+                    String operation = data.getStringExtra("OPERATION");
 
-        if (requestCode == ADD_BOOKING_REQUEST && resultCode == RESULT_OK) {
-            String date = data.getStringExtra(NewBooking.EXTRA_DATE);
-            String start = data.getStringExtra(NewBooking.EXTRA_START);
-            String end = data.getStringExtra(NewBooking.EXTRA_END);
-            String spot=data.getStringExtra(NewBooking.EXTRA_SPOT);
+                    if (operation.equals("ADD_REQ") && resultCode == RESULT_OK) {
+                        String date = data.getStringExtra(NewBooking.EXTRA_DATE);
+                        String start = data.getStringExtra(NewBooking.EXTRA_START);
+                        String end = data.getStringExtra(NewBooking.EXTRA_END);
+                        String spot = data.getStringExtra(NewBooking.EXTRA_SPOT);
 
-            Booking res=new Booking(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
-            addBookingInFirebase(res);
-            allBookings.add(res);
-            checkElementStatus(res);
-            sortBookings();
-            changeDataToActive();
-            adapter.notifyDataSetChanged();
+                        Booking res = new Booking(spot,start,end,date,UserContext.getInstance().getCurrentUser().getUid());
+                        addBookingInFirebase(res);
+                        allBookings.add(res);
+                        checkElementStatus(res);
+                        sortBookings();
+                        changeDataToActive();
+                        adapter.notifyDataSetChanged();
 
 
-            Toast.makeText(this, "Booking saved", Toast.LENGTH_SHORT).show();
-        } else if(requestCode == EDIT_BOOKING_REQUEST && resultCode == RESULT_OK){
-            Booking newB= CurrentBooking.getInstance().getCurrent();
-            newB.setStartTime(data.getStringExtra(NewBooking.EXTRA_START));
-            newB.setEndTime(data.getStringExtra(NewBooking.EXTRA_END));
-            sortBookings();
-            changeDataToActive();
+                        Toast.makeText(SeeBookings.this, "Booking saved", Toast.LENGTH_SHORT).show();
 
-        }else {
-            Toast.makeText(this, "Booking not saved", Toast.LENGTH_SHORT).show();
-        }
-    }
+                    } else if(operation.equals("EDIT_REQ") && resultCode == RESULT_OK){
+                        Booking newB = CurrentBooking.getInstance().getCurrent();
+                        newB.setStartTime(data.getStringExtra(NewBooking.EXTRA_START));
+                        newB.setEndTime(data.getStringExtra(NewBooking.EXTRA_END));
+                        sortBookings();
+                        changeDataToActive();
+
+                    } else {
+                        Toast.makeText(SeeBookings.this, "Booking not saved", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+    );
+
 
     private void addBookingInFirebase(Booking res) {
         fm.addBookingInFirebase(res);
