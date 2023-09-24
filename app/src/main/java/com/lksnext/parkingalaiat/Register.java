@@ -31,7 +31,7 @@ public class Register extends AppCompatActivity {
     private TextView link;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private Context context=this;
+    private Context context = this;
     private TextInputLayout name;
     private TextInputEditText edName;
     private TextInputLayout email;
@@ -40,9 +40,7 @@ public class Register extends AppCompatActivity {
     private TextInputEditText edPhoneNumber;
     private TextInputLayout password;
     private TextInputEditText edPassword;
-
     private TextInputLayout secondPassword;
-
     private LinearProgressIndicator progressIndicator;
 
 
@@ -50,8 +48,8 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        mAuth=FirebaseAuth.getInstance();
-        db=FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         initUi();
 
     }
@@ -63,8 +61,8 @@ public class Register extends AppCompatActivity {
 
 
     private void initView() {
-        button=findViewById(R.id.registerButton);
-        link=findViewById(R.id.loginLink);
+        button = findViewById(R.id.registerButton);
+        link = findViewById(R.id.loginLink);
         //add the stroke to the link
         SpannableString content = new SpannableString(link.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -74,37 +72,35 @@ public class Register extends AppCompatActivity {
 
 
 
-        name =findViewById(R.id.nameField);
+        name = findViewById(R.id.nameField);
         edName = (TextInputEditText) name.getEditText();
 
-        email=findViewById(R.id.emailField);
-        edEmail= (TextInputEditText) email.getEditText();
+        email = findViewById(R.id.emailField);
+        edEmail = (TextInputEditText) email.getEditText();
 
-        phoneNumber=findViewById(R.id.phoneNumber);
-        edPhoneNumber= (TextInputEditText) phoneNumber.getEditText();
+        phoneNumber = findViewById(R.id.phoneNumber);
+        edPhoneNumber = (TextInputEditText) phoneNumber.getEditText();
 
-        password=findViewById(R.id.password1Field);
-        edPassword= (TextInputEditText) password.getEditText();
+        password = findViewById(R.id.password1Field);
+        edPassword = (TextInputEditText) password.getEditText();
 
-        secondPassword=findViewById(R.id.password2Field);
+        secondPassword = findViewById(R.id.password2Field);
 
-        progressIndicator=findViewById(R.id.progressIndicator);
+        progressIndicator = findViewById(R.id.progressIndicator);
         progressIndicator.setProgressCompat(0, true);
         progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.red));
 
         setTitle("");
-
-
     }
 
     private void initListeners(){
-        button.setOnClickListener(v ->{ register(); });
-        link.setOnClickListener(v ->{changeToLogin();});
-        edPassword.setOnClickListener(view -> {onPasswordEdit();});
-        password.setOnClickListener(view -> {onPasswordEdit();});
-        edName.setOnClickListener(view ->{deleteNameErrors();});
-        edEmail.setOnClickListener(view -> {deleteEmailErrors();});
-        edPhoneNumber.setOnClickListener(view -> {deletePhoneErrors();});
+        button.setOnClickListener(v -> { register(); });
+        link.setOnClickListener(v -> { changeToLogin(); });
+        edPassword.setOnClickListener(view -> { onPasswordEdit(); });
+        password.setOnClickListener(view -> { onPasswordEdit(); });
+        edName.setOnClickListener(view ->{ deleteNameErrors(); });
+        edEmail.setOnClickListener(view -> { deleteEmailErrors(); });
+        edPhoneNumber.setOnClickListener(view -> { deletePhoneErrors(); });
     }
 
     private void deleteNameErrors() {
@@ -181,7 +177,7 @@ public class Register extends AppCompatActivity {
             progress += 20;
         }
 
-        if(progress==100){
+        if(progress == 100){
             progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.teal_200));
         }else{
             progressIndicator.setIndicatorColor(ContextCompat.getColor(context,R.color.red));
@@ -191,36 +187,36 @@ public class Register extends AppCompatActivity {
 
         return progress;
     }
-    private boolean checkEmpty(String name, String email, String phoneNumber, String password,String password2){
-        boolean isEmpty=false;
+    private boolean checkEmpty(String name, String email, String phoneNumber, String password, String password2){
+        boolean isEmpty = false;
         if(name.isEmpty()){
             this.name.setError(" ");
-            isEmpty=true;
+            isEmpty = true;
         }
+
         if(email.isEmpty()){
             this.email.setError(" ");
-            isEmpty=true;
-
+            isEmpty = true;
         }
+
         if(phoneNumber.isEmpty()){
             this.phoneNumber.setError(" ");
-            isEmpty=true;
-
-
+            isEmpty = true;
         }
+
         if(password.isEmpty()){
             this.password.setError(" ");
-            isEmpty=true;
-
+            isEmpty = true;
         }
+
         if(password2.isEmpty()){
             this.secondPassword.setError(" ");
-            isEmpty=true;
+            isEmpty = true;
+        }
 
-        }
-        if(isEmpty){
+        if(isEmpty)
             showErrorDialog("Missing info","You must fill all the data");
-        }
+
         return isEmpty;
     }
 
@@ -229,8 +225,8 @@ public class Register extends AppCompatActivity {
         String nam = name.getEditText().getText().toString();
         String ema = email.getEditText().getText().toString();
         String pn = phoneNumber.getEditText().getText().toString();
-        String pass=password.getEditText().getText().toString();
-        String pass2=secondPassword.getEditText().getText().toString();
+        String pass = password.getEditText().getText().toString();
+        String pass2 = secondPassword.getEditText().getText().toString();
 
             if(makeAllRegisterChecking(nam,ema,pn,pass,pass2)) {
 
@@ -317,12 +313,6 @@ public class Register extends AppCompatActivity {
         return str.matches(".*" + specialChars + ".*");
     }
 
-
-
-
-
-
-
     private void showSuccessDialog() {
         new MaterialAlertDialogBuilder(context)
                 .setTitle("User created!")
@@ -347,14 +337,16 @@ public class Register extends AppCompatActivity {
 
 
     private void saveUserDataToFirestore(String userId, String email, String name, String phoneNumber) {
-        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(userId);
+        DocumentReference userRef =
+                FirebaseFirestore.getInstance().collection("users").document(userId);
 
         User user = new User(name, email, phoneNumber);
 
         userRef.set(user)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        DocumentReference parkingRef = db.collection("parking").document("ZVEFi53OQtszxreNsBbN");
+                        DocumentReference parkingRef =
+                                db.collection("parking").document("ZVEFi53OQtszxreNsBbN");
 
                         parkingRef.update("users", FieldValue.arrayUnion(userId))
                                 .addOnSuccessListener(aVoid -> {

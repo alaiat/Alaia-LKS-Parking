@@ -9,17 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 public class CurrentParking {
     private static CurrentParking instance;
-    private List<String> spotListaId;
-    private List<Area> all=new ArrayList<>();
-    private List<Area> car=new ArrayList<>();
-    private List<Area> hand=new ArrayList<>();
-    private List<Area> elec=new ArrayList<>();
-    private List<Area> motor=new ArrayList<>();
+    private List<String> spotListId;
+    private List<Area> all = new ArrayList<>();
+    private List<Area> car = new ArrayList<>();
+    private List<Area> hand = new ArrayList<>();
+    private List<Area> elec = new ArrayList<>();
+    private List<Area> motor = new ArrayList<>();
     FirebaseManager fm;
 
     private CurrentParking() {
         fm= FirebaseManager.getInstance();
-        spotListaId =new ArrayList<>();
+        spotListId =new ArrayList<>();
         addSpotsById();
     }
     public void addSpotsById(){
@@ -27,13 +27,13 @@ public class CurrentParking {
             @Override
             public void onSpotIdsLoaded(List<String> spotIds) {
                 if (spotIds != null) {
-                    spotListaId.clear();
+                    spotListId.clear();
                     car.clear();
                     motor.clear();
                     hand.clear();
                     elec.clear();
-                    spotListaId=spotIds;
-                    addSpotToCorrepondingList();
+                    spotListId = spotIds;
+                    addSpotToCorrespondingList();
                 } else {
                     // Handle the failure case
                     // ...
@@ -42,12 +42,12 @@ public class CurrentParking {
         });
     }
 
-    private void addSpotToCorrepondingList() {
-       fm.sortList(spotListaId, new OnSpotsLoaderByTypeListener() {
+    private void addSpotToCorrespondingList() {
+       fm.sortList(spotListId, new OnSpotsLoaderByTypeListener() {
             @Override
             public void OnSpotsLoaderByTypeListener(List<Area> sortedList) {
-                all=sortedList;
-                for(Area s:all){
+                all = sortedList;
+                for(Area s : all){
                     switch (s.type) {
                         case "CAR":
                             car.add(s);
@@ -137,13 +137,13 @@ public class CurrentParking {
         private String id;
         private String type;
         private List<DayHours> listDayTime;
-        FirebaseManager fm=FirebaseManager.getInstance();
+        FirebaseManager fm = FirebaseManager.getInstance();
 
         public Area(String number, String id, String type) {
             this.number = number;
             this.id = id;
-            this.type=type;
-            listDayTime=new ArrayList<>();
+            this.type = type;
+            listDayTime = new ArrayList<>();
             findBookings(id);
         }
 
@@ -190,19 +190,17 @@ public class CurrentParking {
         }
         public void addListToList(List<Booking> bookings) {
 
-            for(Booking b:bookings){
-                Boolean found=false;
-                DayHours dh=null;
-                for(DayHours d:listDayTime){
+            for(Booking b : bookings){
+                Boolean found = false;
+                DayHours dh = null;
+                for(DayHours d : listDayTime){
                     if(d.getDate().equals(b.getDate())){
-                        found=true;
-                        dh=d;
+                        found = true;
+                        dh = d;
                     }
                 }
-                if(!found){
-                    dh=new DayHours(b.getDate());
-                    found=false;
-                }
+                if(!found)
+                    dh = new DayHours(b.getDate());
 
                 dh.addStartHour(b.getStartTime());
                 dh.addEndHour(b.getEndTime());
@@ -213,7 +211,7 @@ public class CurrentParking {
         }
 
         public DayHours getDayHoursByDate(String date){
-            for(DayHours dh:listDayTime){
+            for(DayHours dh : listDayTime){
                 if(dh.getDate().equals(date)){
                     return dh;
                 }

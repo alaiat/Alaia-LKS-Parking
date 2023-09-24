@@ -1,7 +1,5 @@
 package com.lksnext.parkingalaiat.domain;
 
-import com.google.firebase.database.PropertyName;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +14,16 @@ public class User {
     public User(String name, String email, String phone) {
         this.name = name;
         this.email = email;
-        this.phoneNumber=phone;
-        bookings =new ArrayList<>();
+        this.phoneNumber = phone;
+        bookings = new ArrayList<>();
     }
 
 
-    public List<Booking> getReservas() {
+    public List<Booking> getBookings() {
         return bookings;
     }
 
-    public void setReservas(List<Booking> bookings) {
+    public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
 

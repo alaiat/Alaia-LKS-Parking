@@ -20,7 +20,6 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentBooking;
 import com.lksnext.parkingalaiat.domain.Booking;
-import com.lksnext.parkingalaiat.interfaces.OnBookingUpdatedListener;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -28,11 +27,11 @@ import java.util.Locale;
 
 public class EditBooking extends AppCompatActivity {
 
-    public static final String EXTRA_START="com.lksnext.parkingalaiat.EXTRA_START";
-    public static final String EXTRA_END="com.lksnext.parkingalaiat.EXTRA_END";
+    public static final String EXTRA_START = "com.lksnext.parkingalaiat.EXTRA_START";
+    public static final String EXTRA_END = "com.lksnext.parkingalaiat.EXTRA_END";
 
-    private Boolean startSel=false;
-    private Boolean endSel=false;
+    private Boolean startSel = false;
+    private Boolean endSel = false;
 
     private TextInputLayout startHour;
     private TextInputLayout endHour;
@@ -61,42 +60,42 @@ public class EditBooking extends AppCompatActivity {
 
     private void initUi() {
         initView();
-       initListeners();
-       initData();
+        initListeners();
+        initData();
     }
 
     private void initView() {
-        progress=findViewById(R.id.progress);
-        startHour=findViewById(R.id.startHour);
-        endHour=findViewById(R.id.endHour);
-        date=findViewById(R.id.date);
-        spotList=findViewById(R.id.spots);
-        dropdownField=findViewById(R.id.dropdownField);
+        progress = findViewById(R.id.progress);
+        startHour = findViewById(R.id.startHour);
+        endHour = findViewById(R.id.endHour);
+        date = findViewById(R.id.date);
+        spotList = findViewById(R.id.spots);
+        dropdownField = findViewById(R.id.dropdownField);
 
     }
 
     private void initData() {
-        fm=FirebaseManager.getInstance();
-        currentParking=CurrentParking.getInstance();
+        fm = FirebaseManager.getInstance();
+        currentParking = CurrentParking.getInstance();
         currentBooking = CurrentBooking.getInstance();
-        Booking r= currentBooking.getCurrent();
+
+        Booking r = currentBooking.getCurrent();
+
         startHour.getEditText().setText(r.getStartTime());
         endHour.getEditText().setText(r.getEndTime());
         date.getEditText().setText(r.getDate());
         dropdownField.setText(currentParking.getTypeById(r.getSpot()));
         spotList.setText(currentParking.getNumById(r.getSpot()));
-
     }
 
     private void initListeners() {
-        startHour.setStartIconOnClickListener(view->{showStartTimePicker();});
-        endHour.setStartIconOnClickListener(view->{showEndTimePicker();});
+        startHour.setStartIconOnClickListener(view -> { showStartTimePicker(); });
+        endHour.setStartIconOnClickListener(view -> { showEndTimePicker(); });
     }
 
     private void checkAllDataFill() {
-        if(startSel && endSel){
+        if(startSel && endSel)
             showProgressIndicator();
-        }
     }
 
     private void showEndTimePicker() {
@@ -109,22 +108,25 @@ public class EditBooking extends AppCompatActivity {
                         .build();
         picker.show(getSupportFragmentManager(),"tag");
 
-        picker.addOnPositiveButtonClickListener(selection ->{
+        picker.addOnPositiveButtonClickListener(selection -> {
             int hour = picker.getHour();
             int minute = picker.getMinute();
-            String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+            String formattedTime =
+                    String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
             endHour.getEditText().setText(formattedTime);
-            if(!compareHours()){
 
+            if(!compareHours()){
                 endHour.setError(" ");
                 startHour.setError(" ");
+
             }else{
                 endHour.setError(null);
                 startHour.setError(null);
-                endSel=true;
+                endSel = true;
                 checkAllDataFill();
             }
-            endSel=true;
+
+            endSel = true;
             checkAllDataFill();
         });
 
@@ -132,22 +134,20 @@ public class EditBooking extends AppCompatActivity {
 
     private boolean compareHours() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        String start=startHour.getEditText().getText().toString();
-        String end=endHour.getEditText().getText().toString();
+        String start = startHour.getEditText().getText().toString();
+        String end = endHour.getEditText().getText().toString();
+
         if(start.isEmpty() || end.isEmpty()){
             return true;
+
         }else{
             LocalTime localTime1 = LocalTime.parse(startHour.getEditText().getText(), formatter);
             LocalTime localTime2 = LocalTime.parse(endHour.getEditText().getText(), formatter);
             return localTime2.isAfter(localTime1);
         }
-
     }
 
     private void showProgressIndicator() {
-
-
-
         progress.setVisibility(View.VISIBLE);
 
         // Start the animation
@@ -166,8 +166,8 @@ public class EditBooking extends AppCompatActivity {
     }
 
     private void update(String bookingID) {
-        String start=startHour.getEditText().getText().toString();
-        String end=endHour.getEditText().getText().toString();
+        String start = startHour.getEditText().getText().toString();
+        String end = endHour.getEditText().getText().toString();
 
         fm.updateBooking(bookingID, start, end, success -> {
             if (success) {
@@ -238,8 +238,4 @@ public class EditBooking extends AppCompatActivity {
                 })
                 .show();
     }
-
-
-
-
 }

@@ -23,12 +23,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseManager {
-    private static final String EXTRA_LOGIN_SUCCESS="com.lksnext.parkingalaiat.EXTRA_LOGIN_SUCCESS";
+    private static final String EXTRA_LOGIN_SUCCESS =
+            "com.lksnext.parkingalaiat.EXTRA_LOGIN_SUCCESS";
 
     private static FirebaseManager instance;
     private FirebaseFirestore db;
     private CollectionReference userRef;
-    private CollectionReference reservaRef;
+    private CollectionReference reservRef;
     private CollectionReference spotRef;
     private UserContext user;
     private CurrentBooking currentBooking;
@@ -36,10 +37,11 @@ public class FirebaseManager {
 
     private FirebaseManager(){
         db = FirebaseFirestore.getInstance();
-        reservaRef = db.collection("reservations");
+        reservRef = db.collection("reservations");
         userRef = db.collection("users");
         spotRef = db.collection("spots");
-        user=UserContext.getInstance();
+
+        user = UserContext.getInstance();
         currentBooking = CurrentBooking.getInstance();
 
     }
@@ -52,7 +54,7 @@ public class FirebaseManager {
 
     public void getAllBookingsForUser(OnBookingsListener listener) {
         String userId = user.getCurrentUser().getUid();
-        Query query = reservaRef.whereEqualTo("user", userId);
+        Query query = reservRef.whereEqualTo("user", userId);
 
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Booking> reservations = new ArrayList<>();
@@ -76,8 +78,9 @@ public class FirebaseManager {
         });
     }
     public void deleteBookingByAllData(Booking r) {
-        String userId=user.getCurrentUser().getUid();
-        reservaRef
+        String userId = user.getCurrentUser().getUid();
+
+        reservRef
                 .whereEqualTo("user", userId)
                 .whereEqualTo("spot", r.getSpot())
                 .whereEqualTo("date",r.getDate())
@@ -87,6 +90,7 @@ public class FirebaseManager {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                         DocumentReference reservationRef = documentSnapshot.getReference();
+
                         reservationRef.delete()
                                 .addOnSuccessListener(aVoid -> {
                                     // Reservation successfully deleted
@@ -99,7 +103,10 @@ public class FirebaseManager {
 
                                     // Handle the exception
                                 });
-                        DocumentReference userRef = db.collection("users").document(UserContext.getInstance().getCurrentUser().getUid());
+
+                        DocumentReference userRef =
+                                db.collection("users").document(UserContext.getInstance().getCurrentUser().getUid());
+
                         userRef.update("reservas", FieldValue.arrayRemove(documentSnapshot.getId()))
                                 .addOnSuccessListener(aVoid1 -> {
                                     // Reservation ID removed from user document
@@ -111,8 +118,10 @@ public class FirebaseManager {
 
                                     // Handle the exception
                                 });
+
                         DocumentReference spotRef = db.collection("spots").document(r.getSpot());
-                        //It has to be reservas because we have reservas as database name in firebase
+
+                        // String must be "reservas" since it's the original database name in firebase
                         spotRef.update("reservas", FieldValue.arrayRemove(documentSnapshot.getId()))
                                 .addOnSuccessListener(aVoid2 -> {
                                     // Reservation ID removed from spot document
@@ -130,13 +139,15 @@ public class FirebaseManager {
                 });
     }
     public void addBookingInFirebase(Booking res) {
-        String userId=user.getCurrentUser().getUid();
-        reservaRef.get()
+        String userId = user.getCurrentUser().getUid();
+
+        reservRef.get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
                         db.collection("reservations").document();
                     }
-                    reservaRef.add(res)
+
+                    reservRef.add(res)
                             .addOnSuccessListener(documentReference -> {
                                 String reservationId = documentReference.getId();
                                 //System.out.println("Reservation added with ID: " + reservationId);
@@ -194,9 +205,9 @@ public class FirebaseManager {
                     if (documentSnapshot.exists()) {
                         String type = (String) documentSnapshot.get("type");
                         Object num = documentSnapshot.get("number");
-                        CurrentParking.Area s=new CurrentParking.Area(num.toString(), id, type);
+                        CurrentParking.Area s = new CurrentParking.Area(num.toString(), id, type);
                         all.add(s);
-                        System.out.println(s+"\n");
+                        System.out.println(s + "\n");
                     }
                 }
 
@@ -213,8 +224,9 @@ public class FirebaseManager {
     }
     public void setCurrentBooking(Booking r){
         currentBooking.setCurrent(r);
-        String userId=user.getCurrentUser().getUid();
-        reservaRef
+        String userId = user.getCurrentUser().getUid();
+
+        reservRef
                 .whereEqualTo("user", userId)
                 .whereEqualTo("spot", r.getSpot())
                 .whereEqualTo("date", r.getDate())
@@ -310,11 +322,11 @@ public class FirebaseManager {
     }
 
     public CollectionReference getReservaRef() {
-        return reservaRef;
+        return reservRef;
     }
 
     public void setReservaRef(CollectionReference reservaRef) {
-        this.reservaRef = reservaRef;
+        this.reservRef = reservaRef;
     }
 
     public CollectionReference getSpotRef() {

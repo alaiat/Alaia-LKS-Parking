@@ -71,11 +71,11 @@ public class SeeBookings extends AppCompatActivity {
 
     }
     public void initData(){
-        allBookings =new ArrayList<>();
-        bookingsToShow =new ArrayList<>();
-        activeList =new ArrayList<>();
-        inactiveList =new ArrayList<>();
-        fm=FirebaseManager.getInstance();
+        allBookings = new ArrayList<>();
+        bookingsToShow = new ArrayList<>();
+        activeList = new ArrayList<>();
+        inactiveList = new ArrayList<>();
+        fm = FirebaseManager.getInstance();
 
         getAllBookingsForUser();
 
@@ -87,13 +87,13 @@ public class SeeBookings extends AppCompatActivity {
 
     }
     public void initView(){
-        tabs=findViewById(R.id.tabs);
-        newBookButton =findViewById(R.id.nReservaButton);
+        tabs = findViewById(R.id.tabs);
+        newBookButton = findViewById(R.id.nReservaButton);
         setAdapter();
 
     }
     private void initListeners() {
-        newBookButton.setOnClickListener(view ->{ changeToNewBooking();});
+        newBookButton.setOnClickListener(view -> { changeToNewBooking(); });
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -131,12 +131,12 @@ public class SeeBookings extends AppCompatActivity {
             }
 
         }).attachToRecyclerView(recyclerView);
-        adapter.setOnItemClickListener(position ->  {
+        adapter.setOnItemClickListener(position -> {
 
                 // Handle item click event here
                 Booking r;
-                if(tabs.getSelectedTabPosition()==0){
-                    r= activeList.get(position);
+                if(tabs.getSelectedTabPosition() == 0){
+                    r = activeList.get(position);
                     fm.setCurrentBooking(r);
 
                     Intent intent = new Intent(SeeBookings.this, EditBooking.class);
@@ -177,8 +177,8 @@ public class SeeBookings extends AppCompatActivity {
 
 
     public void setAdapter(){
-        adapter=new BookingAdapter(bookingsToShow,this);
-        recyclerView= findViewById(R.id.listRecyclerView);
+        adapter = new BookingAdapter(bookingsToShow,this);
+        recyclerView = findViewById(R.id.listRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -191,8 +191,8 @@ public class SeeBookings extends AppCompatActivity {
         LocalDate elementDate = LocalDate.parse(element.getDate(), formatter);
 
         if (elementDate.isEqual(currentDate)) {
-            LocalTime now=LocalTime.now();
-            LocalTime time=LocalTime.parse(element.getEndTime());
+            LocalTime now = LocalTime.now();
+            LocalTime time = LocalTime.parse(element.getEndTime());
 
             if(now.isAfter(time)){
                 element.setActive("Inactive");
@@ -290,12 +290,12 @@ public class SeeBookings extends AppCompatActivity {
     private void deleteBooking(int position) {
         Booking r;
         if(tabs.getSelectedTabPosition()==0){
-            r= activeList.get(position);
+            r = activeList.get(position);
             activeList.remove(position);
             allBookings.remove(r);
             changeDataToActive();
         }else{
-            r= inactiveList.get(position);
+            r = inactiveList.get(position);
             inactiveList.remove(position);
             allBookings.remove(r);
             changeDataToInactive();
@@ -317,9 +317,6 @@ public class SeeBookings extends AppCompatActivity {
 
                 })
                 .show();
-
-
-
     }
     private void getAllBookingsForUser() {
         fm.getAllBookingsForUser(bookings -> {
@@ -333,20 +330,5 @@ public class SeeBookings extends AppCompatActivity {
                 changeDataToActive();
             }
         });
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

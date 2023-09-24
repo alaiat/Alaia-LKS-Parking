@@ -19,20 +19,20 @@ public class Profile extends AppCompatActivity {
     private TextInputLayout name,phone,email;
     private Button edit,save;
     private String nameD,phoneD;
-    private FirebaseUser user=UserContext.getInstance().getCurrentUser();
+    private FirebaseUser user = UserContext.getInstance().getCurrentUser();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
 
         initUi();
-
-
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-
-
         setTitle("Profile");
         return true;
     }
@@ -43,28 +43,28 @@ public class Profile extends AppCompatActivity {
     }
 
     private void initListeners() {
-        edit.setOnClickListener(view ->{enableEdit();});
-        save.setOnClickListener(view->{save();});
+        edit.setOnClickListener(view -> { enableEdit(); });
+        save.setOnClickListener(view-> { save(); });
     }
 
     private void save() {
-        Boolean error=false;
-        String na=name.getEditText().getText().toString();
-        String pn=phone.getEditText().getText().toString();
+        Boolean error = false;
+        String na = name.getEditText().getText().toString();
+        String pn = phone.getEditText().getText().toString();
 
         if(na.isEmpty()){
             name.setError(" ");
-            error=true;
+            error = true;
         }
 
         if(pn.isEmpty()){
             phone.setError(" ");
-            error=true;
+            error = true;
 
         }
         if(!error){
-            nameD=na;
-            phoneD=pn;
+            nameD = na;
+            phoneD = pn;
             updateUserData(user.getUid(),nameD,phoneD);
             save.setEnabled(false);
             email.setError(null);
@@ -83,26 +83,20 @@ public class Profile extends AppCompatActivity {
     }
 
     private void initView() {
-        image=findViewById(R.id.imageView);
-        name=findViewById(R.id.name);
-        email=findViewById(R.id.email);
-        phone=findViewById(R.id.number);
-        edit=findViewById(R.id.edit);
-        save=findViewById(R.id.save);
+        image = findViewById(R.id.imageView);
+        name = findViewById(R.id.name);
+        email = findViewById(R.id.email);
+        phone = findViewById(R.id.number);
+        edit = findViewById(R.id.edit);
+        save = findViewById(R.id.save);
 
         showData();
-
-
-
-
-
-
-
-
     }
 
+
     private void showData() {
-        DocumentReference userRef = FirebaseFirestore.getInstance().collection("users").document(user.getUid());
+        DocumentReference userRef =
+                FirebaseFirestore.getInstance().collection("users").document(user.getUid());
 
         userRef.get()
                 .addOnCompleteListener(task -> {
@@ -111,8 +105,7 @@ public class Profile extends AppCompatActivity {
                         if (documentSnapshot.exists()) {
                             String name1 = documentSnapshot.getString("name");
                             String phoneNumber = documentSnapshot.getString("phoneNumber");
-                            String email1 = documentSnapshot
-                                    .getString("email");
+                            String email1 = documentSnapshot.getString("email");
 
                             System.out.println(phoneNumber+"\n\n\n\n\n\n\n\n");
                             this.name.getEditText().setText(name1);
@@ -133,7 +126,8 @@ public class Profile extends AppCompatActivity {
 
 
     public void updateUserData(String userId, String newName, String newPhoneNumber) {
-        DocumentReference userRef =  FirebaseFirestore.getInstance().collection("users").document(userId);
+        DocumentReference userRef =
+                FirebaseFirestore.getInstance().collection("users").document(userId);
 
         userRef.update("name", newName, "phoneNumber", newPhoneNumber)
                 .addOnCompleteListener(task -> {

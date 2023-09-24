@@ -38,9 +38,9 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        mAuth=FirebaseAuth.getInstance();
-        fireManager=fireManager.getInstance();
-        current=CurrentParking.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        fireManager = fireManager.getInstance();
+        current = CurrentParking.getInstance();
         initUi();
     }
 
@@ -50,37 +50,38 @@ public class Login extends AppCompatActivity {
     }
 
     private void initView() {
-        button=findViewById(R.id.loginButton);
-        email=findViewById(R.id.email);
-        edEmail= (TextInputEditText) email.getEditText();
+        button = findViewById(R.id.loginButton);
+        email = findViewById(R.id.email);
+        edEmail = (TextInputEditText) email.getEditText();
 
-        password=findViewById(R.id.password);
-        edPassword= (TextInputEditText) password.getEditText();
+        password = findViewById(R.id.password);
+        edPassword = (TextInputEditText) password.getEditText();
 
-        changeP=findViewById(R.id.changePassword);
+        changeP = findViewById(R.id.changePassword);
         SpannableString content = new SpannableString(changeP.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         changeP.setText(content);
-        createAcco=findViewById(R.id.createAccount);
+
+        createAcco = findViewById(R.id.createAccount);
         SpannableString content2 = new SpannableString(createAcco.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         createAcco.setText(content2);
+
         setTitle("");
     }
 
     private void initListeners(){
-        button.setOnClickListener(v ->{ login(); });
-        createAcco.setOnClickListener(view -> {changeToRegister();});
-        edPassword.setOnClickListener(view ->{password.setError(null);});
-
-    }
+        button.setOnClickListener(v -> { login(); });
+        createAcco.setOnClickListener(view -> { changeToRegister(); });
+        edPassword.setOnClickListener(view -> { password.setError(null); });
+}
 
 
 
     public void login(){
 
-        String em=edEmail.getText().toString();
-        String pass=edPassword.getText().toString();
+        String em = edEmail.getText().toString();
+        String pass = edPassword.getText().toString();
         try{
             mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
@@ -122,6 +123,4 @@ public class Login extends AppCompatActivity {
         startActivity(intent);
         password.setError(null);
     }
-
-
 }

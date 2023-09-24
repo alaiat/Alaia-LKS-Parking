@@ -14,12 +14,12 @@ public class DayHours {
 
     public DayHours(String date) {
         this.date = date;
-        this.spentMinutesOfDay =0;
-        startHours=new ArrayList<>();
-        endHours=new ArrayList<>();
+        this.spentMinutesOfDay = 0;
+        startHours = new ArrayList<>();
+        endHours = new ArrayList<>();
     }
     public void addMinutesPerDay(int min) {
-        int m= getSpentMinutesOfDay()+min;
+        int m = getSpentMinutesOfDay() + min;
         setSpentMinutesOfDay(m);
     }
     public void addAndCalculateNewTime(String time1,String time2){

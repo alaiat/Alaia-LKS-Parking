@@ -13,9 +13,9 @@ public class Booking {
         this.spot = spot;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.date=date;
-        active ="";
-        this.user=user;
+        this.date = date;
+        active = "";
+        this.user = user;
     }
 
 

@@ -12,7 +12,7 @@ public class Spot {
     public Spot( String type, int number) {
         this.type = type;
         this.available = true;
-        this.number=number;
+        this.number = number;
 
     }
 

@@ -48,7 +48,5 @@ public class BookingSorter {
                 return time1.compareTo(time2);
             }
         }
-
     }
-
 }

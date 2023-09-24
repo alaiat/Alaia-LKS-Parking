@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHolder> {
-    private List<Booking> bookings =new ArrayList<>();
+    private List<Booking> bookings = new ArrayList<>();
     private LayoutInflater mInflater;
     private Context context;
     private OnItemClickListener onItemClickListener;
@@ -28,13 +28,12 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
     }
-    public BookingAdapter() {
 
-    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.booking_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.booking_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -72,6 +71,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
             endH = itemView.findViewById(R.id.endHour);
             date = itemView.findViewById(R.id.date);
             number = itemView.findViewById(R.id.number);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -88,14 +88,13 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
 
         void bindData(final Booking item) {
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
-            String type=CurrentParking.getInstance().getTypeById(item.getSpot());
+            String type = CurrentParking.getInstance().getTypeById(item.getSpot());
+
             if(type.equals("CAR")){
                 iconImage.setImageResource(R.drawable.normal_image);
 
-
             }else if(type.equals("MOTORCYCLE" )){
                 iconImage.setImageResource(R.drawable.moto_image);
-
 
             }else if(type.equals("ELECTRIC")){
                 iconImage.setImageResource(R.drawable.electric_image);
@@ -104,15 +103,10 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
                 iconImage.setImageResource(R.drawable.handicapped_image);
             }
 
-
             startH.setText(item.getStartTime());
             endH.setText(item.getEndTime());
             date.setText(item.getDate());
-            number.setText("Nº"+ CurrentParking.getInstance().getNumById(item.getSpot()));
-
-
+            number.setText("Nº" + CurrentParking.getInstance().getNumById(item.getSpot()));
         }
-
-
     }
 }
