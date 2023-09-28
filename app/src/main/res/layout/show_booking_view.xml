@@ -15,19 +15,18 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/activas"
+            android:id="@+id/active"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Activas"
             android:icon="@drawable/list_icon"
-            />
+            android:text="@string/currently_active" />
 
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/pasadas"
+            android:id="@+id/history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pasadas"
+            android:text="@string/history"
             android:icon="@drawable/historial_icon"
             />
 

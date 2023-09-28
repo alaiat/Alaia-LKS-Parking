@@ -283,7 +283,7 @@ public class SeeBookings extends AppCompatActivity {
 
     private void showDeleteDialog(int position) {
         new MaterialAlertDialogBuilder(this)
-                .setMessage("Are you sure you want to delete the booking?")
+                .setMessage("Are you sure you want to delete this booking?")
                 .setPositiveButton("DELETE", (dialog, which) -> {
                     deleteBooking(position);
                     dialog.dismiss();
