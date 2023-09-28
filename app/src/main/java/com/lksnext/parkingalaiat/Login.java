@@ -21,17 +21,13 @@ import com.lksnext.parkingalaiat.domain.UserContext;
 
 public class Login extends AppCompatActivity {
 
-    private CurrentParking current;
     private Button button;
-    private TextInputLayout email;
-    private TextInputEditText edEmail;
+    private TextInputEditText editEmail;
     private TextInputLayout password;
-    private TextInputEditText edPassword;
-    private TextView changeP;
-    private TextView createAcco;
-    private FirebaseManager fireManager;
+    private TextInputEditText editPassword;
+    private TextView createAccount;
     private FirebaseAuth mAuth;
-    private Context context=this;
+    private final Context context = this;
 
 
     @Override
@@ -39,8 +35,6 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         mAuth = FirebaseAuth.getInstance();
-        fireManager = fireManager.getInstance();
-        current = CurrentParking.getInstance();
         initUi();
     }
 
@@ -51,38 +45,43 @@ public class Login extends AppCompatActivity {
 
     private void initView() {
         button = findViewById(R.id.loginButton);
-        email = findViewById(R.id.email);
-        edEmail = (TextInputEditText) email.getEditText();
+        TextInputLayout email = findViewById(R.id.email);
+        editEmail = (TextInputEditText) email.getEditText();
 
         password = findViewById(R.id.password);
-        edPassword = (TextInputEditText) password.getEditText();
+        editPassword = (TextInputEditText) password.getEditText();
 
-        changeP = findViewById(R.id.changePassword);
-        SpannableString content = new SpannableString(changeP.getText());
+        TextView changePassword = findViewById(R.id.changePassword);
+        SpannableString content = new SpannableString(changePassword.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        changeP.setText(content);
+        changePassword.setText(content);
 
-        createAcco = findViewById(R.id.createAccount);
-        SpannableString content2 = new SpannableString(createAcco.getText());
+        createAccount = findViewById(R.id.createAccount);
+        SpannableString content2 = new SpannableString(createAccount.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        createAcco.setText(content2);
+        createAccount.setText(content2);
 
         setTitle("");
     }
 
-    private void initListeners(){
-        button.setOnClickListener(v -> { login(); });
-        createAcco.setOnClickListener(view -> { changeToRegister(); });
-        edPassword.setOnClickListener(view -> { password.setError(null); });
-}
+    private void initListeners() {
+        button.setOnClickListener(v -> {
+            login();
+        });
+        createAccount.setOnClickListener(view -> {
+            changeToRegister();
+        });
+        editPassword.setOnClickListener(view -> {
+            password.setError(null);
+        });
+    }
 
 
+    public void login() {
 
-    public void login(){
-
-        String em = edEmail.getText().toString();
-        String pass = edPassword.getText().toString();
-        try{
+        String em = editEmail.getText().toString();
+        String pass = editPassword.getText().toString();
+        try {
             mAuth.signInWithEmailAndPassword(em, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -94,8 +93,8 @@ public class Login extends AppCompatActivity {
 
                         }
                     });
-        }catch(Exception e){
-           showErrorDialog();
+        } catch (Exception e) {
+            showErrorDialog();
         }
 
     }
@@ -106,7 +105,7 @@ public class Login extends AppCompatActivity {
         password.setError(null);
     }
 
-    private void showErrorDialog(){
+    private void showErrorDialog() {
         new MaterialAlertDialogBuilder(context)
                 .setTitle("Could not login")
                 .setMessage("The email or password introduced are wrong. Please check and try again")
@@ -118,7 +117,8 @@ public class Login extends AppCompatActivity {
                 })
                 .show();
     }
-    public void changeToRegister(){
+
+    public void changeToRegister() {
         Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
         password.setError(null);

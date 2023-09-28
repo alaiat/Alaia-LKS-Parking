@@ -8,14 +8,12 @@ public class Spot {
     private boolean available;
 
 
-
-    public Spot( String type, int number) {
+    public Spot(String type, int number) {
         this.type = type;
         this.available = true;
         this.number = number;
 
     }
-
 
 
     public enum SpotType {
@@ -48,8 +46,6 @@ public class Spot {
     public void setAvailable(boolean available) {
         this.available = available;
     }
-
-
 
 
     @Override

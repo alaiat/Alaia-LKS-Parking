@@ -9,8 +9,8 @@ public class DayHours {
     private String date;
     private int spentMinutesOfDay;
 
-    private List<String> startHours;
-    private List<String> endHours;
+    private final List<String> startHours;
+    private final List<String> endHours;
 
     public DayHours(String date) {
         this.date = date;
@@ -18,11 +18,13 @@ public class DayHours {
         startHours = new ArrayList<>();
         endHours = new ArrayList<>();
     }
+
     public void addMinutesPerDay(int min) {
         int m = getSpentMinutesOfDay() + min;
         setSpentMinutesOfDay(m);
     }
-    public void addAndCalculateNewTime(String time1,String time2){
+
+    public void addAndCalculateNewTime(String time1, String time2) {
         LocalTime start = LocalTime.parse(time1);
         LocalTime end = LocalTime.parse(time2);
         Duration duration = Duration.between(start, end);
@@ -34,10 +36,12 @@ public class DayHours {
 
 
     }
-    public void addEndHour(String end){
+
+    public void addEndHour(String end) {
         endHours.add(end);
     }
-    public void addStartHour(String start){
+
+    public void addStartHour(String start) {
         startHours.add(start);
     }
 

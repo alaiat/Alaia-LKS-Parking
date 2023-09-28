@@ -20,29 +20,31 @@ public class UserContext {
         }
         return instance;
     }
-    public int getMinutesOfDay(String date){
-        for(DayHours dh : this.dateWithHours){
-            if(dh.getDate().equals(date)){
+
+    public int getMinutesOfDay(String date) {
+        for (DayHours dh : this.dateWithHours) {
+            if (dh.getDate().equals(date)) {
                 return dh.getSpentMinutesOfDay();
             }
         }
         return 0;
     }
+
     public void addMinutesToDay(String date, String start, String end) {
         DayHours d = null;
         boolean found = false;
-        for(DayHours dh : this.dateWithHours){
-            if(dh.getDate().equals(date)){
+        for (DayHours dh : this.dateWithHours) {
+            if (dh.getDate().equals(date)) {
                 found = true;
                 d = dh;
             }
         }
-        if(!found){
+        if (!found) {
             d = new DayHours(date);
             this.dateWithHours.add(d);
 
         }
-        d.addAndCalculateNewTime(start,end);
+        d.addAndCalculateNewTime(start, end);
     }
 
 

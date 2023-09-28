@@ -10,7 +10,6 @@ public class User {
     private List<Booking> bookings;
 
 
-
     public User(String name, String email, String phone) {
         this.name = name;
         this.email = email;
@@ -46,8 +45,9 @@ public class User {
     public String getPhoneNumber() {
         return phoneNumber;
     }
-    public void setPhoneNumber(String phoneNumber){
-        this.phoneNumber=phoneNumber;
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
 
