@@ -9,11 +9,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -44,26 +42,25 @@ public class NewBooking extends AppCompatActivity {
     public static final String EXTRA_END = "com.lksnext.parkingalaiat.EXTRA_END";
     public static final String EXTRA_TYPE = "com.lksnext.parkingalaiat.EXTRA_TYPE";
     public static final String EXTRA_SPOT = "com.lksnext.parkingalaiat.EXTRA_SPOT";
-    private CurrentParking current = CurrentParking.getInstance();
+    private final CurrentParking current = CurrentParking.getInstance();
 
     private Boolean typeSel = false;
     private Boolean dateSel = false;
     private Boolean startSel = false;
     private Boolean endSel = false;
-    private String[] spotTypes = {"CAR","MOTORCYCLE", "ELECTRIC","HANDICAPPED"};
-    private String[]spots = {"-1"};
+    private final String[] spotTypes = {"CAR", "MOTORCYCLE", "ELECTRIC", "HANDICAPPED"};
+    private final String[] spots = {"-1"};
 
 
     private AutoCompleteTextView spotTypeOptionsText;
     private AutoCompleteTextView availableSpotListText;
 
     private ArrayAdapter<String> availableSpotAdapter;
-    private TextInputLayout date;
+    private TextInputLayout inputDate;
     private TextInputLayout availableSpotListDropdown;
-    private TextInputLayout startHour;
-    private TextInputLayout endHour;
+    private TextInputLayout inputStartHour;
+    private TextInputLayout inputEndHour;
     private LinearProgressIndicator progress;
-    private MaterialDatePicker<Long> datePicker;
     private Button search;
     private Button mapSelect;
     private Button change;
@@ -72,19 +69,21 @@ public class NewBooking extends AppCompatActivity {
     private List<CurrentParking.Area> selectedTypeSpots = new ArrayList<>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_booking);
         initUi();
     }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.add_booking, menu);
 
         setTitle("New booking");
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.save_note) {
@@ -96,6 +95,7 @@ public class NewBooking extends AppCompatActivity {
         }
 
     }
+
     private void initUi() {
         initView();
         initListeners();
@@ -103,10 +103,10 @@ public class NewBooking extends AppCompatActivity {
 
 
     private void initView() {
-        date = findViewById(R.id.date);
+        inputDate = findViewById(R.id.date);
         progress = findViewById(R.id.progress);
-        startHour = findViewById(R.id.startHour);
-        endHour = findViewById(R.id.endHour);
+        inputStartHour = findViewById(R.id.startHour);
+        inputEndHour = findViewById(R.id.endHour);
         search = findViewById(R.id.searchButton);
         mapSelect = findViewById(R.id.selectMap);
         change = findViewById(R.id.changeData);
@@ -131,48 +131,53 @@ public class NewBooking extends AppCompatActivity {
             checkAllDataFill();
         });
 
-        availableSpotListText.setOnItemClickListener((parent,view,position,id)-> {
-                parent.getItemAtPosition(position).toString();
+        availableSpotListText.setOnItemClickListener((parent, view, position, id) -> {
+            parent.getItemAtPosition(position).toString();
         });
 
-        date.setStartIconOnClickListener(view -> {
-            date.setError(null);
+        inputDate.setStartIconOnClickListener(view -> {
+            inputDate.setError(null);
             showDatePicker();
         });
 
-        startHour.setStartIconOnClickListener(view-> {
-            startHour.setError(null);
-            endHour.setError(null);
+        inputStartHour.setStartIconOnClickListener(view -> {
+            inputStartHour.setError(null);
+            inputEndHour.setError(null);
             showStartTimePicker();
         });
 
-        endHour.setStartIconOnClickListener(view -> {
-            endHour.setError(null);
-            startHour.setError(null);
+        inputEndHour.setStartIconOnClickListener(view -> {
+            inputEndHour.setError(null);
+            inputStartHour.setError(null);
             showEndTimePicker();
         });
 
-        search.setOnClickListener(view -> { showProgressIndicator(); });
-        change.setOnClickListener(view -> { enable(); });
+        search.setOnClickListener(view -> {
+            showProgressIndicator();
+        });
+        change.setOnClickListener(view -> {
+            enable();
+        });
     }
 
     private void enable() {
         spotTypeOptionsText.clearListSelection();
-        date.getEditText().setText("");
-        startHour.getEditText().setText("");
-        endHour.getEditText().setText("");
+        inputDate.getEditText().setText("");
+        inputStartHour.getEditText().setText("");
+        inputEndHour.getEditText().setText("");
         spotTypeOptionsText.setEnabled(true);
-        date.setEnabled(true);
-        startHour.setEnabled(true);
-        endHour.setEnabled(true);
+        inputDate.setEnabled(true);
+        inputStartHour.setEnabled(true);
+        inputEndHour.setEnabled(true);
 
     }
 
     private void checkAllDataFill() {
-        if(typeSel && dateSel && startSel && endSel){
+        if (typeSel && dateSel && startSel && endSel) {
             search.setEnabled(true);
         }
     }
+
     private void getSpotsForType(String type) {
         selectedTypeSpots.clear();
         List<String> drop = new ArrayList<>();
@@ -180,39 +185,37 @@ public class NewBooking extends AppCompatActivity {
         switch (type) {
             case "CAR":
                 // Code for handling the "CAR" option
-                selectedTypeSpots=current.getCar();
+                selectedTypeSpots = current.getCar();
                 break;
             case "MOTORCYCLE":
                 // Code for handling the "MOTORCYCLE" option
-                selectedTypeSpots=current.getMotor();
+                selectedTypeSpots = current.getMotor();
                 break;
             case "ELECTRIC":
                 // Code for handling the "ELECTRIC" option
-                selectedTypeSpots=current.getElec();
+                selectedTypeSpots = current.getElec();
                 break;
             case "HANDICAPPED":
                 // Code for handling the "HANDICAPPED" option
-                selectedTypeSpots=current.getHand();
+                selectedTypeSpots = current.getHand();
                 break;
             default:
                 // Code for handling unrecognized options
                 break;
         }
 
-        for(CurrentParking.Area s : selectedTypeSpots){
+        for (CurrentParking.Area s : selectedTypeSpots) {
             drop.add(s.getNumber());
         }
-        availableSpotAdapter = new ArrayAdapter<>(this,R.layout.dropdown_list_item,drop);
+        availableSpotAdapter = new ArrayAdapter<>(this, R.layout.dropdown_list_item, drop);
         availableSpotListText.setAdapter(availableSpotAdapter);
 
 
     }
 
 
-
-
     private void showEndTimePicker() {
-        endHour.setError(null);
+        inputEndHour.setError(null);
         MaterialTimePicker picker =
                 new MaterialTimePicker.Builder()
                         .setTimeFormat(TimeFormat.CLOCK_24H)
@@ -220,26 +223,26 @@ public class NewBooking extends AppCompatActivity {
                         .setMinute(10)
                         .setTitleText("Select end time")
                         .build();
-        picker.show(getSupportFragmentManager(),"tag");
+        picker.show(getSupportFragmentManager(), "tag");
 
-        picker.addOnPositiveButtonClickListener(selection ->{
+        picker.addOnPositiveButtonClickListener(selection -> {
             int hour = picker.getHour();
             int minute = picker.getMinute();
             String formattedTime =
                     String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-            endHour.getEditText().setText(formattedTime);
-            if(!compareHours()){
+            inputEndHour.getEditText().setText(formattedTime);
+            if (!compareHours()) {
 
-                endHour.setError(" ");
-                startHour.setError(" ");
-            }else{
-                endHour.setError(null);
-                startHour.setError(null);
+                inputEndHour.setError(" ");
+                inputStartHour.setError(" ");
+            } else {
+                inputEndHour.setError(null);
+                inputStartHour.setError(null);
                 endSel = true;
                 checkAllDataFill();
             }
 
-            endSel=true;
+            endSel = true;
             checkAllDataFill();
         });
 
@@ -247,28 +250,28 @@ public class NewBooking extends AppCompatActivity {
 
     private boolean compareHours() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        String start = startHour.getEditText().getText().toString();
-        String end = endHour.getEditText().getText().toString();
+        String start = inputStartHour.getEditText().getText().toString();
+        String end = inputEndHour.getEditText().getText().toString();
 
-        if(start.isEmpty() || end.isEmpty()){
+        if (start.isEmpty() || end.isEmpty()) {
             return true;
-        }else{
-            LocalTime localTime1 = LocalTime.parse(startHour.getEditText().getText(), formatter);
-            LocalTime localTime2 = LocalTime.parse(endHour.getEditText().getText(), formatter);
+        } else {
+            LocalTime localTime1 = LocalTime.parse(inputStartHour.getEditText().getText(), formatter);
+            LocalTime localTime2 = LocalTime.parse(inputEndHour.getEditText().getText(), formatter);
             Duration duration = Duration.between(localTime1, localTime2);
 
             // Get the number of hours in the duration
             int min = (int) duration.toMinutes();
-            if (localTime2.isAfter(localTime1) && min<=480) {
+            if (localTime2.isAfter(localTime1) && min <= 480) {
                 return true;
-            }else if(min > 480){
-                endHour.setError(" ");
-                startHour.setError("You can't book more than 8h");
+            } else if (min > 480) {
+                inputEndHour.setError(" ");
+                inputStartHour.setError("You can't book more than 8h");
                 return false;
 
-            }else{
-                endHour.setError(" ");
-                startHour.setError("End must be after start");
+            } else {
+                inputEndHour.setError(" ");
+                inputStartHour.setError("End must be after start");
                 return false;
             }
         }
@@ -278,39 +281,37 @@ public class NewBooking extends AppCompatActivity {
     private void showProgressIndicator() {
         availableSpotListText.setText("");
         getSpotsForType(spotTypeOptionsText.getEditableText().toString());
-        String newS = startHour.getEditText().getText().toString();
-        String newE = endHour.getEditText().getText().toString();
-        String dat = date.getEditText().getText().toString();
+        String newS = inputStartHour.getEditText().getText().toString();
+        String newE = inputEndHour.getEditText().getText().toString();
+        String dat = inputDate.getEditText().getText().toString();
 
-        if(deleteNotAvailableSpots(dat,newS,newE)){
+        if (deleteNotAvailableSpots(dat, newS, newE)) {
             progress.setVisibility(View.VISIBLE);
 
             // Start the animation
             progress.setProgressCompat(0, true);
 
-           new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
 
-                    // Hide the progress indicator
-                    progress.setVisibility(View.INVISIBLE);
-                    mapSelect.setVisibility(View.VISIBLE);
-                    availableSpotListDropdown.setVisibility(View.VISIBLE);
+                // Hide the progress indicator
+                progress.setVisibility(View.INVISIBLE);
+                mapSelect.setVisibility(View.VISIBLE);
+                availableSpotListDropdown.setVisibility(View.VISIBLE);
 
             }, 3000);
             search.setEnabled(false);
             spotTypeOptionsText.setEnabled(false);
-            date.setEnabled(false);
-            startHour.setEnabled(false);
-            endHour.setEnabled(false);
+            inputDate.setEnabled(false);
+            inputStartHour.setEnabled(false);
+            inputEndHour.setEnabled(false);
         }
 
 
     }
 
 
-
-
     private void showStartTimePicker() {
-        startHour.setError(null);
+        inputStartHour.setError(null);
         MaterialTimePicker picker =
                 new MaterialTimePicker.Builder()
                         .setTimeFormat(TimeFormat.CLOCK_24H)
@@ -318,18 +319,18 @@ public class NewBooking extends AppCompatActivity {
                         .setMinute(10)
                         .setTitleText("Select Appointment time")
                         .build();
-        picker.show(getSupportFragmentManager(),"tag");
+        picker.show(getSupportFragmentManager(), "tag");
 
-        picker.addOnPositiveButtonClickListener(selection ->{
+        picker.addOnPositiveButtonClickListener(selection -> {
             int hour = picker.getHour();
             int minute = picker.getMinute();
             String formattedTime =
                     String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
 
-            startHour.getEditText().setText(formattedTime);
-            if(compareHours()){
-                endHour.setError(null);
-                startHour.setError(null);
+            inputStartHour.getEditText().setText(formattedTime);
+            if (compareHours()) {
+                inputEndHour.setError(null);
+                inputStartHour.setError(null);
                 startSel = true;
                 checkAllDataFill();
             }
@@ -338,7 +339,8 @@ public class NewBooking extends AppCompatActivity {
         });
 
     }
-    public boolean checkOverlap(String oldEnd, String oldStart, String newEnd, String newStart){
+
+    public boolean checkOverlap(String oldEnd, String oldStart, String newEnd, String newStart) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime end1 = LocalTime.parse(oldEnd, formatter);
         LocalTime start1 = LocalTime.parse(oldStart, formatter);
@@ -352,31 +354,32 @@ public class NewBooking extends AppCompatActivity {
         List<CurrentParking.Area> toRemove = new ArrayList<>();
         List<String> libreak = new ArrayList<>();
 
-        for(CurrentParking.Area s : selectedTypeSpots){
+        for (CurrentParking.Area s : selectedTypeSpots) {
             DayHours dh = s.getDayHoursByDate(dat);
-            if(dh != null){
-            for(int i = 0; i < dh.getStartHours().size(); i++){
-                if(!checkOverlap(dh.getStartHours().get(i),dh.getEndHours().get(i),startT,endT)){
-                    toRemove.add(s);
-                    break;
+            if (dh != null) {
+                for (int i = 0; i < dh.getStartHours().size(); i++) {
+                    if (!checkOverlap(dh.getStartHours().get(i), dh.getEndHours().get(i), startT, endT)) {
+                        toRemove.add(s);
+                        break;
+                    }
                 }
-            }
             }
 
         }
-        for(CurrentParking.Area s : selectedTypeSpots){
-            if(!toRemove.contains(s)){
+        for (CurrentParking.Area s : selectedTypeSpots) {
+            if (!toRemove.contains(s)) {
                 libreak.add(s.getNumber());
             }
         }
-        if(libreak.isEmpty()){
+        if (libreak.isEmpty()) {
             showDialog();
             return false;
         }
-        availableSpotAdapter = new ArrayAdapter<>(this,R.layout.dropdown_list_item,libreak);
+        availableSpotAdapter = new ArrayAdapter<>(this, R.layout.dropdown_list_item, libreak);
         availableSpotListText.setAdapter(availableSpotAdapter);
         return true;
     }
+
     private void showDialog() {
         new MaterialAlertDialogBuilder(this)
                 .setMessage("There are not free spots for the introduced data.")
@@ -390,7 +393,7 @@ public class NewBooking extends AppCompatActivity {
     }
 
     private void showDatePicker() {
-        date.setError(null);
+        inputDate.setError(null);
         Calendar calendarStart = Calendar.getInstance();
 
         long today = MaterialDatePicker.todayInUtcMilliseconds();
@@ -422,15 +425,15 @@ public class NewBooking extends AppCompatActivity {
         constraints.setValidator(dateValidator);
 
 
-        datePicker = MaterialDatePicker.Builder.datePicker()
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .setCalendarConstraints(constraints.build())
                 .build();
 
 
-        datePicker.show(getSupportFragmentManager(),"tag");
-        datePicker.addOnPositiveButtonClickListener(selection->{
+        datePicker.show(getSupportFragmentManager(), "tag");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(selection);
             int year = calendar.get(Calendar.YEAR);
@@ -440,10 +443,10 @@ public class NewBooking extends AppCompatActivity {
                     String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month + 1, year);
 
 
-            date.getEditText().setText(formattedDate);
-            if(UserContext.getInstance().getMinutesOfDay(formattedDate) >= 480){
-                date.setError("You already have 8h reserved for this day.");
-            }else{
+            inputDate.getEditText().setText(formattedDate);
+            if (UserContext.getInstance().getMinutesOfDay(formattedDate) >= 480) {
+                inputDate.setError("You already have 8h reserved for this day.");
+            } else {
                 dateSel = true;
                 checkAllDataFill();
             }
@@ -454,26 +457,26 @@ public class NewBooking extends AppCompatActivity {
 
     private void save() {
         current.addSpotsById();
-        String date2 = this.date.getEditText().getText().toString();
-        String startH = this.startHour.getEditText().getText().toString();
-        String endH = this.endHour.getEditText().getText().toString();
+        String date = this.inputDate.getEditText().getText().toString();
+        String startHour = this.inputStartHour.getEditText().getText().toString();
+        String endHour = this.inputEndHour.getEditText().getText().toString();
         String type = this.spotTypeOptionsText.getEditableText().toString();
         String spot = this.availableSpotListText.getEditableText().toString();
         Boolean status = true;
 
-        if(date2.isEmpty() || startH.isEmpty() || endH.isEmpty()){
+        if (date.isEmpty() || startHour.isEmpty() || endHour.isEmpty()) {
             availableSpotListDropdown.setError(" ");
-            this.date.setError(" ");
-            this.startHour.setError(" ");
-            this.endHour.setError(" ");
-        }else{
+            this.inputDate.setError(" ");
+            this.inputStartHour.setError(" ");
+            this.inputEndHour.setError(" ");
+        } else {
             Intent booking = getIntent();
-            booking.putExtra(EXTRA_DATE,date2);
-            booking.putExtra(EXTRA_START,startH);
-            booking.putExtra(EXTRA_END,endH);
-            booking.putExtra(EXTRA_STATUS,status);
-            booking.putExtra(EXTRA_TYPE,type);
-            booking.putExtra(EXTRA_SPOT,current.getIdByNum(spot));
+            booking.putExtra(EXTRA_DATE, date);
+            booking.putExtra(EXTRA_START, startHour);
+            booking.putExtra(EXTRA_END, endHour);
+            booking.putExtra(EXTRA_STATUS, status);
+            booking.putExtra(EXTRA_TYPE, type);
+            booking.putExtra(EXTRA_SPOT, current.getIdByNum(spot));
             setResult(RESULT_OK, booking);
             finish();
         }
