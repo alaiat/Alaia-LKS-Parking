@@ -1,69 +1,61 @@
 package com.lksnext.parkingalaiat.domain;
 
 import com.lksnext.parkingalaiat.FirebaseManager;
-import com.lksnext.parkingalaiat.interfaces.OnBookingsListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotsIdLoadedListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
 public class CurrentParking {
     private static CurrentParking instance;
     private List<String> spotListId;
-    private List<Area> all = new ArrayList<>();
-    private List<Area> car = new ArrayList<>();
-    private List<Area> hand = new ArrayList<>();
-    private List<Area> elec = new ArrayList<>();
-    private List<Area> motor = new ArrayList<>();
+    private List<Area> allVehicles = new ArrayList<>();
+    private final List<Area> combustionVehicle = new ArrayList<>();
+    private final List<Area> handicappedVehicle = new ArrayList<>();
+    private final List<Area> electricVehicle = new ArrayList<>();
+    private final List<Area> motorCycle = new ArrayList<>();
     FirebaseManager fm;
 
     private CurrentParking() {
-        fm= FirebaseManager.getInstance();
-        spotListId =new ArrayList<>();
+        fm = FirebaseManager.getInstance();
+        spotListId = new ArrayList<>();
         addSpotsById();
     }
-    public void addSpotsById(){
-        fm.getAllSpotsId(new OnSpotsIdLoadedListener() {
-            @Override
-            public void onSpotIdsLoaded(List<String> spotIds) {
-                if (spotIds != null) {
-                    spotListId.clear();
-                    car.clear();
-                    motor.clear();
-                    hand.clear();
-                    elec.clear();
-                    spotListId = spotIds;
-                    addSpotToCorrespondingList();
-                } else {
-                    // Handle the failure case
-                    // ...
-                }
+
+    public void addSpotsById() {
+        fm.getAllSpotsId(spotIds -> {
+            if (spotIds != null) {
+                spotListId.clear();
+                combustionVehicle.clear();
+                motorCycle.clear();
+                handicappedVehicle.clear();
+                electricVehicle.clear();
+                spotListId = spotIds;
+                addSpotToCorrespondingList();
+            } else {
+                // TODO: Handle the failure case
             }
         });
     }
 
     private void addSpotToCorrespondingList() {
-       fm.sortList(spotListId, new OnSpotsLoaderByTypeListener() {
-            @Override
-            public void OnSpotsLoaderByTypeListener(List<Area> sortedList) {
-                all = sortedList;
-                for(Area s : all){
-                    switch (s.type) {
-                        case "CAR":
-                            car.add(s);
-                            break;
-                        case "HANDICAPPED":
-                            hand.add(s);
-                            break;
-                        case "MOTORCYCLE":
-                            motor.add(s);
-                            break;
-                        case "ELECTRIC":
-                            elec.add(s);
-                            break;
-                        default:
-                            break;
-                    }
+        fm.sortList(spotListId, sortedList -> {
+            allVehicles = sortedList;
+            for (Area s : allVehicles) {
+                switch (s.type) {
+                    case "CAR":
+                        combustionVehicle.add(s);
+                        break;
+                    case "HANDICAPPED":
+                        handicappedVehicle.add(s);
+                        break;
+                    case "MOTORCYCLE":
+                        motorCycle.add(s);
+                        break;
+                    case "ELECTRIC":
+                        electricVehicle.add(s);
+                        break;
+                    default:
+                        break;
                 }
             }
         });
@@ -71,10 +63,9 @@ public class CurrentParking {
     }
 
 
+    public String getIdByNum(String num) {
 
-    public String getIdByNum(String num){
-
-        for (Area area : all) {
+        for (Area area : allVehicles) {
             if (area.getNumber().equals(num)) {
                 return area.getId();
             }
@@ -82,9 +73,10 @@ public class CurrentParking {
         return null; // Return null if no matching num is found
 
     }
-    public String getNumById(String id){
 
-        for (Area area : all) {
+    public String getNumById(String id) {
+
+        for (Area area : allVehicles) {
             if (area.getId().equals(id)) {
                 return area.getNumber();
             }
@@ -92,9 +84,10 @@ public class CurrentParking {
         return null; // Return null if no matching num is found
 
     }
-    public String getTypeById(String id){
 
-        for (Area area : all) {
+    public String getTypeById(String id) {
+
+        for (Area area : allVehicles) {
             if (area.getId().equals(id)) {
                 return area.getType();
             }
@@ -102,41 +95,38 @@ public class CurrentParking {
         return null; // Return null if no matching num is found
 
     }
-    public  static synchronized CurrentParking getInstance() {
 
-                if (instance == null) {
-                    instance = new CurrentParking();
-                }
+    public static synchronized CurrentParking getInstance() {
+
+        if (instance == null) {
+            instance = new CurrentParking();
+        }
 
 
         return instance;
     }
 
-    public List<Area> getAll() {
-        return all;
+    public List<Area> getCombustionVehicle() {
+        return combustionVehicle;
     }
 
-    public List<Area> getCar() {
-        return car;
+    public List<Area> getHandicappedVehicle() {
+        return handicappedVehicle;
     }
 
-    public List<Area> getHand() {
-        return hand;
+    public List<Area> getElectricVehicle() {
+        return electricVehicle;
     }
 
-    public List<Area> getElec() {
-        return elec;
-    }
-
-    public List<Area> getMotor() {
-        return motor;
+    public List<Area> getMotorCycle() {
+        return motorCycle;
     }
 
     public static class Area {
         private String number;
         private String id;
-        private String type;
-        private List<DayHours> listDayTime;
+        private final String type;
+        private final List<DayHours> listDayTime;
         FirebaseManager fm = FirebaseManager.getInstance();
 
         public Area(String number, String id, String type) {
@@ -149,14 +139,6 @@ public class CurrentParking {
 
         public String getNumber() {
             return number;
-        }
-
-        public List<DayHours> getListDayTime() {
-            return listDayTime;
-        }
-
-        public void setListDayTime(List<DayHours> listDayTime) {
-            this.listDayTime = listDayTime;
         }
 
         public void setNumber(String number) {
@@ -172,47 +154,46 @@ public class CurrentParking {
         }
 
 
-
         private void findBookings(String id) {
-            fm.getBookingsForSpot(id, new OnBookingsListener() {
-                @Override
-                public void onBookingsLoaded(List<Booking> bookings) {
-                    // Handle the reservations list
-                    // ...
-                    addListToList(bookings);
-                    System.out.println(listDayTime);
-
+            fm.getBookingsForSpot(id, (exception, bookings) -> {
+                if (exception != null) {
+                    System.out.println(exception);
+                    // TODO: show error to the user
+                    return;
                 }
 
-
+                // Handle the reservations list
+                addListToList(bookings);
+                System.out.println(listDayTime);
             });
 
         }
+
         public void addListToList(List<Booking> bookings) {
 
-            for(Booking b : bookings){
-                Boolean found = false;
-                DayHours dh = null;
-                for(DayHours d : listDayTime){
-                    if(d.getDate().equals(b.getDate())){
+            for (Booking b : bookings) {
+                boolean found = false;
+                DayHours dayHours = null;
+                for (DayHours localDayHours : listDayTime) {
+                    if (localDayHours.getDate().equals(b.getDate())) {
                         found = true;
-                        dh = d;
+                        dayHours = localDayHours;
                     }
                 }
-                if(!found)
-                    dh = new DayHours(b.getDate());
+                if (!found)
+                    dayHours = new DayHours(b.getDate());
 
-                dh.addStartHour(b.getStartTime());
-                dh.addEndHour(b.getEndTime());
-                dh.addAndCalculateNewTime(b.getStartTime(),b.getEndTime());
-                System.out.println(dh.getStartHours());
-                listDayTime.add(dh);
+                dayHours.addStartHour(b.getStartTime());
+                dayHours.addEndHour(b.getEndTime());
+                dayHours.addAndCalculateNewTime(b.getStartTime(), b.getEndTime());
+                System.out.println(dayHours.getStartHours());
+                listDayTime.add(dayHours);
             }
         }
 
-        public DayHours getDayHoursByDate(String date){
-            for(DayHours dh : listDayTime){
-                if(dh.getDate().equals(date)){
+        public DayHours getDayHoursByDate(String date) {
+            for (DayHours dh : listDayTime) {
+                if (dh.getDate().equals(date)) {
                     return dh;
                 }
             }
@@ -221,10 +202,6 @@ public class CurrentParking {
 
         public String getType() {
             return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
         }
 
         @Override
