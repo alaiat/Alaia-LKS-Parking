@@ -52,6 +52,26 @@ public class Register extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         initUi();
 
+        edPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Update the progress of the LinearProgressIndicator
+                String pass = s.toString();
+                int progress = calculateProgress(pass);
+                progressIndicator.setProgressCompat(progress, true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Do nothing
+                deletePasswordErrors();
+            }
+        });
     }
 
     private void initUi() {
@@ -67,9 +87,6 @@ public class Register extends AppCompatActivity {
         SpannableString content = new SpannableString(link.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         link.setText(content);
-
-
-
 
 
         name = findViewById(R.id.nameField);
@@ -96,8 +113,6 @@ public class Register extends AppCompatActivity {
     private void initListeners(){
         button.setOnClickListener(v -> { register(); });
         link.setOnClickListener(v -> { changeToLogin(); });
-        edPassword.setOnClickListener(view -> { onPasswordEdit(); });
-        password.setOnClickListener(view -> { onPasswordEdit(); });
         edName.setOnClickListener(view ->{ deleteNameErrors(); });
         edEmail.setOnClickListener(view -> { deleteEmailErrors(); });
         edPhoneNumber.setOnClickListener(view -> { deletePhoneErrors(); });
@@ -121,34 +136,8 @@ public class Register extends AppCompatActivity {
 
     }
 
-    private void onPasswordEdit() {
-            edPassword.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // Do nothing
-                    int progress = calculateProgress(s.toString()); // Calculate the progress based on password complexity or criteria
-                    progressIndicator.setProgressCompat(progress, true);
-                }
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    // Update the progress of the LinearProgressIndicator
-                    String pass = s.toString();
-                    int progress = calculateProgress(pass);
-                    progressIndicator.setProgressCompat(progress, true);
-                }
 
-                @Override
-                public void afterTextChanged(Editable s) {
-                    // Do nothing
-                    deletePasswordErrors();
-                    int progress = calculateProgress(s.toString()); // Calculate the progress based on password complexity or criteria
-                    progressIndicator.setProgressCompat(progress, true);
-
-                }
-            });
-
-    }
     private int calculateProgress(String password) {
         int progress = 0;
 
