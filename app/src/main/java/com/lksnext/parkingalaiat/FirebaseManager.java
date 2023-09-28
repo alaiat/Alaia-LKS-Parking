@@ -245,13 +245,13 @@ public class FirebaseManager {
                     }
                 });
     }
-    public void updateBooking(String reservaId, String start, String end, OnBookingUpdatedListener listener) {
+    public void updateBooking(String reservationId, String start, String end, OnBookingUpdatedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference reservaRef = db.collection("reservations").document(reservaId);
+        DocumentReference reservationRef = db.collection("reservations").document(reservationId);
 
-        reservaRef.update("startTime", start)
+        reservationRef.update("startTime", start)
                 .addOnSuccessListener(aVoid -> {
-                    reservaRef.update("endTime", end)
+                    reservationRef.update("endTime", end)
                             .addOnSuccessListener(aVoid1 -> {
                                 // Reservation updated successfully
                                 listener.OnBookingUpdatedListener(true);
