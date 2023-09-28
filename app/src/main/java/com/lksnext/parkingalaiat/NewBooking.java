@@ -42,7 +42,7 @@ public class NewBooking extends AppCompatActivity {
     public static final String EXTRA_END = "com.lksnext.parkingalaiat.EXTRA_END";
     public static final String EXTRA_TYPE = "com.lksnext.parkingalaiat.EXTRA_TYPE";
     public static final String EXTRA_SPOT = "com.lksnext.parkingalaiat.EXTRA_SPOT";
-    private final CurrentParking current = CurrentParking.getInstance();
+    private final CurrentParking currentParking = CurrentParking.getInstance();
 
     private Boolean typeSel = false;
     private Boolean dateSel = false;
@@ -185,19 +185,19 @@ public class NewBooking extends AppCompatActivity {
         switch (type) {
             case "CAR":
                 // Code for handling the "CAR" option
-                selectedTypeSpots = current.getCar();
+                selectedTypeSpots = currentParking.getCombustionVehicle();
                 break;
             case "MOTORCYCLE":
                 // Code for handling the "MOTORCYCLE" option
-                selectedTypeSpots = current.getMotor();
+                selectedTypeSpots = currentParking.getMotorCycle();
                 break;
             case "ELECTRIC":
                 // Code for handling the "ELECTRIC" option
-                selectedTypeSpots = current.getElec();
+                selectedTypeSpots = currentParking.getElectricVehicle();
                 break;
             case "HANDICAPPED":
                 // Code for handling the "HANDICAPPED" option
-                selectedTypeSpots = current.getHand();
+                selectedTypeSpots = currentParking.getHandicappedVehicle();
                 break;
             default:
                 // Code for handling unrecognized options
@@ -456,7 +456,7 @@ public class NewBooking extends AppCompatActivity {
     }
 
     private void save() {
-        current.addSpotsById();
+        currentParking.addSpotsById();
         String date = this.inputDate.getEditText().getText().toString();
         String startHour = this.inputStartHour.getEditText().getText().toString();
         String endHour = this.inputEndHour.getEditText().getText().toString();
@@ -476,7 +476,7 @@ public class NewBooking extends AppCompatActivity {
             booking.putExtra(EXTRA_END, endHour);
             booking.putExtra(EXTRA_STATUS, status);
             booking.putExtra(EXTRA_TYPE, type);
-            booking.putExtra(EXTRA_SPOT, current.getIdByNum(spot));
+            booking.putExtra(EXTRA_SPOT, currentParking.getIdByNum(spot));
             setResult(RESULT_OK, booking);
             finish();
         }
