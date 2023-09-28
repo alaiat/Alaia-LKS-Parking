@@ -8,8 +8,7 @@
     <string name="registerPassword">Password</string>
     <string name="registerTologin_link">Already have an account? Login</string>
     <string name="loginToRegister_link">Dont have an account? Register</string>
-    <string name="Er"></string>
-    <string name="currently_active">Currently active</string>
+    <string name="active">Active</string>
     <string name="history">History</string>
 
 </resources>

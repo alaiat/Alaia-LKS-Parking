@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/list_icon"
-            android:text="@string/currently_active" />
+            android:text="@string/active" />
 
 
         <com.google.android.material.tabs.TabItem
