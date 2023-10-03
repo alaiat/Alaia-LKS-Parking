@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class SeeBookings extends AppCompatActivity {
@@ -289,6 +290,8 @@ public class SeeBookings extends AppCompatActivity {
                     dialog.dismiss();
                 }).setNegativeButton("CANCEL", (dialog, which) -> {
                     dialog.dismiss();
+                    if (tabs.getSelectedTabPosition() == 0) changeDataToActive();
+                    else                                    changeDataToInactive();
                 })
                 .show();
     }
@@ -331,7 +334,7 @@ public class SeeBookings extends AppCompatActivity {
     }
 
     private void getAllBookingsForUser() {
-        fm.getAllBookingsForUser(bookings -> {
+        fm.getAllBookingsForUser((exception, bookings) -> {
             if (bookings != null) {
                 allBookings.clear();
                 allBookings.addAll(bookings);
