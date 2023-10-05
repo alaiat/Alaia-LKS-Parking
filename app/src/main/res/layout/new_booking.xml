@@ -45,7 +45,9 @@
                 android:id="@+id/dropdownField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none|text"></AutoCompleteTextView>
+                android:inputType="none|text"
+                android:maxLines="1"
+                ></AutoCompleteTextView>
 
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
@@ -70,6 +72,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="true"
+                android:maxLines="1"
+
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -104,6 +108,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="true"
+                    android:maxLines="1"
+
                     />
 
 
@@ -132,6 +138,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="true"
+                    android:maxLines="1"
+
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
