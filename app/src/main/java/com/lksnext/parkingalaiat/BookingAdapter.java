@@ -110,7 +110,9 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
             startH.setText(item.getStartTime());
             endH.setText(item.getEndTime());
             date.setText(item.getDate());
-            number.setText("Nº" + CurrentParking.getInstance().getNumById(item.getSpot()));
+
+            String typeNumber = CurrentParking.getInstance().getNumById(item.getSpot());
+            number.setText(typeNumber != null ? ("Nº" + typeNumber) : "Type missing");
         }
     }
 }
