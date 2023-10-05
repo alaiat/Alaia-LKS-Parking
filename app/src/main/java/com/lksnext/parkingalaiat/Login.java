@@ -61,6 +61,9 @@ public class Login extends AppCompatActivity {
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         createAccount.setText(content2);
 
+        editEmail.setText("proba@email.com");
+        editPassword.setText("Contrasena1@");
+
         setTitle("");
     }
 
