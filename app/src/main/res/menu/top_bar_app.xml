@@ -9,12 +9,6 @@
         android:actionLayout="@layout/menu_item_layout"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:title="busqueda"
-        android:id="@+id/search"
-        android:icon="@drawable/search_icon_white"
-        android:actionLayout="@layout/menu_item_layout"
-        app:showAsAction="ifRoom" />
 
 
 
