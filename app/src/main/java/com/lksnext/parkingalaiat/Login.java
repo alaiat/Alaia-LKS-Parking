@@ -51,14 +51,11 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.password);
         editPassword = (TextInputEditText) password.getEditText();
 
-        TextView changePassword = findViewById(R.id.changePassword);
-        SpannableString content = new SpannableString(changePassword.getText());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        changePassword.setText(content);
+
 
         createAccount = findViewById(R.id.createAccount);
         SpannableString content2 = new SpannableString(createAccount.getText());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        content2.setSpan(new UnderlineSpan(), 0, content2.length(), 0);
         createAccount.setText(content2);
 
         editEmail.setText("proba@email.com");

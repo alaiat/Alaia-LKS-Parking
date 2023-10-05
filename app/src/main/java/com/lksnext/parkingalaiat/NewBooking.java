@@ -62,7 +62,6 @@ public class NewBooking extends AppCompatActivity {
     private TextInputLayout inputEndHour;
     private LinearProgressIndicator progress;
     private Button search;
-    private Button mapSelect;
     private Button change;
 
 
@@ -108,7 +107,6 @@ public class NewBooking extends AppCompatActivity {
         inputStartHour = findViewById(R.id.startHour);
         inputEndHour = findViewById(R.id.endHour);
         search = findViewById(R.id.searchButton);
-        mapSelect = findViewById(R.id.selectMap);
         change = findViewById(R.id.changeData);
         availableSpotListText = findViewById(R.id.spots);
         availableSpotListDropdown = findViewById(R.id.spotDropdwon);
@@ -295,7 +293,6 @@ public class NewBooking extends AppCompatActivity {
 
                 // Hide the progress indicator
                 progress.setVisibility(View.INVISIBLE);
-                mapSelect.setVisibility(View.VISIBLE);
                 availableSpotListDropdown.setVisibility(View.VISIBLE);
 
             }, 3000);

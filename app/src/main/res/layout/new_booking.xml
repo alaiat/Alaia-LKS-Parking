@@ -188,21 +188,6 @@
                     android:inputType="none"></AutoCompleteTextView>
 
             </com.google.android.material.textfield.TextInputLayout>
-            <Button
-                style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/selectMap"
-                android:layout_width="145dp"
-                android:layout_marginTop="3dp"
-                android:layout_height="wrap_content"
-                android:text="Select on map"
-                android:textColor="@color/purple_500"
-                android:textSize="16dp"
-                android:visibility="invisible"
-                app:strokeColor="@color/purple_500"
-                app:layout_constraintTop_toBottomOf="@id/spotDropdwon"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
 
 
 
