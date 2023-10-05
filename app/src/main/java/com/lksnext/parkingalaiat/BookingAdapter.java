@@ -52,9 +52,11 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
         notifyDataSetChanged();
 
     }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
+
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
@@ -90,17 +92,19 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.ViewHold
             //iconImage.setColorFilter(Color.parseColor(item.getColor()), PorterDuff.Mode.SRC_IN);
             String type = CurrentParking.getInstance().getTypeById(item.getSpot());
 
-            if(type.equals("CAR")){
-                iconImage.setImageResource(R.drawable.normal_image);
+            if (type != null) {
+                if (type.equals("CAR")) {
+                    iconImage.setImageResource(R.drawable.normal_image);
 
-            }else if(type.equals("MOTORCYCLE" )){
-                iconImage.setImageResource(R.drawable.moto_image);
+                } else if (type.equals("MOTORCYCLE")) {
+                    iconImage.setImageResource(R.drawable.moto_image);
 
-            }else if(type.equals("ELECTRIC")){
-                iconImage.setImageResource(R.drawable.electric_image);
+                } else if (type.equals("ELECTRIC")) {
+                    iconImage.setImageResource(R.drawable.electric_image);
 
-            }else if(type.equals("HANDICAPPED")){
-                iconImage.setImageResource(R.drawable.handicapped_image);
+                } else if (type.equals("HANDICAPPED")) {
+                    iconImage.setImageResource(R.drawable.handicapped_image);
+                }
             }
 
             startH.setText(item.getStartTime());
