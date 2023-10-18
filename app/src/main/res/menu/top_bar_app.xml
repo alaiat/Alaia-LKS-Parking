@@ -3,13 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="perfil"
-        android:id="@+id/perfil"
+        android:id="@+id/profileMenu"
         android:icon="@drawable/account_icon_white"
-        android:actionLayout="@layout/menu_item_layout"
-        app:showAsAction="ifRoom" />
-
-
-
-
+        app:showAsAction="ifRoom"
+        android:title="Profile">
+        <menu>
+            <item
+                android:id="@+id/perfil"
+                android:actionLayout="@layout/menu_item_layout"
+                android:icon="@drawable/account_icon_white"
+                android:title="Edit Profile"
+                app:showAsAction="ifRoom" />
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/account_icon_white"
+                android:title="Logout" />
+        </menu>
+    </item>
 </menu>

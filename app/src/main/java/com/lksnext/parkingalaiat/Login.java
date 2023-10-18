@@ -90,13 +90,11 @@ public class Login extends AppCompatActivity {
                             changeToSeeBookings();
                         } else {
                             showErrorDialog();
-
                         }
                     });
         } catch (Exception e) {
             showErrorDialog();
         }
-
     }
 
     private void changeToSeeBookings() {

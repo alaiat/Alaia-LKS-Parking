@@ -22,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.lksnext.parkingalaiat.domain.CurrentBooking;
 import com.lksnext.parkingalaiat.domain.Booking;
 import com.lksnext.parkingalaiat.domain.UserContext;
@@ -276,10 +277,18 @@ public class SeeBookings extends AppCompatActivity {
             Intent intent = new Intent(SeeBookings.this, Profile.class);
             startActivity(intent);
             return true;
+        } else if (item.getItemId() == R.id.logout) {
+            logout();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
 
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(SeeBookings.this, Login.class);
+        startActivity(intent);
     }
 
     private void showDeleteDialog(int position) {
