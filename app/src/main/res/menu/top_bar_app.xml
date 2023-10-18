@@ -9,14 +9,10 @@
         android:title="Profile">
         <menu>
             <item
-                android:id="@+id/perfil"
-                android:actionLayout="@layout/menu_item_layout"
-                android:icon="@drawable/account_icon_white"
-                android:title="Edit Profile"
-                app:showAsAction="ifRoom" />
+                android:id="@+id/profile"
+                android:title="Edit Profile" />
             <item
                 android:id="@+id/logout"
-                android:icon="@drawable/account_icon_white"
                 android:title="Logout" />
         </menu>
     </item>

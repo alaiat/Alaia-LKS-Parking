@@ -273,7 +273,7 @@ public class SeeBookings extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.perfil) {
+        if (item.getItemId() == R.id.profile) {
             Intent intent = new Intent(SeeBookings.this, Profile.class);
             startActivity(intent);
             return true;
@@ -286,7 +286,7 @@ public class SeeBookings extends AppCompatActivity {
     }
 
     private void logout() {
-        FirebaseAuth.getInstance().signOut();
+        FirebaseManager.getInstance().logOut();
         Intent intent = new Intent(SeeBookings.this, Login.class);
         startActivity(intent);
     }
