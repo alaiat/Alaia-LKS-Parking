@@ -101,6 +101,7 @@ public class Login extends AppCompatActivity {
         Intent intent = new Intent(Login.this, SeeBookings.class);
         startActivity(intent);
         password.setError(null);
+        finish();
     }
 
     private void showErrorDialog() {
@@ -120,5 +121,6 @@ public class Login extends AppCompatActivity {
         Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
         password.setError(null);
+        finish();
     }
 }
