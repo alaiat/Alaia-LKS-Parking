@@ -250,6 +250,7 @@ public class Register extends AppCompatActivity {
     private void changeToLogin(){
         Intent intent = new Intent(Register.this, Login.class);
         startActivity(intent);
+        finish();
     }
 
 

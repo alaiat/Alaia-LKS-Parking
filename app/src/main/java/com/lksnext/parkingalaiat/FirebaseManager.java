@@ -1,6 +1,7 @@
 package com.lksnext.parkingalaiat;
 
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -74,6 +75,10 @@ public class FirebaseManager {
             // Invoke the listener with null to indicate failure
             listener.onBookingsLoaded(e, null);
         });
+    }
+    public void logOut(){
+        FirebaseAuth.getInstance().signOut();
+        user.setCurrentUser(null);
     }
 
     public void deleteBookingByAllData(Booking r) {

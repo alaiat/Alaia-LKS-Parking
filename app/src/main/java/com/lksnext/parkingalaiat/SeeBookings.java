@@ -272,14 +272,24 @@ public class SeeBookings extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.perfil) {
+        if (item.getItemId() == R.id.profile) {
             Intent intent = new Intent(SeeBookings.this, Profile.class);
             startActivity(intent);
             return true;
-        } else {
+        } else if(item.getItemId()==R.id.logOutButton){
+            fm.logOut();
+            changeToLogin();
+            return true;
+        }else{
             return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void changeToLogin() {
+        Intent intent = new Intent(SeeBookings.this, Login.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showDeleteDialog(int position) {
