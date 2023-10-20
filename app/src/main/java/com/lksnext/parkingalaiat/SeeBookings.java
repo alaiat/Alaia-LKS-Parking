@@ -286,7 +286,7 @@ public class SeeBookings extends AppCompatActivity {
     }
 
     private void logout() {
-        FirebaseManager.getInstance().logOut();
+        fm.logOut();
         Intent intent = new Intent(SeeBookings.this, Login.class);
         startActivity(intent);
     }
