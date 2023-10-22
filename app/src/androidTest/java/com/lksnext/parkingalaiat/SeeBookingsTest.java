@@ -21,27 +21,29 @@ public class SeeBookingsTest {
         // For testing, you might consider using Firebase Authentication Test Rules
         // to set up a test user.
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
 
-        if (user == null) {
-            auth.signInWithEmailAndPassword("proba@email.com", "Contrasena1@")
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser actualUser = auth.getCurrentUser();
-                            UserContext.getInstance().setCurrentUser(actualUser);
-                        }
-                    });
-        }
+        auth.signInWithEmailAndPassword("proba@email.com", "Contrasena1@")
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser actualUser = auth.getCurrentUser();
+                        UserContext.getInstance().setCurrentUser(actualUser);
+                    }
+                });
     }
 
     @Test
-    public void testLogOut() {
-        // Launch the activity
+    public void testLogOut() throws InterruptedException {
+        Thread.sleep(1000);
 
+        // Launch the activity
         ActivityScenario.launch(SeeBookings.class);
 
+        // Simulate a click on the profile menu button
+        ViewInteraction profileMenu = Espresso.onView(ViewMatchers.withId(R.id.profileMenu));
+        profileMenu.perform(ViewActions.click());
+
         // Simulate a click on the log-out button
-        ViewInteraction logOutButton = Espresso.onView(ViewMatchers.withId(R.id.logout));
+        ViewInteraction logOutButton = Espresso.onView(ViewMatchers.withText("Logout"));
         logOutButton.perform(ViewActions.click());
 
         // Check if the user is logged out

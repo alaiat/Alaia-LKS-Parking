@@ -9,10 +9,10 @@
         android:title="Profile">
         <menu>
             <item
-                android:id="@+id/profile"
+                android:id="@+id/profileButton"
                 android:title="Edit Profile" />
             <item
-                android:id="@+id/logout"
+                android:id="@+id/logoutButton"
                 android:title="Logout" />
         </menu>
     </item>
