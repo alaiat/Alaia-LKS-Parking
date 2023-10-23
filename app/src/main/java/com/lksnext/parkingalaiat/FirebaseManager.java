@@ -14,10 +14,10 @@ import com.lksnext.parkingalaiat.domain.CurrentParking;
 import com.lksnext.parkingalaiat.domain.CurrentBooking;
 import com.lksnext.parkingalaiat.domain.Booking;
 import com.lksnext.parkingalaiat.domain.UserContext;
-import com.lksnext.parkingalaiat.interfaces.OnBookingUpdatedListener;
-import com.lksnext.parkingalaiat.interfaces.OnBookingsListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotsIdLoadedListener;
-import com.lksnext.parkingalaiat.interfaces.OnSpotsLoaderByTypeListener;
+import com.lksnext.parkingalaiat.listeners.OnBookingUpdatedListener;
+import com.lksnext.parkingalaiat.listeners.OnBookingsListener;
+import com.lksnext.parkingalaiat.listeners.OnSpotsIdLoadedListener;
+import com.lksnext.parkingalaiat.listeners.OnSpotsLoaderByTypeListener;
 
 import java.util.ArrayList;
 import java.util.List;
